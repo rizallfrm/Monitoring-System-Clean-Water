@@ -4,34 +4,32 @@ import { Button } from "./Button";
 
 export const Hero = () => {
   return (
-    <section className="px-20 py-24 max-md:p-10 max-sm:p-6">
-      <div className="flex gap-12 justify-center items-start px-6 py-14 mx-auto max-w-screen-xl max-md:flex-col max-md:items-center">
-        <div className="w-[592px] max-md:w-full">
-          <h1 className="mb-16 text-5xl font-bold leading-10 text-gray-900 max-sm:text-3xl max-sm:leading-9">
+    <section className="h-screen w-full bg-gradient-to-br from-[#dbeafe] to-[#eff6ff] flex items-center justify-center">
+      <div className="flex flex-col-reverse md:flex-row items-center justify-between w-full max-w-7xl px-6 md:px-20 gap-12">
+        
+        {/* Kiri: Teks */}
+        <div className="w-full md:w-1/2 text-center md:text-left">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
             Smart Water Monitoring System
           </h1>
-          <p className="mb-20 text-lg leading-5 text-gray-600 max-sm:text-base">
+          <p className="text-lg md:text-xl text-gray-700 mb-10">
             Real-time monitoring and analytics for your water supply system. Get
-            instant alerts, usage patterns, and quality metrics at your
-            fingertips.
+            instant alerts, usage patterns, and quality metrics at your fingertips.
           </p>
-          <div className="flex gap-4 max-sm:flex-col max-sm:gap-3">
-            <Button className="px-8 py-3.5 max-sm:w-full max-sm:text-center">
-              Get Started
-            </Button>
-            <Button
-              variant="outline"
-              className="px-8 py-3.5 max-sm:w-full max-sm:text-center"
-            >
+          <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-4">
+            <Button className="px-8 py-3 text-base">Get Started</Button>
+            <Button variant="outline" className="px-8 py-3 text-base">
               Learn More
             </Button>
           </div>
         </div>
-        <div className="w-[592px] max-md:w-full">
+
+        {/* Kanan: Gambar */}
+        <div className="w-full md:w-1/2 flex justify-center">
           <img
             src="https://cdn.builder.io/api/v1/image/assets/TEMP/42c4de1cd425e0d1c68078bb12a70fc01cd81c71"
             alt="Dashboard"
-            className="w-full h-auto rounded-lg shadow-[0_25px_50px_rgba(0,0,0,0.25)]"
+            className="w-full max-w-md md:max-w-lg h-auto rounded-2xl shadow-xl"
           />
         </div>
       </div>
