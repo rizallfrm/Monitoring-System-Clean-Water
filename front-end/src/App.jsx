@@ -11,7 +11,7 @@ function App() {
 
   return (
     <div className='overflow-hidder w-full'>
-      <Navigation />
+      <Navigation/>
       <main>
         <Hero />
         <Features />
