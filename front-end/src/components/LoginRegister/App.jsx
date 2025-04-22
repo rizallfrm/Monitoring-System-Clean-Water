@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import InputDesign from "./components/LoginRegister/InputDesign";
+import InputDesign from "./InputDesign";
 
 function App() {
   return (

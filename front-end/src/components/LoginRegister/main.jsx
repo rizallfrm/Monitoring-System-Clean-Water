@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
-import "./index.css"; // optional, kalau kamu pakai Tailwind atau CSS custom
+// import "./index.css"; // optional, kalau kamu pakai Tailwind atau CSS custom
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -9,3 +9,5 @@ root.render(
     <App />
   </React.StrictMode>
 );
+
+export default App

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Logo } from "./Logo";
 import { Button } from "./Button";
 import { Menu, X } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -29,7 +30,9 @@ export const Navigation = () => {
                 {item}
               </a>
             ))}
-            <Button className="ml-4">Login</Button>
+            <Link to="/login">
+              <Button className="ml-4">Login</Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Icon */}

@@ -1,26 +1,19 @@
-import './App.css'
-import { Navigation } from './components/LandingPage/Navigation'
-import {Hero} from './components/LandingPage/Hero'
-import { Features } from "./components/LandingPage/Features";
-import { HowItWorks } from "./components/LandingPage/HowItWorks";
-import { CallToAction } from "./components/LandingPage/CallToAction";
-import { Footer } from "./components/LandingPage/Footer";
+import "./App.css";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
+import LandingPage  from "./pages/LandingPage";
+import  LoginForm  from "./components/LoginRegister/main";
 
 function App() {
-
   return (
-    <div className='overflow-hidder w-full'>
-      <Navigation/>
-      <main>
-        <Hero />
-        <Features />
-        <HowItWorks />
-        <CallToAction />
-      </main>
-      <Footer />
-    </div>
-  )
+    <Router>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginForm />} />
+        {/* <Route path="/register" element={<Register />} /> */}
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
