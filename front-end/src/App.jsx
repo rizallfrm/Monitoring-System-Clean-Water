@@ -3,13 +3,14 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import LandingPage  from "./pages/LandingPage";
 import  LoginForm  from "./components/LoginRegister/main";
-
+import UserPage from "./components/UserPage/main"
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginForm />} />
+        <Route path='/user' element={<UserPage />} />
         {/* <Route path="/register" element={<Register />} /> */}
       </Routes>
     </Router>
