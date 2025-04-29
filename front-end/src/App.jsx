@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import LandingPage  from "./pages/LandingPage";
 import  LoginForm  from "./components/LoginRegister/main";
+import AdminDashboard from "./pages/AdminDashboard";
+import UserPage from "./components/UserPage/main"
 
 function App() {
   return (
@@ -10,6 +12,8 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginForm />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/user" element={<UserPage />} />
         {/* <Route path="/register" element={<Register />} /> */}
       </Routes>
     </Router>
