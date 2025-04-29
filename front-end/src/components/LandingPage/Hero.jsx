@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { Button } from "./Button";
+import { Link } from "react-router-dom";
 
 export const Hero = () => {
   return (
@@ -17,7 +18,10 @@ export const Hero = () => {
             Get instant alerts, usage patterns, and quality metrics at your fingertips.
           </p>
           <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-4">
-            <Button className="px-8 py-3 text-base">Get Started</Button>
+            {/* Tombol ke halaman login */}
+            <Link to="/login">
+              <Button className="px-8 py-3 text-base">Get Started</Button>
+            </Link>
             <Button variant="outline" className="px-8 py-3 text-base">
               Learn More
             </Button>
