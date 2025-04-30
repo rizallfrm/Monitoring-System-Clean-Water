@@ -1,6 +1,6 @@
 import api from './apiService';
 
-export const statusService = {
+const statusService = {
   createStatusUpdate: async (statusData) => {
     try {
       const response = await api.post('/status-updates', statusData);
@@ -37,3 +37,5 @@ export const statusService = {
     }
   },
 };
+
+export default statusService;
