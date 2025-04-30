@@ -1,6 +1,6 @@
 import api from './apiService';
 
-export const reportService = {
+const reportService = {
   createReport: async (reportData) => {
     try {
       const response = await api.post('/reports', reportData);
@@ -64,3 +64,5 @@ export const reportService = {
     }
   },
 };
+
+export default reportService;
