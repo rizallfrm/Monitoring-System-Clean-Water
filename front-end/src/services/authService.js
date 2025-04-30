@@ -1,6 +1,6 @@
 import api from './apiService';
 
-export const authService = {
+const authService = {
   login: async (email, password) => {
     try {
       const response = await api.post('/auth/login', { email, password });
@@ -37,3 +37,5 @@ export const authService = {
     }
   },
 };
+
+export default authService;
