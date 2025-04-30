@@ -5,7 +5,7 @@ import LandingPage  from "./pages/LandingPage";
 import  LoginForm  from "./components/LoginRegister/main";
 import AdminDashboard from "./pages/AdminDashboard";
 import UserPage from "./components/UserPage/main"
-import PetugasPage from "./components/Petugas/Dashboard"
+import OfficerPage from "./pages/OfficerPage"
 function App() {
   return (
     <Router>
@@ -14,7 +14,7 @@ function App() {
         <Route path="/login" element={<LoginForm />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/user" element={<UserPage />} />
-        <Route path="/petugas" element={<PetugasPage />} />
+        <Route path="/officer" element={<OfficerPage />} />
 
         {/* <Route path="/register" element={<Register />} /> */}
       </Routes>
