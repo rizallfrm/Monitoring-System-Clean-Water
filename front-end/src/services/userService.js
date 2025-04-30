@@ -1,6 +1,6 @@
 import api from './apiService';
 
-export const userService = {
+const userService = {
   getAllUsers: async () => {
     try {
       const response = await api.get('/users');
@@ -46,3 +46,5 @@ export const userService = {
     }
   },
 };
+
+export default userService;
