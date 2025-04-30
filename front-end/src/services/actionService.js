@@ -1,6 +1,6 @@
 import api from './apiService';
 
-export const actionService = {
+const actionService = {
   createAction: async (actionData) => {
     try {
       const response = await api.post('/actions', actionData);
@@ -55,3 +55,5 @@ export const actionService = {
     }
   },
 };
+
+export default actionService;
