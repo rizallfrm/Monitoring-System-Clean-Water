@@ -4,7 +4,7 @@ const userController = require('../controller/userController');
 const { verifyToken, checkRole } = require('../../../common/middleware/auth');
 
 // Routes publik
-router.post('/register',verifyToken, userController.register);
+router.post('/register', userController.register);
 router.post('/login', userController.login);
 
 // Routes yang memerlukan autentikasi
