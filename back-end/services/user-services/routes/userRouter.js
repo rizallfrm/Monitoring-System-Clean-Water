@@ -4,8 +4,13 @@ const userController = require('../controller/userController');
 const { verifyToken, checkRole } = require('../../../common/middleware/auth');
 
 // Routes publik
-router.post('/register', userController.register);
-router.post('/login', userController.login);
+router.post('/register', (req, res, next) => {
+  // If role is specified and not Warga, verify token
+  if (req.body.role && req.body.role !== "Warga") {
+    return verifyToken(req, res, next);
+  }
+  next();
+}, userController.register);router.post('/login', userController.login);
 
 // Routes yang memerlukan autentikasi
 router.get('/profile', verifyToken, userController.getProfile);
