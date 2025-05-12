@@ -74,6 +74,7 @@ const userController = {
   // Login user
   login: async (req, res) => {
     try {
+      console.log("Request body:", req.body);
       const { email, password } = req.body;
 
       // Cari user berdasarkan email
@@ -109,10 +110,13 @@ const userController = {
         },
       });
     } catch (error) {
+      console.error("Login error:", error); // Pastikan ini tercatat di log
+
       return res.status(500).json({
         status: "error",
         message: "Terjadi kesalahan saat login",
         error: error.message,
+        stack: error.stack,
       });
     }
   },
