@@ -12,7 +12,10 @@ export const api = (serviceName) => {
     baseURL: servicePorts[serviceName],
     headers: {
       "Content-Type": "application/json",
-      "Accept": "application/json",
+      "Accept": "application/json",      
+      "Cache-Control": "no-cache",
+
+      Pragma: "no-cache",
     },
   });
   instance.defaults.headers = instance.defaults.headers || {};
