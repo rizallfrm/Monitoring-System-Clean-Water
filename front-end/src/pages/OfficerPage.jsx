@@ -1,225 +1,181 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { reportService, actionService, statusService } from '../services';
-import { ReportList, ActionList, StatusStatistics, NewActionModal } from '../components/Officers';
-import { Button, Tabs, Badge, message, Avatar } from 'antd';
-import {
-  FileDoneOutlined,
-  SolutionOutlined,
-  DashboardOutlined,
-  PlusOutlined,
-  LogoutOutlined
-} from '@ant-design/icons';
-import '../components/Officers/styles/OfficerPage.css';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import authService from '../services/authService';
 
-const { TabPane } = Tabs;
-
-const OfficerPage = () => {
-  const [activeTab, setActiveTab] = useState('reports');
-  const [reports, setReports] = useState([]);
-  const [actions, setActions] = useState([]);
-  const [statistics, setStatistics] = useState(null);
-  const [loading, setLoading] = useState({
-    reports: false,
-    actions: false,
-    stats: false
+const RegisterPage = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    phone: '',
+    role: 'Warga'
   });
-  const [selectedReport, setSelectedReport] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [userProfile, setUserProfile] = useState(null);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchUserProfile();
-    fetchReports();
-    fetchStatistics();
-  }, []);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
-  useEffect(() => {
-    if (activeTab === 'actions' && reports.length > 0) {
-      fetchActions();
-    }
-  }, [activeTab, reports]);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
 
-  const fetchUserProfile = async () => {
     try {
-      const response = await authService.getProfile();
-      setUserProfile(response.data);
-    } catch (error) {
-      message.error('Gagal memuat profil pengguna');
+      await authService.register(formData);
+      setSuccess('Pendaftaran berhasil! Silakan login.');
+      setTimeout(() => navigate('/login'), 2000);
+    } catch (err) {
+      console.error('Registration error:', err);
+      setError(err.message || 'Pendaftaran gagal. Silakan coba lagi.');
+      setLoading(false);
     }
-  };
-
-  const fetchReports = async () => {
-    setLoading(prev => ({ ...prev, reports: true }));
-    try {
-      const response = await reportService.getAllReports({ 
-        assignedTo: userProfile?.user_id 
-      });
-      setReports(response.data.reports);
-    } catch (error) {
-      message.error('Gagal memuat laporan');
-    } finally {
-      setLoading(prev => ({ ...prev, reports: false }));
-    }
-  };
-
-  const fetchActions = async () => {
-    setLoading(prev => ({ ...prev, actions: true }));
-    try {
-      const response = await actionService.getAllActions({ 
-        performedBy: userProfile?.user_id,
-        limit: 10
-      });
-      setActions(response.data.actions);
-    } catch (error) {
-      message.error('Gagal memuat tindakan');
-    } finally {
-      setLoading(prev => ({ ...prev, actions: false }));
-    }
-  };
-
-  const fetchStatistics = async () => {
-    setLoading(prev => ({ ...prev, stats: true }));
-    try {
-      const response = await statusService.getStatusStatistics();
-      setStatistics(response.data);
-    } catch (error) {
-      message.error('Gagal memuat statistik');
-    } finally {
-      setLoading(prev => ({ ...prev, stats: false }));
-    }
-  };
-
-  const handleCompleteReport = async (reportId) => {
-    try {
-      await reportService.completeReport(reportId);
-      message.success('Laporan berhasil diselesaikan');
-      fetchReports();
-      fetchStatistics();
-    } catch (error) {
-      message.error('Gagal menyelesaikan laporan');
-    }
-  };
-
-  const handleAddAction = (report) => {
-    setSelectedReport(report);
-    setModalVisible(true);
-  };
-
-  const handleSubmitAction = async (values) => {
-    try {
-      await actionService.createAction({
-        reportId: selectedReport.report_id,
-        actionDescription: values.description
-      });
-      message.success('Tindakan berhasil ditambahkan');
-      setModalVisible(false);
-      fetchReports();
-      fetchActions();
-    } catch (error) {
-      message.error('Gagal menambahkan tindakan');
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
   };
 
   return (
-    <div className="petugas-container">
-      <header className="petugas-header">
-        <div className="header-left">
-          <h1 className="app-title">Layanan Pengaduan Masyarakat</h1>
-          <p className="app-subtitle">Portal Petugas</p>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Buat akun baru
+          </h2>
         </div>
-        <div className="header-right">
-          <div className="user-profile">
-            <Avatar 
-              size="large" 
-              style={{ backgroundColor: '#1890ff' }}
-            >
-              {userProfile?.name?.charAt(0)}
-            </Avatar>
-            <div className="user-info">
-              <span className="user-name">{userProfile?.name}</span>
-              <span className="user-role">Petugas</span>
+
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <span className="block sm:inline">{error}</span>
+          </div>
+        )}
+
+        {success && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+            <span className="block sm:inline">{success}</span>
+          </div>
+        )}
+
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div className="rounded-md shadow-sm space-y-4">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                Nama Lengkap
+              </label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                autoComplete="name"
+                required
+                className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                value={formData.name}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                value={formData.email}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="new-password"
+                required
+                className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                value={formData.password}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                Nomor Telepon
+              </label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                autoComplete="tel"
+                required
+                className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                value={formData.phone}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="role" className="block text-sm font-medium text-gray-700">
+                Peran (Role)
+              </label>
+              <select
+                id="role"
+                name="role"
+                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                value={formData.role}
+                onChange={handleChange}
+                disabled
+              >
+                <option value="Warga">Warga</option>
+                <option value="Petugas">Petugas</option>
+                <option value="Admin">Admin</option>
+              </select>
+              <p className="mt-1 text-xs text-gray-500">
+                * Default peran adalah Warga. Hanya Admin yang dapat mengubah peran.
+              </p>
             </div>
           </div>
-          <Button 
-            icon={<LogoutOutlined />} 
-            onClick={handleLogout}
-            className="logout-btn"
-          >
-            Keluar
-          </Button>
+
+          <div>
+            <button
+              type="submit"
+              disabled={loading}
+              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+            >
+              {loading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Memproses...
+                </>
+              ) : 'Daftar'}
+            </button>
+          </div>
+        </form>
+
+        <div className="text-center text-sm text-gray-600">
+          Sudah punya akun?{' '}
+          <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
+            Masuk di sini
+          </Link>
         </div>
-      </header>
-
-      <main className="petugas-content">
-        <Tabs 
-          activeKey={activeTab} 
-          onChange={setActiveTab}
-          className="petugas-tabs"
-        >
-          <TabPane
-            tab={
-              <span>
-                <SolutionOutlined />
-                Laporan Saya <Badge count={reports.length} />
-              </span>
-            }
-            key="reports"
-          >
-            <ReportList 
-              reports={reports} 
-              loading={loading.reports}
-              onComplete={handleCompleteReport}
-              onAddAction={handleAddAction}
-            />
-          </TabPane>
-          
-          <TabPane
-            tab={
-              <span>
-                <FileDoneOutlined />
-                Tindakan Saya <Badge count={actions.length} />
-              </span>
-            }
-            key="actions"
-          >
-            <ActionList 
-              actions={actions} 
-              loading={loading.actions}
-            />
-          </TabPane>
-          
-          <TabPane
-            tab={
-              <span>
-                <DashboardOutlined />
-                Dashboard
-              </span>
-            }
-            key="dashboard"
-          >
-            <StatusStatistics 
-              data={statistics} 
-              loading={loading.stats}
-            />
-          </TabPane>
-        </Tabs>
-      </main>
-
-      <NewActionModal
-        visible={modalVisible}
-        onCancel={() => setModalVisible(false)}
-        onSubmit={handleSubmitAction}
-        report={selectedReport}
-      />
+      </div>
     </div>
   );
 };
 
-export default OfficerPage;
+export default RegisterPage;
