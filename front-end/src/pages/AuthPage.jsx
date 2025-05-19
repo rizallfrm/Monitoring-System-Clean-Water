@@ -6,6 +6,7 @@ import Logo from "../components/LoginRegister/Logo";
 import Button from "../components/LoginRegister/Button";
 import FormInput from "../components/LoginRegister/FormInput";
 import Checkbox from "../components/LoginRegister/CheckBox";
+import authService from "../services/authService";
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -14,13 +15,15 @@ const AuthPage = () => {
     email: "",
     password: "",
     confirmPassword: "",
+    phone: "",
+    role: "Warga",
   });
   const [rememberMe, setRememberMe] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { login } = useAuth();
-  const router = useNavigate();
+  const navigate = useNavigate();
 
   const toggleAuthMode = () => {
     setIsLogin(!isLogin);
@@ -29,10 +32,7 @@ const AuthPage = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -42,52 +42,42 @@ const AuthPage = () => {
 
     try {
       if (isLogin) {
-        // Handle login
-        const { email, password } = formData;
-        await login({ email, password });
-        router.push("/user"); // Redirect ke user page setelah login
+        // [Login logic...]
       } else {
-        // Handle register
+        // 1. Validasi dulu
         if (formData.password !== formData.confirmPassword) {
-          throw new Error("Passwords don't match");
-        }
-        // if (!acceptTerms) {
-        //   throw new Error("You must accept the terms and conditions");
-        // }
-
-        const response = await fetch(
-          "http://localhost:3001/api/users/register",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              name: formData.name,
-              email: formData.email.trim(),
-              password: formData.password,
-              phone: formData.phone,
-              role: "Warga", // Default role untuk registrasi
-            }),
-          }
-        );
-
-        if (!response.ok) {
-          // Try logging the raw response before parsing
-          const errorText = await response.text(); // Get response as text
-          console.error("Error response:", errorText);
-          throw new Error(errorText || "Registration failed");
+          throw new Error("Password tidak sama");
         }
 
-        const responseData = await response.json();
-        console.log("Registration response:", responseData);
+        if (!formData.email || !formData.email.includes("@")) {
+          throw new Error("Email tidak valid");
+        }
 
-        // Auto login setelah registrasi berhasil
-        await login({ email: formData.email, password: formData.password });
-        router.push("/user"); // Redirect ke user page setelah registrasi
+        // 2. Register
+        const userData = {
+          name: formData.name,
+          email: formData.email.trim(),
+          password: formData.password,
+          phone: formData.phone,
+          role: "Warga",
+        };
+
+        console.log("Attempting register with:", userData); // Debug
+        await authService.register(userData); // 👈 Register dulu
+
+        // 3. Auto-login setelah register
+        console.log("Attempting auto-login...");
+        const loginResult = await authService.login({
+          email: userData.email,
+          password: userData.password,
+        });
+
+        await login(loginResult); // Simpan ke context/auth
+        navigate("/user"); // Redirect
       }
     } catch (err) {
-      setError(err.message);
+      console.error("Auth error:", err);
+      setError(err.message || "Gagal register");
     } finally {
       setLoading(false);
     }
@@ -95,11 +85,11 @@ const AuthPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-blue-50">
-      <main className="flex flex-col items-center px-0 py-10 mx-auto max-w-none bg-blue-50 max-md:p-5 max-md:max-w-[991px] max-sm:p-4 max-sm:max-w-screen-sm">
-        <section className="flex justify-center items-center mb-10 w-full max-w-md max-md:max-w-[400px] max-sm:max-w-[360px]">
-          <div className="box-border p-8 w-full bg-white rounded-lg shadow-[0px_1px_2px_rgba(0,0,0,0.1),0px_1px_3px_rgba(0,0,0,0.1)] max-md:p-6 max-sm:p-5">
+      <main className="flex flex-col items-center px-0 py-10 max-w-none bg-blue-50 max-md:p-5">
+        <section className="w-full max-w-md">
+          <div className="p-8 bg-white rounded-lg shadow max-md:p-6">
             <Logo />
-            <h2 className="mb-6 w-full text-xl font-bold text-center text-gray-900 max-md:text-lg max-sm:text-base">
+            <h2 className="mb-6 text-xl font-bold text-center text-gray-900">
               {isLogin ? "Sign in to your account" : "Create an account"}
             </h2>
 
@@ -111,25 +101,26 @@ const AuthPage = () => {
 
             <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
               {!isLogin && (
-                <FormInput
-                  label="Full Name"
-                  name="name"
-                  placeholder="John Doe"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                />
+                <>
+                  <FormInput
+                    label="Full Name"
+                    name="name"
+                    placeholder="John Doe"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                  />
+                  <FormInput
+                    label="Phone"
+                    name="phone"
+                    placeholder="08*****"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    required
+                  />
+                </>
               )}
-              {!isLogin && (
-                <FormInput
-                  label="Phone"
-                  name="phone"
-                  placeholder="08*****"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  required
-                />
-              )}
+
               <FormInput
                 label="Email"
                 name="email"
@@ -149,6 +140,7 @@ const AuthPage = () => {
                 required
                 minLength={6}
               />
+
               {!isLogin && (
                 <FormInput
                   label="Confirm Password"
@@ -180,11 +172,12 @@ const AuthPage = () => {
                 <Checkbox
                   checked={acceptTerms}
                   onChange={(e) => setAcceptTerms(e.target.checked)}
+                  required
                 >
                   <span>I accept the </span>
                   <button
                     type="button"
-                    className="text-sm font-medium text-blue-600 cursor-pointer"
+                    className="text-sm font-medium text-blue-600"
                   >
                     Terms and Conditions
                   </button>
@@ -231,7 +224,7 @@ const AuthPage = () => {
               <button
                 type="button"
                 onClick={toggleAuthMode}
-                className="text-base font-medium text-center text-blue-600 cursor-pointer max-md:text-base max-sm:text-sm"
+                className="text-base font-medium text-center text-blue-600"
                 disabled={loading}
               >
                 {isLogin ? "Sign up" : "Sign in"}
