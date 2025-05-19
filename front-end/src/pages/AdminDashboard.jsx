@@ -10,41 +10,33 @@ import AlertsNotifications from "../components/Admin/AlertsNotifications";
 import SystemSettings from "../components/Admin/SystemSetting";
 import SystemLogs from "../components/Admin/SystemLogs";
 import Footer from "../components/Admin/Footer";
-import Login from "../components/Admin/Login";
+
+import { useAuth } from "../Context/authContext";
 
 function AdminDashboard() {
-//   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-//   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { user, loading } = useAuth();
 
-//   useEffect(() => {
-//     const authStatus = localStorage.getItem("auth");
-//     if (authStatus === "true") {
-//       setIsAuthenticated(true);
-//     }
-//   }, []);
+  if (loading) return <div>Loading...</div>;
 
-//   const handleLogin = () => {
-//     setIsAuthenticated(true);
-//   };
+  // Jika belum login
+  if (!user) {
+    return <div>Unauthorized. Silakan login dulu.</div>; // Atau redirect
+  }
 
-//   const handleLogout = () => {
-//     localStorage.removeItem("auth"); // Hapus auth dari localStorage
-//     setIsAuthenticated(false); // Balik ke halaman login
-//   };
+  // Jika bukan admin
+  if (user.role !== "Admin") {
+    return (
+      <div>Akses ditolak. Hanya Admin yang bisa mengakses halaman ini.</div>
+    );
+  }
 
-//   if (!isAuthenticated) {
-//     return <Login onLogin={handleLogin} />;
-//   }
-
-// onSidebarToggle={() => setMobileSidebarOpen(true)} onLogout={handleLogout}
-// open={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} 
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
       <div className="flex flex-1">
         <Sidebar />
         <div className="flex flex-col flex-1 overflow-y-auto">
-          <Header/>
-          <MobileSidebar/>
+          <Header />
+          <MobileSidebar />
           <main className="flex-1 p-6 overflow-y-auto">
             <DashboardOverview />
             <UserManagement />
