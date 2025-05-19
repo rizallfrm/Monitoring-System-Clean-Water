@@ -10,6 +10,7 @@ const userController = {
       console.log("Role dari token:", req.user?.role);
 
       const { name, email, password, phone, role } = req.body;
+      console.log("EMAIL YANG MASUK:", email);
 
       // Periksa apakah email sudah terdaftar
       const existingUser = await User.findOne({ where: { email } });
@@ -35,6 +36,12 @@ const userController = {
         });
       }
 
+      // Validasi format email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ message: "Format email tidak valid" });
+      }
+
       // Buat user baru
       const newUser = await User.create({
         name,
@@ -53,6 +60,9 @@ const userController = {
         data: userWithoutPassword,
       });
     } catch (error) {
+      console.log("BODY YANG DITERIMA:", req.body);
+
+      console.error(error);
       return res.status(500).json({
         status: "error",
         message: "Terjadi kesalahan saat membuat user",
@@ -64,6 +74,7 @@ const userController = {
   // Login user
   login: async (req, res) => {
     try {
+      console.log("Request body:", req.body);
       const { email, password } = req.body;
 
       // Cari user berdasarkan email
@@ -99,10 +110,13 @@ const userController = {
         },
       });
     } catch (error) {
+      console.error("Login error:", error); // Pastikan ini tercatat di log
+
       return res.status(500).json({
         status: "error",
         message: "Terjadi kesalahan saat login",
         error: error.message,
+        stack: error.stack,
       });
     }
   },

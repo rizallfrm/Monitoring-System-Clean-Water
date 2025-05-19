@@ -1,4 +1,4 @@
-import api from './apiService';
+import {api} from './apiService';
 
 const actionService = {
   createAction: async (actionData) => {

@@ -1,6 +1,6 @@
 import React from "react";
 
-export const FormInput = ({ label, placeholder, type = "text" }) => {
+const FormInput = ({ label, placeholder, type = "text" }) => {
   return (
     <div className="flex flex-col gap-2">
       <label className="text-sm font-medium text-gray-900">{label}</label>
@@ -12,3 +12,5 @@ export const FormInput = ({ label, placeholder, type = "text" }) => {
     </div>
   );
 };
+
+export default FormInput;
