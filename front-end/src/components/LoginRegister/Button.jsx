@@ -1,6 +1,6 @@
 import React from "react";
 
-export const Button = ({ children, onClick }) => {
+const Button = ({ children, onClick }) => {
   return (
     <button
       onClick={onClick}
@@ -10,3 +10,5 @@ export const Button = ({ children, onClick }) => {
     </button>
   );
 };
+
+export default Button;
