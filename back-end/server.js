@@ -50,7 +50,6 @@ actionService.listen(ACTION_SERVICE_PORT, () => {
   console.log(`Action Service berjalan di port ${ACTION_SERVICE_PORT}`);
 });
 
-console.log("Semua microservice telah dijalankan!");
 console.log(`
 Layanan yang tersedia:
 - User Service: http://localhost:${USER_SERVICE_PORT}
