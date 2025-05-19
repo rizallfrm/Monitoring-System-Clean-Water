@@ -1,26 +1,46 @@
 "use client";
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../Context/authContext';
-import { useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useAuth } from "../Context/authContext";
+
+const roleMappings = {
+  'warga': 'user',
+  'petugas': 'officer',
+  'admin': 'admin'
+};
 
 const ProtectedRoute = ({ children, roles = [] }) => {
   const { user, loading, isAuthenticated } = useAuth();
-  const router = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      router.push('/login');
-    } else if (!loading && isAuthenticated && roles.length > 0 && !roles.includes(user.role)) {
-      // Redirect ke halaman yang sesuai berdasarkan role
-      if (user.role === 'admin') {
-        router.push('/admin');
-      } else if (user.role === 'officer') {
-        router.push('/officer');
-      } else {
-        router.push('/user');
+    if (loading) return;
+
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+
+    const normalizedUserRole = user?.role?.toLowerCase();
+    const mappedRole = roleMappings[normalizedUserRole] || normalizedUserRole;
+    
+    if (roles.length > 0 && !roles.includes(mappedRole)) {
+      // Redirect based on mapped role
+      switch(mappedRole) {
+        case 'admin':
+          navigate("/admin");
+          break;
+        case 'user':
+          navigate("/user");
+          break;
+        case 'officer':
+          navigate("/officer");
+          break;
+        default:
+          navigate("/login");
       }
     }
-  }, [loading, isAuthenticated, user, roles, router]);
+  }, [loading, isAuthenticated, user, roles, navigate]);
 
   if (loading || !isAuthenticated) {
     return (
@@ -30,11 +50,16 @@ const ProtectedRoute = ({ children, roles = [] }) => {
     );
   }
 
-  if (roles.length > 0 && !roles.includes(user?.role)) {
+  const normalizedUserRole = user?.role?.toLowerCase();
+  const mappedRole = roleMappings[normalizedUserRole] || normalizedUserRole;
+  
+  if (roles.length > 0 && !roles.includes(mappedRole)) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-500">Unauthorized Access</h1>
+          <h1 className="text-2xl font-bold text-red-500">
+            Unauthorized Access
+          </h1>
           <p className="mt-2">You don't have permission to access this page.</p>
         </div>
       </div>
