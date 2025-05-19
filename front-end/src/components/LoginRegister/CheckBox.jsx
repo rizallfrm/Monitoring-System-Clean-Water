@@ -1,6 +1,6 @@
 import React from "react";
 
-export const Checkbox = ({ label, children }) => {
+const  Checkbox = ({ label, children }) => {
   return (
     <label className="flex items-center cursor-pointer">
       <input type="checkbox" className="hidden" />
@@ -9,3 +9,5 @@ export const Checkbox = ({ label, children }) => {
     </label>
   );
 };
+
+export default Checkbox
