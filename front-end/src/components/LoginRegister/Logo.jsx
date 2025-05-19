@@ -1,6 +1,6 @@
 import React from "react";
 
-export const Logo = () => {
+const Logo = () => {
   return (
     <div className="flex justify-center items-center mb-6">
       <div>
@@ -15,3 +15,5 @@ export const Logo = () => {
     </div>
   );
 };
+
+export default Logo;
