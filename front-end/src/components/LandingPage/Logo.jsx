@@ -3,7 +3,7 @@ import React from "react";
 
 export const Logo = ({ className = "", color = "#2563EB" }) => {
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
+    <div className={`flex items-center gap-3 -ml-2 ${className}`}>
       <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-xl shadow-sm">
         <svg
           width="24"

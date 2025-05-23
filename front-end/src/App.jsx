@@ -1,26 +1,51 @@
-import './App.css'
-import { Navigation } from './components/Navigation'
-import {Hero} from './components/Hero'
-import { Features } from "./components/Features";
-import { HowItWorks } from "./components/HowItWorks";
-import { CallToAction } from "./components/CallToAction";
-import { Footer } from "./components/Footer";
-
+import "./App.css";
+import { Route, Routes } from "react-router-dom";
+import ProtectedRoute from "./Context/ProtectedRoute";
+import LandingPage from "./pages/LandingPage";
+import AuthPage from "./pages/AuthPage";
+import AdminDashboard from "./pages/AdminDashboard";
+import UserPage from "./pages/UserPage";
+import OfficerPage from "./pages/OfficerPage";
+import AuthLayout from "./pages/AuthLayout";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 
 function App() {
-
   return (
-    <div className='overflow-hidder w-full'>
-      <Navigation/>
-      <main>
-        <Hero />
-        <Features />
-        <HowItWorks />
-        <CallToAction />
-      </main>
-      <Footer />
-    </div>
-  )
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/" element={<LandingPage />} />
+      <Route element={<AuthLayout />}>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+      </Route>
+      {/* Protected Routes */}
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute roles={["admin"]}>
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/user"
+        element={
+          <ProtectedRoute roles={["user"]}>
+            <UserPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/officer"
+        element={
+          <ProtectedRoute roles={["officer"]}>
+            <OfficerPage />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+  );
 }
 
-export default App
+export default App;
