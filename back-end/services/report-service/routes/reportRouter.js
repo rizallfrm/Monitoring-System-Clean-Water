@@ -27,4 +27,4 @@ router.post('/reports/:id/cancel', reportController.cancelReport);
 // Menyelesaikan laporan (petugas yang ditugaskan atau Admin)
 router.post('/reports/:id/complete', reportController.completeReport);
 
-module.exports = router;
+module.exports = router; 
