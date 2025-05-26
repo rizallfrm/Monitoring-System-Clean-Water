@@ -1,9 +1,27 @@
-import {api} from './apiService';
+import { api } from "./apiService";
 
 const userService = {
   getAllUsers: async () => {
     try {
-      const response = await api.get('/users');
+      const response = await api.get("/users");
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  getProfile: async () => {
+    try {
+      const response = await api.get("/profile");
+      return response.data.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+    updateProfile: async () => {
+    try {
+      const response = await api.put("/profile");
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -39,7 +57,7 @@ const userService = {
 
   getOfficers: async () => {
     try {
-      const response = await api.get('/officers');
+      const response = await api.get("/officers");
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
