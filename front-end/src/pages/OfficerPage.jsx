@@ -1,181 +1,184 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import authService from '../services/authService';
+import React, { useEffect, useState } from "react";
+import reportService from "../services/reportService";
+import actionService from "../services/actionService";
+import statusService from "../services/statusService";
+import userService from "../services/userService";
 
-const RegisterPage = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    phone: '',
-    role: 'Warga'
-  });
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+const OfficerPage = () => {
+  const [reports, setReports] = useState([]);
+  const [selectedReportId, setSelectedReportId] = useState(null);
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [actions, setActions] = useState([]);
+  const [statusHistory, setStatusHistory] = useState([]);
+  const [officers, setOfficers] = useState([]);
+  const [newAction, setNewAction] = useState({ description: "" });
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [error, setError] = useState(null);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+  // Load all reports on mount
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        setLoading(true);
+        const data = await reportService.getAllReports();
+        setReports(data);
+      } catch (err) {
+        setError(err.toString());
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchReports();
+  }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+  // Load detail when selectedReportId changes
+  useEffect(() => {
+    if (!selectedReportId) {
+      setSelectedReport(null);
+      setActions([]);
+      setStatusHistory([]);
+      return;
+    }
+    const fetchReportDetails = async () => {
+      try {
+        setLoading(true);
+        // 1. Get report detail
+        const report = await reportService.getReportById(selectedReportId);
+        setSelectedReport(report);
 
+        // 2. Get actions linked to report
+        const actionList = await actionService.getActionsByReportId(selectedReportId);
+        setActions(actionList);
+
+        // 3. Get status history
+        const statusList = await statusService.getStatusHistoryByReportId(selectedReportId);
+        setStatusHistory(statusList);
+
+        // 4. Get officers (for assignment dropdown, optional)
+        const officersList = await userService.getOfficers();
+        setOfficers(officersList);
+      } catch (err) {
+        setError(err.toString());
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchReportDetails();
+  }, [selectedReportId]);
+
+  // Handler tambah tindakan
+  const handleAddAction = async () => {
+    if (!newAction.description.trim()) return alert("Deskripsi tindakan harus diisi!");
     try {
-      await authService.register(formData);
-      setSuccess('Pendaftaran berhasil! Silakan login.');
-      setTimeout(() => navigate('/login'), 2000);
+      setLoading(true);
+      await actionService.createAction({
+        reportId: selectedReportId,
+        description: newAction.description,
+      });
+      // Refresh actions list setelah tambah
+      const updatedActions = await actionService.getActionsByReportId(selectedReportId);
+      setActions(updatedActions);
+      setNewAction({ description: "" });
     } catch (err) {
-      console.error('Registration error:', err);
-      setError(err.message || 'Pendaftaran gagal. Silakan coba lagi.');
+      setError(err.toString());
+    } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Buat akun baru
-          </h2>
-        </div>
-
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-            <span className="block sm:inline">{error}</span>
-          </div>
-        )}
-
-        {success && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-            <span className="block sm:inline">{success}</span>
-          </div>
-        )}
-
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm space-y-4">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Nama Lengkap
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                autoComplete="name"
-                required
-                className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                value={formData.name}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                value={formData.password}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-                Nomor Telepon
-              </label>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                autoComplete="tel"
-                required
-                className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                value={formData.phone}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700">
-                Peran (Role)
-              </label>
-              <select
-                id="role"
-                name="role"
-                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                value={formData.role}
-                onChange={handleChange}
-                disabled
-              >
-                <option value="Warga">Warga</option>
-                <option value="Petugas">Petugas</option>
-                <option value="Admin">Admin</option>
-              </select>
-              <p className="mt-1 text-xs text-gray-500">
-                * Default peran adalah Warga. Hanya Admin yang dapat mengubah peran.
-              </p>
-            </div>
-          </div>
-
-          <div>
+  // Render list laporan
+  const renderReportList = () => (
+    <div style={{ width: "30%", borderRight: "1px solid #ccc", paddingRight: "1rem" }}>
+      <h2>Daftar Laporan</h2>
+      {loading && !selectedReportId && <p>Loading reports...</p>}
+      <ul style={{ listStyle: "none", paddingLeft: 0 }}>
+        {reports.map((r) => (
+          <li key={r.id} style={{ marginBottom: "0.5rem" }}>
             <button
-              type="submit"
-              disabled={loading}
-              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+              style={{
+                backgroundColor: selectedReportId === r.id ? "#007bff" : "#eee",
+                color: selectedReportId === r.id ? "#fff" : "#000",
+                border: "none",
+                padding: "0.5rem 1rem",
+                cursor: "pointer",
+                width: "100%",
+                textAlign: "left",
+              }}
+              onClick={() => setSelectedReportId(r.id)}
             >
-              {loading ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Memproses...
-                </>
-              ) : 'Daftar'}
+              #{r.id} - {r.title || r.subject || "No title"}
             </button>
-          </div>
-        </form>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 
-        <div className="text-center text-sm text-gray-600">
-          Sudah punya akun?{' '}
-          <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-            Masuk di sini
-          </Link>
+  // Render detail laporan + actions + status
+  const renderReportDetail = () => {
+    if (!selectedReport) return <p>Pilih laporan untuk lihat detail.</p>;
+    return (
+      <div style={{ width: "70%", paddingLeft: "1rem" }}>
+        <h2>Detail Laporan #{selectedReport.id}</h2>
+        <p><strong>Judul:</strong> {selectedReport.title || selectedReport.subject || "–"}</p>
+        <p><strong>Deskripsi:</strong> {selectedReport.description || "–"}</p>
+        <p><strong>Status:</strong> {selectedReport.status || "–"}</p>
+        <p><strong>Tanggal Dibuat:</strong> {new Date(selectedReport.createdAt).toLocaleString()}</p>
+
+        <hr />
+
+        <h3>Tindakan</h3>
+        {loading && <p>Loading actions...</p>}
+        <ul>
+          {actions.length === 0 && <li>Tidak ada tindakan.</li>}
+          {actions.map((a) => (
+            <li key={a.id}>
+              <strong>{a.description}</strong> — <em>{new Date(a.createdAt).toLocaleString()}</em>
+            </li>
+          ))}
+        </ul>
+
+        <div style={{ marginTop: "1rem" }}>
+          <textarea
+            placeholder="Deskripsi tindakan baru..."
+            rows={3}
+            value={newAction.description}
+            onChange={(e) => setNewAction({ description: e.target.value })}
+            style={{ width: "100%" }}
+          />
+          <button onClick={handleAddAction} disabled={loading} style={{ marginTop: "0.5rem" }}>
+            Tambah Tindakan
+          </button>
         </div>
+
+        <hr />
+
+        <h3>Riwayat Status</h3>
+        <ul>
+          {statusHistory.length === 0 && <li>Tidak ada riwayat status.</li>}
+          {statusHistory.map((s) => (
+            <li key={s.id}>
+              <strong>{s.status}</strong> — <em>{new Date(s.createdAt).toLocaleString()}</em>
+            </li>
+          ))}
+        </ul>
+
+        <hr />
+
+        <h3>Penugasan Officer</h3>
+        <p>Penugasan dan update status bisa ditambahkan di sini sesuai kebutuhan.</p>
+        {/* Bisa ditambah dropdown select untuk assign officer dan tombol update laporan */}
       </div>
+    );
+  };
+
+  return (
+    <div style={{ display: "flex", height: "100vh" }}>
+      {renderReportList()}
+      {error && <div style={{ color: "red" }}>Error: {error}</div>}
+      {renderReportDetail()}
     </div>
   );
 };
 
-export default RegisterPage;
+export default OfficerPage;
