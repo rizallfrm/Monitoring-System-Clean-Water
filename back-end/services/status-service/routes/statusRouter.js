@@ -18,4 +18,4 @@ router.get('/status-updates', checkRole(['Admin', 'Petugas']), statusController.
 // Mendapatkan statistik status (untuk Dashboard)
 router.get('/status-statistics', checkRole(['Admin', 'Petugas']), statusController.getStatusStatistics);
 
-module.exports = router;
+module.exports = router; 
