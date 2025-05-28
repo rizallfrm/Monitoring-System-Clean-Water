@@ -5,7 +5,6 @@ const { verifyToken, checkRole } = require('../../../common/middleware/auth');
 
 // Semua route memerlukan autentikasi
 router.use(verifyToken);
-
 // Membuat laporan baru (semua role bisa) - dengan upload middleware
 router.post('/reports', 
   reportController.createReport[0], // upload middleware
