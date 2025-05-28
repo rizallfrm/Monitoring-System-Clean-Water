@@ -1,4 +1,4 @@
-import "./App.css";
+import "./index.css";
 import { Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./Context/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
@@ -39,7 +39,9 @@ function App() {
       <Route
         path="/officer"
         element={
+          <ProtectedRoute roles={["officer"]}>
             <OfficerPage />
+          </ProtectedRoute>
         }
       />
     </Routes>
