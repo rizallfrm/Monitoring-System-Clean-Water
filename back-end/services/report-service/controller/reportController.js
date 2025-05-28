@@ -1,10 +1,13 @@
 const { Report, User, StatusUpdate } = require('../../../common/models');
 const { Op } = require('sequelize');
-
+const {upload,uploadToImageKit} = require ("../../../common/middleware/uploadMiddleware")
 // Controller untuk pengelolaan report
 const reportController = {
   // Membuat laporan baru
-  createReport: async (req, res) => {
+  createReport: [
+  upload.array('images', 5), // Maksimal 5 gambar
+  uploadToImageKit,
+  async (req, res) => {
     try {
       const { description, location } = req.body;
       const userId = req.user.id;
@@ -17,12 +20,13 @@ const reportController = {
         });
       }
       
-      // Buat laporan baru
+      // Buat laporan baru dengan gambar jika ada
       const newReport = await Report.create({
         user_id: userId,
         description,
         location,
-        status: 'Pending'
+        status: 'Pending',
+        images: req.uploadedImages || [] // Menyimpan array gambar dari ImageKit
       });
       
       // Buat entry status update untuk status awal
@@ -44,7 +48,8 @@ const reportController = {
         error: error.message
       });
     }
-  },
+  }
+],
   
   // Mendapatkan semua laporan dengan filter dan pagination
   getAllReports: async (req, res) => {
