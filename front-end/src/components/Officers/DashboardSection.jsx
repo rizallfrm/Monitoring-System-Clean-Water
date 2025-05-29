@@ -1,0 +1,61 @@
+import StatCard from "./StatCard";
+
+export function DashboardSection() {
+  const stats = [
+    {
+      title: "Total Laporan",
+      value: "4",
+      icon: (
+        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#6366F1" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6M9 16h6M4 6h16M4 6v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6M4 6V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2" />
+      </svg>
+      )
+    },
+    {
+      title: "Menunggu",
+      value: "2",
+      icon: (
+        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#EAB308" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+      </svg>
+      )
+    },
+    {
+      title: "Selesai",
+      value: "1",
+      icon: (
+        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#22C55E" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
+      </svg>
+      )
+    },
+    {
+      title: "Dibatalkan",
+      value: "1",
+      icon: (
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#DC2626" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636L5.636 18.364M12 21c4.9706 0 9-4.0294 9-9s-4.0294-9-9-9-9 4.0294-9 9 4.0294 9 9 9z"/>
+        </svg>
+      )
+    }
+  ];
+
+  return (
+    <section className="flex flex-col gap-6 mb-10 w-[1104px] max-md:w-full">
+      <h2 className="text-xl font-bold leading-5 text-gray-900 max-sm:text-lg">
+        Statistik Laporan
+      </h2>
+      <div className="flex gap-6 w-[1104px] max-md:flex-wrap max-md:gap-4 max-md:w-full max-sm:flex-col">
+        {stats.map((stat, index) => (
+          <StatCard
+            key={index}
+            icon={stat.icon}
+            title={stat.title}
+            value={stat.value}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+export default DashboardSection;
