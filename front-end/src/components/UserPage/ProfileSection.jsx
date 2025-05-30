@@ -135,13 +135,13 @@ const ProfileSection = ({ profile }) => {
               <div>
                 <dt className="text-sm font-medium text-gray-500">Member since</dt>
                 <dd className="mt-1 text-sm text-gray-900">
-                  {profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString() : 'Unknown'}
+                  {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : 'Unknown'}
                 </dd>
               </div>
-              <div>
+              {/* <div>
                 <dt className="text-sm font-medium text-gray-500">Total Reports</dt>
                 <dd className="mt-1 text-sm text-gray-900">{profile?.reportCount || 0}</dd>
-              </div>
+              </div> */}
             </dl>
           </div>
         </div>

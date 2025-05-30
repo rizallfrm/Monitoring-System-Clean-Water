@@ -42,7 +42,7 @@ const ReportList = ({ reports }) => {
       setLoading(true);
       setError(null);
 
-      await cancelReport(reportId);
+      await reportService.cancelReport(reportId);
       // Ideally, we would refresh the reports list here
       alert("Report cancelled successfully");
       setSelectedReport(null);

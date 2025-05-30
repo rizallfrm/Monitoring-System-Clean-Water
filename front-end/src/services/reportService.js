@@ -21,6 +21,9 @@ const reportService = {
 
   getReportById: async (id) => {
     try {
+      const testInstance = api("report");
+      console.log("Manual test:", typeof testInstance.get); // harus function
+
       console.log("API instance:", api("report"));
       const response = await api("report").get(`/reports/reports/${id}`);
       return response.data;
