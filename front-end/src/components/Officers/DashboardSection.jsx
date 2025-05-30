@@ -1,44 +1,59 @@
+import { useEffect, useState } from "react";
 import StatCard from "./StatCard";
 
 export function DashboardSection() {
-  const stats = [
-    {
-      title: "Total Laporan",
-      value: "4",
-      icon: (
-        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#6366F1" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6M9 16h6M4 6h16M4 6v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6M4 6V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2" />
+  const [stats, setStats] = useState([
+    { title: "Total Laporan", value: "0", icon: (
+      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#6366F1" xmlns="http://www.w3.org/2000/svg">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6M9 16h6M4 6h16M4 6v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6M4 6V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2" />
       </svg>
-      )
-    },
-    {
-      title: "Menunggu",
-      value: "2",
-      icon: (
-        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#EAB308" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+    )},
+    { title: "Menunggu", value: "0", icon: (
+      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#EAB308" xmlns="http://www.w3.org/2000/svg">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
       </svg>
-      )
-    },
-    {
-      title: "Selesai",
-      value: "1",
-      icon: (
-        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#22C55E" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
+    )},
+    { title: "Selesai", value: "0", icon: (
+      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#22C55E" xmlns="http://www.w3.org/2000/svg">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
       </svg>
-      )
-    },
-    {
-      title: "Dibatalkan",
-      value: "1",
-      icon: (
-        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#DC2626" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636L5.636 18.364M12 21c4.9706 0 9-4.0294 9-9s-4.0294-9-9-9-9 4.0294-9 9 4.0294 9 9 9z"/>
-        </svg>
-      )
+    )},
+    { title: "Dibatalkan", value: "0", icon: (
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#DC2626" xmlns="http://www.w3.org/2000/svg">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636L5.636 18.364M12 21c4.9706 0 9-4.0294 9-9s-4.0294-9-9-9-9 4.0294-9 9 4.0294 9 9 9z"/>
+      </svg>
+    )}
+  ]);
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const res = await fetch('/reports');
+        if (!res.ok) throw new Error('Gagal mengambil data laporan');
+        const reports = await res.json();
+
+        // Hitung statistik berdasarkan status
+        const total = reports.length;
+        const menunggu = reports.filter(r => r.status === 'Menunggu').length;
+        const selesai = reports.filter(r => r.status === 'Selesai' || r.status === 'Complete').length;
+        const dibatalkan = reports.filter(r => r.status === 'Dibatalkan' || r.status === 'Cancel').length;
+
+        setStats(prevStats => prevStats.map(stat => {
+          switch (stat.title) {
+            case 'Total Laporan': return { ...stat, value: total.toString() };
+            case 'Menunggu': return { ...stat, value: menunggu.toString() };
+            case 'Selesai': return { ...stat, value: selesai.toString() };
+            case 'Dibatalkan': return { ...stat, value: dibatalkan.toString() };
+            default: return stat;
+          }
+        }));
+      } catch (error) {
+        console.error(error);
+        // Tetap tampilkan stats default jika error, bisa juga tambahkan alert dll sesuai kebutuhan
+      }
     }
-  ];
+    fetchStats();
+  }, []);
 
   return (
     <section className="flex flex-col gap-6 mb-10 w-[1104px] max-md:w-full">
@@ -58,4 +73,5 @@ export function DashboardSection() {
     </section>
   );
 }
+
 export default DashboardSection;

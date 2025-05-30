@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from 'react';
 
-export function ActionModal({ isOpen, onClose }) {
+export function ActionModal({ isOpen, onClose, onActionAdded }) {
   const [form, setForm] = useState({
     description: "",
     location: "",
@@ -14,12 +14,27 @@ export function ActionModal({ isOpen, onClose }) {
     status: ""
   });
 
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState("");
+
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
 
   useEffect(() => {
     if (isOpen) {
       closeButtonRef.current?.focus();
+      setApiError("");
+      setLoading(false);
+      setForm({
+        description: "",
+        location: "",
+        status: ""
+      });
+      setErrors({
+        description: "",
+        location: "",
+        status: ""
+      });
     }
   }, [isOpen]);
 
@@ -44,10 +59,39 @@ export function ActionModal({ isOpen, onClose }) {
     return isValid;
   };
 
-  const handleSubmit = () => {
-    if (validateForm()) {
-      // Handle form submission here
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+
+    setLoading(true);
+    setApiError("");
+
+    try {
+      const response = await fetch('/actions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Jika perlu authorization, tambahkan header di bawah ini:
+          // 'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(form),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Gagal menyimpan tindakan');
+      }
+
+      // Jika server mengembalikan data tindakan baru
+      const newAction = await response.json();
+
+      // Callback agar parent komponen bisa refresh data tindakan
+      if (onActionAdded) onActionAdded(newAction);
+
       onClose();
+    } catch (error) {
+      setApiError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -68,6 +112,7 @@ export function ActionModal({ isOpen, onClose }) {
           aria-label="Close modal"
           ref={closeButtonRef}
           onClick={onClose}
+          disabled={loading}
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
             <path
@@ -82,7 +127,14 @@ export function ActionModal({ isOpen, onClose }) {
         <h3 id="modal-title" className="mb-5 text-lg font-semibold">
           Tambah Tindakan
         </h3>
-        <form className="flex flex-col gap-4">
+
+        {apiError && (
+          <p className="mb-4 text-sm text-red-600">
+            {apiError}
+          </p>
+        )}
+
+        <form className="flex flex-col gap-4" onSubmit={e => e.preventDefault()}>
           <div>
             <label
               htmlFor="description"
@@ -104,6 +156,7 @@ export function ActionModal({ isOpen, onClose }) {
               aria-required="true"
               aria-invalid={!!errors.description}
               aria-describedby={errors.description ? 'description-error' : undefined}
+              disabled={loading}
             />
             {errors.description && (
               <p id="description-error" className="mt-1 text-xs text-red-500">
@@ -134,6 +187,7 @@ export function ActionModal({ isOpen, onClose }) {
               aria-required="true"
               aria-invalid={!!errors.location}
               aria-describedby={errors.location ? 'location-error' : undefined}
+              disabled={loading}
             />
             {errors.location && (
               <p id="location-error" className="mt-1 text-xs text-red-500">
@@ -163,6 +217,7 @@ export function ActionModal({ isOpen, onClose }) {
               aria-required="true"
               aria-invalid={!!errors.status}
               aria-describedby={errors.status ? 'status-error' : undefined}
+              disabled={loading}
             >
               <option value="">Pilih status</option>
               <option value="Menunggu">Menunggu</option>
@@ -179,15 +234,17 @@ export function ActionModal({ isOpen, onClose }) {
           <div className="flex gap-3 mt-6">
             <button
               type="button"
-              className="px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md cursor-pointer border-none"
+              className="px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md cursor-pointer border-none disabled:opacity-50"
               onClick={handleSubmit}
+              disabled={loading}
             >
-              Simpan Tindakan
+              {loading ? "Menyimpan..." : "Simpan Tindakan"}
             </button>
             <button
               type="button"
               className="px-4 py-2 font-semibold text-gray-700 bg-white rounded-md border border-gray-200 cursor-pointer"
               onClick={onClose}
+              disabled={loading}
             >
               Batal
             </button>
@@ -197,4 +254,5 @@ export function ActionModal({ isOpen, onClose }) {
     </div>
   );
 }
+
 export default ActionModal;
