@@ -12,14 +12,15 @@ const userService = {
 
   getProfile: async () => {
     try {
-      const response = await api.get("/profile");
-      return response.data.data;
+      console.log("Get profile");
+      const response = await api("user").get("/users/profile");
+      return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
     }
   },
 
-    updateProfile: async () => {
+  updateProfile: async () => {
     try {
       const response = await api.put("/profile");
       return response.data;

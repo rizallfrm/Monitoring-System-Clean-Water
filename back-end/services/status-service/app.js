@@ -9,9 +9,16 @@ const app = express();
 const PORT = process.env.STATUS_SERVICE_PORT || 3003;
 
 // Middleware
-app.use(cors());
+const corsOptions = {
+  origin: "*",
+  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+// Middleware
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 
 // Logging
 if (process.env.NODE_ENV !== 'production') {
