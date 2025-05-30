@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { DataTable } from "./DataTable";
+import reportService from "../../services/reportService"; // Adjust the import path as needed
 
 export function ReportsSection({ onAddAction }) {
   const [data, setData] = useState([]);
@@ -8,16 +9,14 @@ export function ReportsSection({ onAddAction }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch data laporan dari API saat komponen mount
+  // Fetch reports data from API when component mounts
   useEffect(() => {
     async function fetchReports() {
       try {
-        const res = await fetch("/api/reports"); // sesuaikan URL API
-        if (!res.ok) throw new Error("Gagal mengambil data laporan");
-        const json = await res.json();
-        setData(json);
+        const response = await reportService.getAllReports();
+        setData(response.data); // Assuming the response has a data property
       } catch (err) {
-        setError(err.message);
+        setError(err.message || "Gagal mengambil data laporan");
       } finally {
         setLoading(false);
       }
@@ -25,15 +24,12 @@ export function ReportsSection({ onAddAction }) {
     fetchReports();
   }, []);
 
-  // Handle update status laporan menjadi "Selesai"
+  // Handle updating report status to "Completed"
   const handleComplete = async (reportId) => {
     try {
-      const res = await fetch(`/api/reports/${reportId}/complete`, {
-        method: "POST",
-      });
-      if (!res.ok) throw new Error("Gagal update status laporan");
+      await reportService.completeReport(reportId);
 
-      // Jika berhasil, update state lokal
+      // Update local state if successful
       setData((prevData) =>
         prevData.map((report) =>
           report.id === reportId ? { ...report, status: "Selesai" } : report
@@ -45,7 +41,7 @@ export function ReportsSection({ onAddAction }) {
         [reportId]: true,
       }));
     } catch (err) {
-      alert(err.message);
+      alert(err.message || "Gagal update status laporan");
     }
   };
 
