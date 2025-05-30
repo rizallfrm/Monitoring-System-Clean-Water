@@ -1,9 +1,9 @@
-import {api} from './apiService';
+import { api } from "./apiService";
 
 const reportService = {
   createReport: async (reportData) => {
     try {
-      const response = await api.post('/reports', reportData);
+      const response = await api("report").post("/reports/reports", reportData);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -12,8 +12,8 @@ const reportService = {
 
   getAllReports: async (params = {}) => {
     try {
-      const response = await api.get('/reports', { params });
-      return response.data;
+      const response = await api("report").get("/reports/reports", { params });
+      return response.data.data.reports;
     } catch (error) {
       throw error.response?.data || error.message;
     }
@@ -21,7 +21,8 @@ const reportService = {
 
   getReportById: async (id) => {
     try {
-      const response = await api.get(`/reports/${id}`);
+      console.log("API instance:", api("report"));
+      const response = await api("report").get(`/reports/reports/${id}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -30,7 +31,10 @@ const reportService = {
 
   updateReport: async (id, reportData) => {
     try {
-      const response = await api.put(`/reports/${id}`, reportData);
+      const response = await api("report").put(
+        `/reports/reports/${id}`,
+        reportData
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -39,7 +43,10 @@ const reportService = {
 
   assignOfficer: async (reportId, officerId) => {
     try {
-      const response = await api.post(`/reports/${reportId}/assign`, { officerId });
+      const response = await api("report").post(
+        `/reports/reports/${reportId}/assign`,
+        { officerId }
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -48,7 +55,9 @@ const reportService = {
 
   cancelReport: async (reportId) => {
     try {
-      const response = await api.post(`/reports/${reportId}/cancel`);
+      const response = await api("report").post(
+        `/reports/reports/${reportId}/cancel`
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -57,7 +66,9 @@ const reportService = {
 
   completeReport: async (reportId) => {
     try {
-      const response = await api.post(`/reports/${reportId}/complete`);
+      const response = await api("report").post(
+        `/reports/reports/${reportId}/complete`
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
