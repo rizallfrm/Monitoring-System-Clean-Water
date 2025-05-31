@@ -320,7 +320,10 @@ const userController = {
       const offset = (page - 1) * limit;
 
       // Siapkan filter untuk petugas
-      let whereClause = { role: "Petugas" };
+      let whereClause = {
+        role: "Petugas",
+        name: { [Op.not]: null }, // tambah ini untuk pastikan name tidak null
+      };
 
       if (search) {
         whereClause = {
