@@ -5,6 +5,7 @@ const ReportForm = ({ onReportCreated }) => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    location: '',
     priority: 'medium',
     images: []
   });
