@@ -1,12 +1,35 @@
 import { api } from "./apiService";
 
 const reportService = {
-  createReport: async (reportData) => {
+  createReport: async (formData, files) => {
     try {
-      const response = await api("report").post("/reports/reports", reportData);
+      // 1. Handle file upload terpisah jika diperlukan
+      const formPayload = new FormData();
+      
+      // Append form data
+      formPayload.append('description', formData.description);
+      formPayload.append('location', formData.location);
+      
+      // Append files jika ada
+      if (files && files.length > 0) {
+        files.forEach(file => {
+          formPayload.append('images', file);
+        });
+      }
+
+      // 2. Kirim ke endpoint yang benar dengan content-type multipart
+      const response = await api("report").post("/reports/reports", formPayload, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
       return response.data;
     } catch (error) {
-      throw error.response?.data || error.message;
+      throw error.response?.data || { 
+        status: 'error', 
+        message: error.message || 'Failed to create report' 
+      };
     }
   },
 
