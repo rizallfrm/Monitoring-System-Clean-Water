@@ -1,16 +1,55 @@
-export function StatCard({ icon, title, value }) {
+import { Clock, Activity, CheckCircle, XCircle } from 'lucide-react';
+
+const StatCard = ({ icon: Icon, title, value, color, trend }) => (
+  <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300">
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
+        <p className={`text-3xl font-bold ${color}`}>{value}</p>
+        {trend && (
+          <p className="text-sm text-green-600 flex items-center mt-2">
+            <TrendingUp className="h-4 w-4 mr-1" />
+            {trend}
+          </p>
+        )}
+      </div>
+      <div className={`p-3 rounded-full ${color.replace('text-', 'bg-').replace('-600', '-100')}`}>
+        <Icon className={`h-6 w-6 ${color}`} />
+      </div>
+    </div>
+  </div>
+);
+
+export const StatCards = ({ stats }) => {
   return (
-    <article className="flex flex-col gap-4 justify-center items-center p-8 h-36 bg-white rounded-xl shadow w-[258px] max-md:min-w-[200px] max-md:w-[calc(50%_-_8px)] max-sm:w-full">
-      <header className="flex gap-2 items-center">
-        <div className="w-6 h-6 flex-shrink-0">
-          {icon}
-        </div>
-        <h2 className="text-lg font-semibold leading-5 text-gray-800">
-          {title}
-        </h2>
-      </header>
-      <p className="text-3xl font-bold text-gray-900">{value}</p>
-    </article>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <StatCard
+        icon={Clock}
+        title="Menunggu"
+        value={stats.pending}
+        color="text-yellow-600"
+        trend="+2 hari ini"
+      />
+      <StatCard
+        icon={Activity}
+        title="Dikerjakan"
+        value={stats.onGoing}
+        color="text-blue-600"
+        trend="+3 hari ini"
+      />
+      <StatCard
+        icon={CheckCircle}
+        title="Selesai"
+        value={stats.completed}
+        color="text-green-600"
+        trend="+5 hari ini"
+      />
+      <StatCard
+        icon={XCircle}
+        title="Dibatalkan"
+        value={stats.cancelled}
+        color="text-red-600"
+      />
+    </div>
   );
-}
-export default StatCard;
+};
