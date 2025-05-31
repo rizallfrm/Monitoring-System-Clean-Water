@@ -3,8 +3,8 @@ import { api } from "./apiService";
 const userService = {
   getAllUsers: async () => {
     try {
-      const response = await api.get("/users");
-      return response.data;
+      const response = await api("user").get("/users/users");
+      return response?.data?.data?.users || [];
     } catch (error) {
       throw error.response?.data || error.message;
     }
@@ -22,7 +22,7 @@ const userService = {
 
   updateProfile: async () => {
     try {
-      const response = await api.put("/profile");
+      const response = await api("user").put("/profile");
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -31,7 +31,7 @@ const userService = {
 
   getUserById: async (id) => {
     try {
-      const response = await api.get(`/users/${id}`);
+      const response = await api("user").get(`/users/${id}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -40,7 +40,7 @@ const userService = {
 
   updateUser: async (id, userData) => {
     try {
-      const response = await api.put(`/users/${id}`, userData);
+      const response = await api("user").put(`/users/${id}`, userData);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -49,7 +49,7 @@ const userService = {
 
   deleteUser: async (id) => {
     try {
-      const response = await api.delete(`/users/${id}`);
+      const response = await api("user").delete(`/users/${id}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -58,8 +58,8 @@ const userService = {
 
   getOfficers: async () => {
     try {
-      const response = await api.get("/officers");
-      return response.data;
+      const response = await api("user").get("/users/officers");
+      return response.data.data;
     } catch (error) {
       throw error.response?.data || error.message;
     }
