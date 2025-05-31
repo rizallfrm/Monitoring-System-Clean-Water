@@ -30,7 +30,7 @@ const actionService = {
 
   getActionById: async (id) => {
     try {
-      const response = await api("action").get(`/actions/${id}`);
+      const response = await api("action").get(`/actions/actions/${id}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -39,7 +39,7 @@ const actionService = {
 
   updateAction: async (id, actionData) => {
     try {
-      const response = await api("action").put(`/actions/${id}`, actionData);
+      const response = await api("action").put(`/actions/actions/${id}`, actionData);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -48,7 +48,7 @@ const actionService = {
 
   deleteAction: async (id) => {
     try {
-      const response = await api("action").delete(`/actions/${id}`);
+      const response = await api("action").delete(`/actions/actions/${id}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
