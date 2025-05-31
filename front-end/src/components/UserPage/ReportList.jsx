@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReportDetail from "./ReportDetailModal";
 import reportService from "../../services/reportService";
 import statusService from "../../services/statusService";
@@ -9,31 +9,46 @@ const ReportList = ({ reports }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Tambahkan sementara di ReportList.jsx
+  // useEffect(() => {
+  //   const testApi = async () => {
+  //     try {
+  //       const test = await api("report").get("/reports/reports/2");
+  //       console.log("Direct API test:", test);
+  //     } catch (e) {
+  //       console.error("Direct API error:", e);
+  //     }
+  //   };
+  //   testApi();
+  // }, []);
+
   const handleViewDetails = async (reportId) => {
-  try {
-    setLoading(true);
-    setError(null);
+    try {
+      setLoading(true);
+      setError(null);
+  
+      const [report, history] = await Promise.all([
+        reportService.getReportById(reportId),
+        statusService.getStatusHistoryByReportId(reportId).catch((err) => {
+          console.warn("Failed to get history, using empty array:", err);
+          return []; // Return empty array if history fails
+        }),
+      ]);
 
-    console.log("Fetching report details for id:", reportId);
+      setSelectedReport(report);
+      setStatusHistory(history);
+    } catch (err) {
+      console.error("Error in handleViewDetails:", err);
+      setError(err.message || "Gagal memuat detail laporan");
 
-    const [report, history] = await Promise.all([
-      reportService.getReportById(reportId),
-      statusService.getStatusHistoryByReportId(reportId),
-    ]);
-
-    console.log("Report data:", report);
-    console.log("Status history:", history);
-
-    setSelectedReport(report);
-    setStatusHistory(history);
-  } catch (err) {
-    console.error("Error fetching report details:", err);
-    setError(err.message || "Failed to fetch report details");
-  } finally {
-    setLoading(false);
-  }
-};
-
+      // Tetap tampilkan report meskipun history gagal
+      if (selectedReport) {
+        setStatusHistory([]);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCancelReport = async (reportId) => {
     if (!window.confirm("Are you sure you want to cancel this report?")) return;
@@ -73,10 +88,15 @@ const ReportList = ({ reports }) => {
     <div>
       {error && (
         <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-          {error}
+          <p>Error: {error}</p>
+          <button
+            onClick={() => setError(null)}
+            className="mt-2 text-sm text-red-600 hover:text-red-800"
+          >
+            Tutup
+          </button>
         </div>
       )}
-
       <div className="space-y-4">
         {reports.map((report) => (
           <div
@@ -129,7 +149,6 @@ const ReportList = ({ reports }) => {
           </div>
         ))}
       </div>
-
       {selectedReport && (
         <ReportDetail
           report={selectedReport}
