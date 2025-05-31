@@ -93,7 +93,13 @@ function App() {
           </ProtectedRoute>
         }
       />
-      <Route path="/officer" element={<OfficerPage />} />
+      <Route path="/officer" 
+      element={
+        <ProtectedRoute roles={["officer"]}>
+            <OfficerPage />
+        </ProtectedRoute>
+      } 
+      />
     </Routes>
   );
 }
