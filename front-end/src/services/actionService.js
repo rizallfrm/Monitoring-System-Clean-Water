@@ -3,7 +3,7 @@ import {api} from './apiService';
 const actionService = {
   createAction: async (actionData) => {
     try {
-      const response = await api.post('/actions', actionData);
+      const response = await api("action").post('/actions/actions', actionData);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -12,7 +12,7 @@ const actionService = {
 
   getActionsByReportId: async (reportId) => {
     try {
-      const response = await api.get(`/reports/${reportId}/actions`);
+      const response = await api("action").get(`/reports/${reportId}/actions`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -21,7 +21,7 @@ const actionService = {
 
   getAllActions: async (params = {}) => {
     try {
-      const response = await api.get('/actions', { params });
+      const response = await api("action").get('/actions/actions', { params });
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -30,7 +30,7 @@ const actionService = {
 
   getActionById: async (id) => {
     try {
-      const response = await api.get(`/actions/${id}`);
+      const response = await api("action").get(`/actions/${id}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -39,7 +39,7 @@ const actionService = {
 
   updateAction: async (id, actionData) => {
     try {
-      const response = await api.put(`/actions/${id}`, actionData);
+      const response = await api("action").put(`/actions/${id}`, actionData);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -48,7 +48,7 @@ const actionService = {
 
   deleteAction: async (id) => {
     try {
-      const response = await api.delete(`/actions/${id}`);
+      const response = await api("action").delete(`/actions/${id}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
