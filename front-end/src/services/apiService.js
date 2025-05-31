@@ -7,42 +7,42 @@ const servicePorts = {
   action: "http://localhost:3004/api",
 };
 
-export const api = (serviceName) => {
+const createApiInstance = (serviceName) => {
   const instance = axios.create({
     baseURL: servicePorts[serviceName],
     headers: {
       "Content-Type": "application/json",
-      "Accept": "application/json",      
+      "Accept": "application/json",
       "Cache-Control": "no-cache",
-
-      Pragma: "no-cache",
+      "Pragma": "no-cache",
     },
+    timeout: 10000, // Tambahkan timeout 10 detik
   });
-  instance.defaults.headers = instance.defaults.headers || {};
-  instance.defaults.headers.common = instance.defaults.headers.common || {};
-  // Interceptor request: tambahkan token
+
+  // Interceptor untuk menambahkan token
   instance.interceptors.request.use(
     (config) => {
       const token = localStorage.getItem("token");
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
+      console.log(`Mengirim request ke: ${config.baseURL}${config.url}`); // Logging
       return config;
     },
-    (error) => Promise.reject(error)
+    (error) => {
+      console.error("Error pada request:", error);
+      return Promise.reject(error);
+    }
   );
 
-  // Interceptor response: tangani 401
+  // Interceptor untuk handling response
   instance.interceptors.response.use(
     (response) => {
-      return {
-        data: response.data,
-        status: response.status,
-        headers: response.headers,
-        config: response.config,
-      };
+      console.log("Response dari:", response.config.url, response.data); // Logging
+      return response;
     },
     (error) => {
+      console.error("Error pada response:", error.config?.url, error.response?.status);
       if (error.response?.status === 401) {
         localStorage.removeItem("token");
         window.location.href = "/login";
@@ -52,4 +52,11 @@ export const api = (serviceName) => {
   );
 
   return instance;
+};
+
+export const api = (serviceName = 'status') => {
+  if (!servicePorts[serviceName]) {
+    throw new Error(`Service ${serviceName} tidak dikonfigurasi`);
+  }
+  return createApiInstance(serviceName);
 };
