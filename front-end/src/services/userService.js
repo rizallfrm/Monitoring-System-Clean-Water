@@ -22,7 +22,7 @@ const userService = {
 
   updateProfile: async () => {
     try {
-      const response = await api("user").put("/profile");
+      const response = await api("user").put("/users/profile");
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -31,7 +31,7 @@ const userService = {
 
   getUserById: async (id) => {
     try {
-      const response = await api("user").get(`/users/${id}`);
+      const response = await api("user").get(`/users/users/${id}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -40,7 +40,7 @@ const userService = {
 
   updateUser: async (id, userData) => {
     try {
-      const response = await api("user").put(`/users/${id}`, userData);
+      const response = await api("user").put(`/users/users/${id}`, userData);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -49,7 +49,7 @@ const userService = {
 
   deleteUser: async (id) => {
     try {
-      const response = await api("user").delete(`/users/${id}`);
+      const response = await api("user").delete(`/users/users/${id}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
