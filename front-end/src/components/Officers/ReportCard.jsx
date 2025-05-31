@@ -1,5 +1,7 @@
 import React from 'react';
 import { Users, Clock, Eye, UserCheck, Plus, MapPin } from 'lucide-react';
+import reportService from '../../services/reportService';
+import actionService from '../../services/actionService';
 
 const ReportCard = ({ report, onView, onAssign, onAddAction }) => {
   const getPriorityColor = (priority) => {
@@ -30,6 +32,48 @@ const ReportCard = ({ report, onView, onAssign, onAddAction }) => {
     return badges[priority] || 'bg-gradient-to-r from-gray-500 to-slate-600 text-white';
   };
 
+  // Handle assign report
+  const handleAssign = async (reportId) => {
+    try {
+      // Dapatkan ID petugas dari state/auth
+      const officerId = 'current-officer-id'; // Ganti dengan ID petugas yang sesungguhnya
+      
+      // Panggil API untuk assign petugas
+      await reportService.assignOfficer(reportId, { officerId });
+      
+      // Panggil callback dari parent component jika ada
+      if (onAssign) {
+        onAssign(reportId);
+      }
+      
+      // Tambahkan notifikasi sukses jika diperlukan
+      console.log('Laporan berhasil diassign');
+    } catch (error) {
+      console.error('Gagal mengassign laporan:', error);
+      // Tambahkan notifikasi error jika diperlukan
+    }
+  };
+
+  // Handle add action
+  const handleAddAction = async (report) => {
+    try {
+      // Panggil callback dari parent component untuk membuka modal
+      if (onAddAction) {
+        onAddAction(report);
+      }
+    } catch (error) {
+      console.error('Gagal membuka modal aksi:', error);
+    }
+  };
+
+  // Format reporter name
+  const getReporterName = () => {
+    if (report.user?.name) return report.user.name;
+    if (report.reporter?.name) return report.reporter.name;
+    if (report.reporter) return report.reporter;
+    return 'Anonim';
+  };
+
   return (
     <div className="group bg-white rounded-2xl shadow-md border border-gray-100 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 overflow-hidden relative">
       {/* Decorative elements */}
@@ -42,9 +86,7 @@ const ReportCard = ({ report, onView, onAssign, onAddAction }) => {
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center">
                 <div className={`w-4 h-4 rounded-full ${getPriorityColor(report.priority)} mr-3 shadow-sm`}></div>
-                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getPriorityBadge(report.priority)}`}>
-                  {report.priority.toUpperCase()}
-                </span>
+               
               </div>
               <span className={`px-3 py-1.5 rounded-xl text-xs font-semibold border-2 shadow-sm ${getStatusColor(report.status)}`}>
                 {report.status === 'pending' ? 'Menunggu' : 
@@ -65,7 +107,7 @@ const ReportCard = ({ report, onView, onAssign, onAddAction }) => {
                 <Users className="h-4 w-4 mr-2 text-blue-500" />
                 <div>
                   <p className="font-medium text-gray-700">Pelapor</p>
-                  <p>{report.reporter?.name || report.reporter}</p>
+                  <p>{getReporterName()}</p>
                 </div>
               </div>
               <div className="flex items-center bg-gray-50 rounded-lg px-3 py-2">
@@ -96,7 +138,7 @@ const ReportCard = ({ report, onView, onAssign, onAddAction }) => {
           </button>
           {report.status === 'pending' && (
             <button 
-              onClick={() => onAssign(report.id)}
+              onClick={() => handleAssign(report.id)}
               className="flex items-center px-4 py-2.5 bg-gradient-to-r from-green-50 to-emerald-50 text-green-600 rounded-xl hover:from-green-100 hover:to-emerald-100 transition-all duration-200 text-sm font-medium border border-green-200 hover:border-green-300 shadow-sm hover:shadow-md transform hover:scale-105 active:scale-95"
             >
               <UserCheck className="h-4 w-4 mr-2" />
@@ -104,7 +146,7 @@ const ReportCard = ({ report, onView, onAssign, onAddAction }) => {
             </button>
           )}
           <button 
-            onClick={() => onAddAction(report)}
+            onClick={() => handleAddAction(report)}
             className="flex items-center px-4 py-2.5 bg-gradient-to-r from-purple-50 to-pink-50 text-purple-600 rounded-xl hover:from-purple-100 hover:to-pink-100 transition-all duration-200 text-sm font-medium border border-purple-200 hover:border-purple-300 shadow-sm hover:shadow-md transform hover:scale-105 active:scale-95"
           >
             <Plus className="h-4 w-4 mr-2" />
