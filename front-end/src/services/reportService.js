@@ -21,13 +21,23 @@ const reportService = {
 
   getReportById: async (id) => {
     try {
-      const testInstance = api("report");
-      console.log("Manual test:", typeof testInstance.get); // harus function
+      // Gunakan instance api dengan benar
+      const apiInstance = api("report");
+      console.log("Api instance methods:", {
+        get: typeof apiInstance.get,
+        post: typeof apiInstance.post
+      });
 
-      console.log("API instance:", api("report"));
-      const response = await api("report").get(`/reports/reports/${id}`);
-      return response.data;
+      const response = await apiInstance.get(`/reports/reports/${id}`);
+      console.log("Full API response:", response);
+      
+      // Pastikan struktur data sesuai
+      if (response.data && response.data.status === 'success') {
+        return response.data.data; // Ambil data dari response
+      }
+      throw new Error("Invalid response structure");
     } catch (error) {
+      console.error("Error in getReportById:", error);
       throw error.response?.data || error.message;
     }
   },
