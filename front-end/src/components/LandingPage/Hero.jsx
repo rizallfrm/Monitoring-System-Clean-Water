@@ -1,42 +1,116 @@
 "use client";
-import React from "react";
-import { Button } from "./Button";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import {
+   Droplets,
+   ChevronRight,
+  Play
+} from 'lucide-react';
 
 export const Hero = () => {
+  const [currentText, setCurrentText] = useState(0);
+  const texts = [
+    "Informasi Kualitas Air Bersih PDAM",
+    "Mudah dan Cepat Diakses",
+    "Transparan dan Real-Time"
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentText((prev) => (prev + 1) % texts.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <section className="min-h-screen w-full bg-gradient-to-br from-[#dbeafe] to-[#eff6ff] flex items-center">
-      <div className="flex flex-col-reverse md:flex-row items-center justify-between w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16 gap-10">
-        
-        {/* Kiri: Teks */}
-        <div className="w-full md:w-1/2 text-center md:text-left">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-            Smart Water Monitoring System
+    <div className="relative min-h-screen bg-gradient-to-br from-sky-400 via-blue-500 to-blue-600 overflow-hidden animate-gradient-x">
+      <style jsx>{`
+        @keyframes gradient-x {
+          0%, 100% {
+            background-size: 200% 200%;
+            background-position: left center;
+          }
+          50% {
+            background-size: 200% 200%;
+            background-position: right center;
+          }
+        }
+        .animate-gradient-x {
+          background: linear-gradient(-45deg, #38bdf8, #3b82f6, #2563eb, #1d4ed8);
+          background-size: 400% 400%;
+          animation: gradient-x 15s ease infinite;
+        }
+      `}</style>
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute bg-white/10 rounded-full animate-pulse"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              width: `${Math.random() * 100 + 20}px`,
+              height: `${Math.random() * 100 + 20}px`,
+              animationDelay: `${Math.random() * 2}s`,
+              animationDuration: `${Math.random() * 4 + 3}s`
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Water Wave Animation */}
+      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-blue-400/30 to-transparent">
+        <div className="absolute bottom-0 left-0 w-full h-16 bg-blue-400/20 rounded-t-full animate-pulse" style={{animationDuration: '4s'}} />
+        <div className="absolute bottom-0 left-1/4 w-3/4 h-12 bg-blue-300/15 rounded-t-full animate-pulse" style={{animationDuration: '6s', animationDelay: '1s'}} />
+      </div>
+
+      <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
+        <div className="text-center max-w-4xl mx-auto">
+          {/* Animated Water Drop Icon */}
+          <div className="mb-8 flex justify-center">
+            <div className="relative">
+              <Droplets className="w-20 h-20 text-blue-200 animate-bounce" />
+              <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-300 rounded-full animate-ping" />
+            </div>
+          </div>
+
+          {/* Animated Title */}
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+            <span className="block transform transition-all duration-500 ease-in-out">
+              {texts[currentText]}
+            </span>
           </h1>
-          <p className="text-lg text-gray-700 mb-8">
-            Real-time monitoring and analytics for your water supply system.
-            Get instant alerts, usage patterns, and quality metrics at your fingertips.
+
+          <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-2xl mx-auto">
+            Pantau kondisi dan kualitas air bersih di wilayah Anda secara transparan dan real-time.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-4">
-            {/* Tombol ke halaman login */}
-            <Link to="/login">
-              <Button className="px-8 py-3 text-base">Get Started</Button>
-            </Link>
-            <Button variant="outline" className="px-8 py-3 text-base">
-              Learn More
-            </Button>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <button className="group bg-white text-blue-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-blue-50 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-2">
+              <Play className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              Mulai Sekarang
+            </button>
+            <button className="group border-2 border-white text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white hover:text-blue-600 transform hover:scale-105 transition-all duration-300 flex items-center gap-2">
+              Pelajari Lebih Lanjut
+              <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </button>
+          </div>
+
+          {/* Floating Water Droplets */}
+          <div className="mt-12 flex justify-center">
+            <div className="flex items-center gap-4">
+              <div className="w-4 h-4 bg-blue-300 rounded-full animate-bounce" style={{animationDelay: '0s'}} />
+              <div className="w-6 h-6 bg-cyan-300 rounded-full animate-bounce" style={{animationDelay: '0.2s'}} />
+              <div className="w-5 h-5 bg-teal-300 rounded-full animate-bounce" style={{animationDelay: '0.4s'}} />
+              <div className="w-4 h-4 bg-blue-300 rounded-full animate-bounce" style={{animationDelay: '0.6s'}} />
+              <div className="w-3 h-3 bg-cyan-300 rounded-full animate-bounce" style={{animationDelay: '0.8s'}} />
+            </div>
           </div>
         </div>
-
-        {/* Kanan: Gambar */}
-        <div className="w-full md:w-1/2 flex justify-center">
-          <img
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/42c4de1cd425e0d1c68078bb12a70fc01cd81c71"
-            alt="Dashboard"
-            className="w-full max-w-sm md:max-w-md lg:max-w-lg h-auto rounded-2xl shadow-xl"
-          />
-        </div>
       </div>
-    </section>
+    </div>
   );
 };
+
+export default Hero;

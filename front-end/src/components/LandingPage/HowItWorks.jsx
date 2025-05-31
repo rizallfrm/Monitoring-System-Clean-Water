@@ -1,88 +1,120 @@
 "use client";
 import React from "react";
+import { Link } from "react-router-dom";
+import { 
 
-const Step = ({ icon, title, description }) => (
-  <div className="text-center w-[379px] max-md:w-full">
-    <div className="flex justify-center items-center mx-auto mt-0 mb-6 w-16 h-16 bg-blue-100 rounded-full">
-      {icon}
-    </div>
-    <h3 className="mb-5 text-xl font-bold text-gray-900">{title}</h3>
-    <p className="text-base text-gray-600">{description}</p>
-  </div>
-);
+  FileText, 
+  Bell, 
+ 
+  Users, 
+  CheckCircle, 
+ 
+  ChevronRight,
+  Play,
+
+  Globe
+} from 'lucide-react';
 
 export const HowItWorks = () => {
   const steps = [
     {
-      icon: (
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 25 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M7.66406 20.9859L7.07344 22.3688C6.19687 21.9234 5.39063 21.375 4.65938 20.7328L5.72344 19.6688C6.30937 20.1797 6.96094 20.625 7.66406 20.9859ZM2.23125 12.75H0.726562C0.792187 13.7438 0.979688 14.7047 1.275 15.6141L2.67188 15.0563C2.44219 14.3203 2.2875 13.5469 2.23125 12.75ZM2.23125 11.25C2.29687 10.3688 2.475 9.51562 2.75156 8.71406L1.36875 8.12344C1.01719 9.10781 0.796875 10.1578 0.726562 11.25H2.23125Z"
-            fill="#2563EB"
-          />
-        </svg>
-      ),
-      title: "Install Sensors",
-      description:
-        "Smart sensors are installed at key points in your water supply system",
+      number: "01",
+      title: "Update Status",
+      description: "Pengelola PDAM atau petugas mengupdate status sistem air secara real-time",
+      icon: <Users className="w-8 h-8" />,
+      color: "from-blue-500 to-cyan-500"
     },
     {
-      icon: (
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 31 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M3.52496 9.51094C6.75933 6.40781 11.1468 4.5 15.9843 4.5C20.8218 4.5 25.2093 6.40781 28.4437 9.51094C29.0437 10.0828 29.9906 10.0641 30.5625 9.46875C31.1343 8.87344 31.1156 7.92188 30.5203 7.35C26.7515 3.72656 21.6281 1.5 15.9843 1.5C10.3406 1.5 5.21714 3.72656 1.44371 7.34531C0.848394 7.92187 0.829644 8.86875 1.40152 9.46875C1.97339 10.0688 2.92496 10.0875 3.52027 9.51094H3.52496Z"
-            fill="#2563EB"
-          />
-        </svg>
-      ),
-      title: "Connect & Monitor",
-      description:
-        "Sensors connect to our cloud platform for real-time monitoring",
+      number: "02", 
+      title: "Akses Informasi",
+      description: "Pengguna mengakses website untuk melihat status dan kualitas air terbaru",
+      icon: <Globe className="w-8 h-8" />,
+      color: "from-green-500 to-emerald-500"
     },
     {
-      icon: (
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 19 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M1.40625 3C1.40625 1.34531 2.75156 0 4.40625 0H14.9062C16.5609 0 17.9062 1.34531 17.9062 3V21C17.9062 22.6547 16.5609 24 14.9062 24H4.40625C2.75156 24 1.40625 22.6547 1.40625 21V3Z"
-            fill="#2563EB"
-          />
-        </svg>
-      ),
-      title: "Access Anywhere",
-      description: "Monitor and manage your water system from any device",
-    },
+      number: "03",
+      title: "Laporan Masalah", 
+      description: "Pengguna bisa melaporkan masalah kualitas air dengan mudah dan cepat",
+      icon: <FileText className="w-8 h-8" />,
+      color: "from-purple-500 to-pink-500"
+    }
   ];
 
   return (
-    <section className="p-20 bg-white max-md:p-10 max-sm:p-6">
-      <div className="px-6 mx-auto max-w-screen-xl text-center">
-        <h2 className="mb-3.5 text-3xl font-bold text-gray-900">
-          How It Works
-        </h2>
-        <div className="flex gap-12 justify-center mt-16 max-md:flex-col max-md:items-center">
+    <div className="py-20 bg-gradient-to-b from-white to-gray-50">
+      <div className="max-w-6xl mx-auto px-4">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 bg-green-100 text-green-600 px-4 py-2 rounded-full text-sm font-medium mb-4">
+            <Play className="w-4 h-4" />
+            Cara Kerja
+          </div>
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
+            Mudah dalam 3 Langkah
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Sistem yang dirancang untuk kemudahan dan efisiensi maksimal
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-8">
           {steps.map((step, index) => (
-            <Step key={index} {...step} />
+            <div key={index} className="relative group">
+              {/* Connection Line */}
+              {index < steps.length - 1 && (
+                <div className="hidden md:block absolute top-1/2 -right-4 w-8 h-0.5 bg-gradient-to-r from-gray-300 to-transparent transform -translate-y-1/2 z-10"></div>
+              )}
+              
+              <div className="bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 group-hover:scale-105 relative overflow-hidden">
+                {/* Background Gradient */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${step.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
+                
+                <div className="relative z-10">
+                  {/* Step Number */}
+                  <div className={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r ${step.color} text-white rounded-2xl text-2xl font-bold mb-6`}>
+                    {step.number}
+                  </div>
+
+                  {/* Icon */}
+                  <div className="mb-6">
+                    <div className={`inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r ${step.color} bg-opacity-10 rounded-xl text-gray-600`}>
+                      {step.icon}
+                    </div>
+                  </div>
+
+                  <h3 className="text-2xl font-bold text-gray-800 mb-4">{step.title}</h3>
+                  <p className="text-gray-600 leading-relaxed">{step.description}</p>
+                </div>
+              </div>
+            </div>
           ))}
         </div>
+
+        {/* Process Flow Visualization */}
+        <div className="mt-16 bg-gray-800 rounded-3xl p-8 text-white">
+          <h3 className="text-2xl font-bold text-center mb-8">Alur Sistem Real-Time</h3>
+          <div className="flex items-center justify-center space-x-4 overflow-x-auto">
+            <div className="flex items-center gap-4 min-w-max">
+              <div className="bg-blue-600 p-4 rounded-full">
+                <Users className="w-6 h-6" />
+              </div>
+              <ChevronRight className="w-5 h-5 text-gray-400" />
+              <div className="bg-green-600 p-4 rounded-full">
+                <Globe className="w-6 h-6" />
+              </div>
+              <ChevronRight className="w-5 h-5 text-gray-400" />
+              <div className="bg-purple-600 p-4 rounded-full">
+                <Bell className="w-6 h-6" />
+              </div>
+              <ChevronRight className="w-5 h-5 text-gray-400" />
+              <div className="bg-pink-600 p-4 rounded-full">
+                <CheckCircle className="w-6 h-6" />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </section>
+    </div>
   );
 };
+
+export default HowItWorks;

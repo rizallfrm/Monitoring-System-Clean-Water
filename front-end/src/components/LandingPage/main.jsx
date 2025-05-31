@@ -1,9 +1,24 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { App } from './App'
+import Hero from "./Hero";
+import Features from "./Features";
+import HowItWorks from "./HowItWorks";
+import CallToAction from "./CallToAction";
+import Footer from "./Footer" 
+import AboutService from "./AboutService";
+import StatisticsSection from "./StatisticSection";
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+
+const Landing = () => {
+  return (
+    <div className="min-h-screen">
+      <Hero />
+      <AboutService />
+      <Features />
+      <HowItWorks />
+      <StatisticsSection />
+      <CallToAction />
+      <Footer />
+    </div>
+  );
+};
+
+export default Landing;
