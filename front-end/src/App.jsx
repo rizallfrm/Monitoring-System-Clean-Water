@@ -9,6 +9,12 @@ import OfficerPage from "./pages/OfficerPage";
 import AuthLayout from "./pages/AuthLayout";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import UserManagementPage from "./pages/Admin/UserManagementPage";
+import OfficerManagementPage from "./pages/Admin/OfficerManagementPage";
+import CreateOfficerPage from "./pages/Admin/CreateOfficerPage";
+import ReportManagementPage from "./pages/Admin/ReportManagementPage";
+import ReportDetailPage from "./pages/Admin/ReportDetailPage";
+import ActionManagementPage from "./pages/Admin/ActionManagementPage";
 
 function App() {
   return (
@@ -21,13 +27,64 @@ function App() {
       </Route>
       {/* Protected Routes */}
       <Route
-        path="/admin"
+        path="/admin/*"
         element={
           <ProtectedRoute roles={["admin"]}>
             <AdminDashboard />
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/users"
+        element={
+          <ProtectedRoute roles={["admin"]}>
+            <UserManagementPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/officers"
+        element={
+          <ProtectedRoute roles={["admin"]}>
+            <OfficerManagementPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/officers/new"
+        element={
+          <ProtectedRoute roles={["admin"]}>
+            <CreateOfficerPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/reports"
+        element={
+          <ProtectedRoute roles={["admin"]}>
+            <ReportManagementPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/reports/:id"
+        element={
+          <ProtectedRoute roles={["admin"]}>
+            <ReportDetailPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/actions"
+        element={
+          <ProtectedRoute roles={["admin"]}>
+            <ActionManagementPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Admin Routes element */}
       <Route
         path="/user"
         element={
@@ -36,14 +93,7 @@ function App() {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/officer"
-        element={
-          <ProtectedRoute roles={["officer"]}>
-            <OfficerPage />
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/officer" element={<OfficerPage />} />
     </Routes>
   );
 }
