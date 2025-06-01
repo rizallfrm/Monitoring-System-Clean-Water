@@ -32,6 +32,7 @@ export default function UserPage() {
           reportService.getAllReports(),
         ]);
         console.log("Fetched reports:", reportsData);
+        console.log("Fetched reports 2:", reportsData);
 
         setProfile(profileData);
         setReports(reportsData);
