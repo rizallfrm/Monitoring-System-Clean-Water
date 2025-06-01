@@ -114,7 +114,7 @@ const ReportCard = ({ report, onView, onAssign, onAddAction }) => {
                 <Clock className="h-4 w-4 mr-2 text-green-500" />
                 <div>
                   <p className="font-medium text-gray-700">Tanggal</p>
-                  <p>{new Date(report.createdAt).toLocaleDateString('id-ID')}</p>
+                  <p>{new Date(report.created_at).toLocaleDateString('id-ID')}</p>
                 </div>
               </div>
               <div className="col-span-2 flex items-center bg-gray-50 rounded-lg px-3 py-2">

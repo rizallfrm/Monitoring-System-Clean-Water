@@ -71,7 +71,7 @@ const ReportDetailModal = ({
               </div>
               <h3 className="text-2xl font-bold mb-2">{report.title}</h3>
               <p className="text-blue-100 text-sm">
-                Laporan Detail - ID: #{report.id}
+                Laporan Detail - ID: #{report.report_id}
               </p>
             </div>
             <button
