@@ -7,7 +7,7 @@ import ReportList from "../components/UserPage/ReportList";
 import ReportForm from "../components/UserPage/ReportForm";
 import authService from "../services/authService";
 import reportService from "../services/reportService";
-import { Droplets, FileText, Plus, AlertCircle, Activity, RefreshCw } from "lucide-react";
+import { Droplets, FileText, Plus, AlertCircle, Activity } from "lucide-react";
 
 export default function UserPage() {
   const { user, logout } = useAuth();
@@ -16,7 +16,6 @@ export default function UserPage() {
   const [activeTab, setActiveTab] = useState("reports");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [retryCount, setRetryCount] = useState(0);
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
@@ -33,7 +32,6 @@ export default function UserPage() {
           reportService.getAllReports(),
         ]);
         console.log("Fetched reports:", reportsData);
-        console.log("Fetched reports 2:", reportsData);
 
         setProfile(profileData);
         setReports(reportsData);
@@ -54,17 +52,11 @@ export default function UserPage() {
       }
     };
 
-  const handleRetry = () => {
-    fetchData(true);
-  };
-
-  useEffect(() => {
     if (user) {
       fetchData();
     }
   }, [user]);
 
-  // Loading state for user authentication
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50">
@@ -76,44 +68,28 @@ export default function UserPage() {
     );
   }
 
-  // Loading state for data fetching
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50">
         <div className="flex flex-col items-center space-y-4">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 border-t-blue-600"></div>
-          <p className="text-blue-600 font-medium">
-            Memuat dashboard... {retryCount > 0 && `(Percobaan ${retryCount + 1})`}
-          </p>
+          <p className="text-blue-600 font-medium">Memuat dashboard...</p>
         </div>
       </div>
     );
   }
 
-  // Error state with retry option
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-red-50 to-orange-50">
         <div className="bg-white border border-red-200 text-red-700 px-8 py-6 rounded-xl shadow-lg max-w-md">
-          <div className="flex items-center space-x-3 mb-4">
-            <AlertCircle className="h-6 w-6 text-red-500 flex-shrink-0" />
-            <div className="flex-1">
+          <div className="flex items-center space-x-3">
+            <AlertCircle className="h-6 w-6 text-red-500" />
+            <div>
               <h3 className="font-semibold">Terjadi Kesalahan</h3>
-              <p className="text-sm text-red-600 mt-1">{error}</p>
-              {retryCount > 0 && (
-                <p className="text-xs text-red-500 mt-1">
-                  Percobaan ke-{retryCount + 1}
-                </p>
-              )}
+              <p className="text-sm text-red-600">{error}</p>
             </div>
           </div>
-          <button
-            onClick={handleRetry}
-            className="w-full flex items-center justify-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
-          >
-            <RefreshCw className="h-4 w-4" />
-            <span>Coba Lagi</span>
-          </button>
         </div>
       </div>
     );
@@ -245,10 +221,14 @@ export default function UserPage() {
                       </div>
                       <ReportForm
                         onReportCreated={(newReport) => {
-                          const updatedReports = [newReport, ...reports];
-                          setReports(updatedReports);
+                          setReports([newReport, ...reports]);
                           setActiveTab("reports");
-                          setStats(calculateStats(updatedReports));
+                          // Update stats
+                          setStats(prev => ({
+                            ...prev,
+                            total: prev.total + 1,
+                            pending: prev.pending + 1
+                          }));
                         }}
                       />
                     </div>
