@@ -1,25 +1,9 @@
 import React, { useState, useEffect } from "react";
 import {
-  Search,
-  Plus,
-  MoreVertical,
-  Eye,
-  UserCheck,
-  XCircle,
-  CheckCircle,
-  Droplets,
-  Activity,
-  AlertTriangle,
-  Calendar,
-  Filter,
-  ChevronDown,
-  MapPin,
-  Clock
+  Search, Plus, MoreVertical, Eye, UserCheck, XCircle, CheckCircle, Droplets, Activity, AlertTriangle, Calendar, Filter, ChevronDown, MapPin
 } from "lucide-react";
 import reportService from "../../services/reportService";
-
-// Mock data untuk demo
-
+import userService from "../../services/userService";
 
 const statusColors = {
   Pending: {
@@ -30,7 +14,7 @@ const statusColors = {
     gradient: "from-amber-400 to-orange-500"
   },
   "On-Going": {
-    bg: "bg-blue-100", 
+    bg: "bg-blue-100",
     text: "text-blue-800",
     border: "border-blue-200",
     icon: Activity,
@@ -38,7 +22,7 @@ const statusColors = {
   },
   Completed: {
     bg: "bg-green-100",
-    text: "text-green-800", 
+    text: "text-green-800",
     border: "border-green-200",
     icon: CheckCircle,
     gradient: "from-green-400 to-emerald-500"
@@ -46,7 +30,7 @@ const statusColors = {
   Cancelled: {
     bg: "bg-red-100",
     text: "text-red-800",
-    border: "border-red-200", 
+    border: "border-red-200",
     icon: XCircle,
     gradient: "from-red-400 to-pink-500"
   },
@@ -64,14 +48,24 @@ const ReportManagementPage = () => {
   const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState("All");
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [officers, setOfficers] = useState([]);
+  const [selectedOfficer, setSelectedOfficer] = useState("");
+  const [assignLoading, setAssignLoading] = useState(false);
 
-  // Simulate API loading
+  // Fetch data from API
   useEffect(() => {
     const fetchReports = async () => {
       try {
         setLoading(true);
         const data = await reportService.getAllReports();
-        setReports(data);
+
+        // Validasi dan normalisasi data
+        const normalizedReports = Array.isArray(data) ? data.map((report, index) => ({
+          ...report,
+          id: report.report_id ? (report.report_id) : `temp-${Date.now()}-${index}` // Fallback ID unik
+        })) : [];
+
+        setReports(normalizedReports);
       } catch (err) {
         console.error("Error fetching reports:", err);
         setError(err.message || "Failed to load reports");
@@ -79,7 +73,7 @@ const ReportManagementPage = () => {
         setLoading(false);
       }
     };
-
+    
     fetchReports();
   }, []);
 
@@ -88,18 +82,27 @@ const ReportManagementPage = () => {
   };
 
   const handleActionClick = (reportId) => {
-    setSelectedReportId(reportId);
-    setShowActionMenu(!showActionMenu);
+    const normalizedReportId = String(reportId);
+    if (selectedReportId === normalizedReportId && showActionMenu) {
+      setShowActionMenu(false);
+      setSelectedReportId(null);
+    } else {
+      setSelectedReportId(normalizedReportId);
+      setShowActionMenu(true);
+    }
   };
 
   const handleViewReport = () => {
     alert(`Viewing report ${selectedReportId}`);
     setShowActionMenu(false);
+    setSelectedReportId(null);
   };
 
   const handleAssignClick = () => {
+    console.log('Opening assign dialog for report:', selectedReportId);
     setAssignDialogOpen(true);
     setShowActionMenu(false);
+    setSelectedOfficer("");
   };
 
   const handleCancelClick = () => {
@@ -116,7 +119,7 @@ const ReportManagementPage = () => {
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       setReports(
         reports.map((report) =>
           report.id === selectedReportId
@@ -136,16 +139,17 @@ const ReportManagementPage = () => {
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       setReports(
         reports.map((report) =>
-          report.id === selectedReportId
+          (report.report_id) === (selectedReportId)
             ? { ...report, status: "Cancelled" }
             : report
         )
       );
 
       setCancelDialogOpen(false);
+      setSelectedReportId(null);
     } catch (err) {
       console.error("Error cancelling report:", err);
       setError(err.message || "Failed to cancel report");
@@ -156,20 +160,28 @@ const ReportManagementPage = () => {
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       setReports(
         reports.map((report) =>
-          report.id === selectedReportId
+          (report.id) === (selectedReportId)
             ? { ...report, status: "Completed" }
             : report
         )
       );
 
       setCompleteDialogOpen(false);
+      setSelectedReportId(null);
     } catch (err) {
       console.error("Error completing report:", err);
       setError(err.message || "Failed to complete report");
     }
+  };
+
+  // Handler untuk menutup dialog assign
+  const handleCloseAssignDialog = () => {
+    setAssignDialogOpen(false);
+    setSelectedOfficer("");
+    setSelectedReportId(null);
   };
 
   const filteredReports = reports
@@ -201,7 +213,7 @@ const ReportManagementPage = () => {
   const StatusBadge = ({ status }) => {
     const config = statusColors[status] || statusColors.Pending;
     const IconComponent = config.icon;
-    
+
     return (
       <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium ${config.bg} ${config.text} ${config.border} border`}>
         <IconComponent className="w-3 h-3 mr-1.5" />
@@ -212,7 +224,7 @@ const ReportManagementPage = () => {
 
   const StatCard = ({ title, value, status, icon: Icon }) => {
     const config = statusColors[status] || { gradient: "from-gray-400 to-gray-600" };
-    
+
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
         <div className="flex items-center justify-between">
@@ -228,46 +240,55 @@ const ReportManagementPage = () => {
     );
   };
 
-  const ActionMenu = ({ report }) => (
-    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-20">
-      <div className="py-1">
-        <button
-          onClick={handleViewReport}
-          className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 flex items-center transition-colors"
-        >
-          <Eye className="w-4 h-4 mr-2" />
-          View Details
-        </button>
-        {report.status === "Pending" && (
+
+  const ActionMenu = ({ report }) => {
+    if (!report.id) return null; // Skip jika tidak ada ID
+
+    return (
+      <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-20">
+        <div className="py-1">
           <button
-            onClick={handleAssignClick}
+            onClick={handleViewReport}
             className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 flex items-center transition-colors"
           >
-            <UserCheck className="w-4 h-4 mr-2" />
-            Assign Officer
+            <Eye className="w-4 h-4 mr-2" />
+            View Details
           </button>
-        )}
-        {report.status === "On-Going" && (
-          <button
-            onClick={handleCompleteClick}
-            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 flex items-center transition-colors"
-          >
-            <CheckCircle className="w-4 h-4 mr-2" />
-            Mark as Complete
-          </button>
-        )}
-        {report.status !== "Cancelled" && report.status !== "Completed" && (
-          <button
-            onClick={handleCancelClick}
-            className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center transition-colors"
-          >
-            <XCircle className="w-4 h-4 mr-2" />
-            Cancel Report
-          </button>
-        )}
+          {report.status === "Pending" && (
+            <button
+              onClick={() => {
+                console.log('Assign clicked for report:', report.id);
+                setSelectedReportId(String(report.id)); // Pastikan ID string
+                handleAssignClick();
+              }}
+              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 flex items-center transition-colors"
+            >
+              <UserCheck className="w-4 h-4 mr-2" />
+              Assign Officer
+            </button>
+          )}
+          {report.status === "On-Going" && (
+            <button
+              onClick={handleCompleteClick}
+              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 flex items-center transition-colors"
+            >
+              <CheckCircle className="w-4 h-4 mr-2" />
+              Mark as Complete
+            </button>
+          )}
+          {report.status !== "Cancelled" && report.status !== "Completed" && (
+            <button
+              onClick={handleCancelClick}
+              className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center transition-colors"
+            >
+              <XCircle className="w-4 h-4 mr-2" />
+              Cancel Report
+            </button>
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   if (loading) {
     return (
@@ -285,8 +306,8 @@ const ReportManagementPage = () => {
             <div className="mt-4 flex justify-center">
               <div className="flex space-x-1">
                 <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
               </div>
             </div>
           </div>
@@ -305,7 +326,7 @@ const ReportManagementPage = () => {
             </div>
             <h3 className="text-lg font-semibold text-red-800 mb-2">System Error</h3>
             <p className="text-red-600 mb-4">{error}</p>
-            <button 
+            <button
               onClick={() => window.location.reload()}
               className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
             >
@@ -438,7 +459,7 @@ const ReportManagementPage = () => {
           ) : (
             filteredReports.map((report) => (
               <div
-                key={report.id}
+                key={`report-${report.id || `temp-${index}`}`} // Gunakan ID atau fallback ke index sementara
                 className="bg-white rounded-2xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 hover:transform hover:-translate-y-1"
               >
                 <div className="p-6">
@@ -449,9 +470,9 @@ const ReportManagementPage = () => {
                         <StatusBadge status={report.status} />
                       </div>
                       <p className="text-gray-600 mb-6 leading-relaxed">
-                        {report.description.length > 150
+                        {report.description && report.description.length > 150
                           ? `${report.description.substring(0, 150)}...`
-                          : report.description}
+                          : report.description || 'Tidak ada deskripsi'}
                       </p>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-500">
                         <div className="flex items-center space-x-2">
@@ -464,7 +485,7 @@ const ReportManagementPage = () => {
                         </div>
                         <div className="flex items-center space-x-2">
                           <MapPin className="w-4 h-4 text-green-500" />
-                          <span className="truncate">{report.location}</span>
+                          <span className="truncate">{report.location || 'Lokasi tidak diketahui'}</span>
                         </div>
                         <div className="flex items-center space-x-2">
                           <UserCheck className="w-4 h-4 text-purple-500" />
@@ -479,7 +500,7 @@ const ReportManagementPage = () => {
                       >
                         <MoreVertical className="w-5 h-5" />
                       </button>
-                      {showActionMenu && selectedReportId === report.id && (
+                      {showActionMenu && String(selectedReportId) === String(report.id) && (
                         <ActionMenu report={report} />
                       )}
                     </div>
@@ -491,48 +512,100 @@ const ReportManagementPage = () => {
         </div>
       </div>
 
-      {/* Dialogs */}
+      {/* Assign Officer Dialog */}
       {assignDialogOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-                <UserCheck className="w-8 h-8 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Tugaskan Petugas</h3>
-              <p className="text-gray-600">Pilih petugas untuk menangani laporan ini</p>
-            </div>
-            <div className="space-y-3 mb-6">
-              <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">AR</span>
-                  </div>
-                  <div>
-                    <p className="font-medium">Ahmad Rahman</p>
-                    <p className="text-sm text-gray-500">Senior Water Quality Inspector</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="flex space-x-3">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-900">Tugaskan Petugas</h2>
               <button
-                onClick={() => setAssignDialogOpen(false)}
-                className="flex-1 px-6 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+                onClick={handleCloseAssignDialog}
+                disabled={assignLoading}
+                className="text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <XCircle className="w-6 h-6" />
+              </button>
+            </div>
+
+            <p className="text-gray-600 mb-6">
+              Pilih petugas untuk menangani laporan ini
+              {selectedReportId && (
+                <span className="block text-sm text-blue-600 mt-1">
+                  Report ID: {selectedReportId}
+                </span>
+              )}
+            </p>
+
+            {officers.length === 0 ? (
+              <div className="text-center py-8">
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-gray-100 rounded-full mb-4">
+                  <UserCheck className="w-6 h-6 text-gray-400" />
+                </div>
+                <p className="text-gray-500">Tidak ada petugas tersedia</p>
+              </div>
+            ) : (
+              <div className="space-y-2 mb-6 max-h-60 overflow-y-auto">
+                {officers.map((officer) => {
+                  const isSelected = String(selectedOfficer) === String(officer.id);
+
+                  return (
+                    <div
+                      key={`officer-${officer.id}`}
+                      onClick={() => {
+                        if (!assignLoading) {
+                          setSelectedOfficer(isSelected ? "" : String(officer.id));
+                        }
+                      }}
+                      className={`p-4 border rounded-xl cursor-pointer transition-all ${isSelected
+                        ? 'border-blue-500 bg-blue-50 shadow-sm'
+                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        } ${assignLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-gray-900">{officer.name}</p>
+                          <p className="text-sm text-gray-500">
+                            {officer.username && `@${officer.username}`}
+                            {officer.email && ` • ${officer.email}`}
+                          </p>
+                        </div>
+                        {isSelected && (
+                          <CheckCircle className="w-5 h-5 text-blue-500" />
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+              <button
+                onClick={handleCloseAssignDialog}
+                disabled={assignLoading}
+                className="px-6 py-2 text-gray-700 rounded-xl hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Batal
               </button>
               <button
                 onClick={handleAssignConfirm}
-                className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
+                disabled={!selectedOfficer || assignLoading || officers.length === 0}
+                className={`px-6 py-2 rounded-xl text-white transition-all flex items-center space-x-2 ${selectedOfficer && !assignLoading && officers.length > 0
+                  ? 'bg-blue-600 hover:bg-blue-700 shadow-sm hover:shadow-md'
+                  : 'bg-gray-400 cursor-not-allowed'
+                  }`}
               >
-                Tugaskan
+                {assignLoading && (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                )}
+                <span>{assignLoading ? 'Menugaskan...' : 'Tugaskan'}</span>
               </button>
             </div>
           </div>
         </div>
       )}
 
+      {/* Cancel Dialog */}
       {cancelDialogOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
@@ -596,6 +669,7 @@ const ReportManagementPage = () => {
           onClick={() => {
             setShowActionMenu(false);
             setShowFilterDropdown(false);
+            setSelectedReportId(null);
           }}
         />
       )}
