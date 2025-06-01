@@ -22,6 +22,16 @@ const UserManagementPage = () => {
   const [userToDelete, setUserToDelete] = useState(null);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [filterRole, setFilterRole] = useState("all");
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [userToEdit, setUserToEdit] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    phone: "",
+    role: "Warga",
+  });
+  const [editUser, setEditUser] = useState(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -54,11 +64,102 @@ const UserManagementPage = () => {
     setActiveDropdown(null);
   };
 
+  const handleUpdateUser = async () => {
+    setLoading(true);
+
+    try {
+      // Your existing API integration for updateUser
+      const response = await userService.updateUser(editingUser.user_id, {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phone,
+        role: formData.role,
+      });
+
+      if (response.ok) {
+        // Update local state
+        setUsers(
+          users.map((user) =>
+            user.user_id === editingUser.user_id
+              ? { ...user, ...formData }
+              : user
+          )
+        );
+        setShowEditModal(false);
+        setEditingUser(null);
+        setFormData({
+          name: "",
+          email: "",
+          password: "",
+          phone: "",
+          role: "warga",
+        });
+      }
+    } catch (error) {
+      console.error("Error updating user:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleEditUser = (userId) => {
-    // Navigate to edit user
-    console.log("Edit user:", userId);
+    const selectedUser = users.find((u) => u.user_id === userId);
+    if (!selectedUser) return;
+
+    setUserToEdit(selectedUser);
+    setEditUser(selectedUser); // Tambahkan ini
+    setEditFormData({
+      name: selectedUser.name,
+      email: selectedUser.email,
+      password: "", // Kosongkan karena opsional
+      phone: selectedUser.phone || "",
+      role: selectedUser.role,
+    });
+    setEditDialogOpen(true);
     setActiveDropdown(null);
   };
+
+  const handleEditInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+ const handleEditSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    if (!userToEdit || !userToEdit.user_id) {
+      throw new Error("User data is incomplete");
+    }
+
+    // Siapkan data untuk dikirim ke backend
+    const payload = {
+      name: editFormData.name,
+      email: editFormData.email,
+      phone: editFormData.phone,
+      role: editFormData.role
+    };
+
+    // Hanya kirim password jika diisi
+    if (editFormData.password) {
+      payload.password = editFormData.password;
+    }
+
+    await userService.updateUser(userToEdit.user_id, payload);
+
+    // Update state
+    const updatedUsers = users.map((u) => 
+      u.user_id === userToEdit.user_id ? { ...u, ...payload } : u
+    );
+    
+    setUsers(updatedUsers);
+    setEditDialogOpen(false);
+    setUserToEdit(null);
+  } catch (err) {
+    console.error("Failed to update user:", err);
+    setError(err.message || "Gagal update user");
+  }
+};
 
   const handleDeleteClick = (user) => {
     setUserToDelete(user);
@@ -68,19 +169,16 @@ const UserManagementPage = () => {
 
   const handleDeleteConfirm = async () => {
     try {
-      await userService.deleteUser(userToDelete.id);
-      setUsers(users.filter((user) => user.id !== userToDelete.id));
+      await userService.deleteUser(userToDelete?.user_id);
+      console.log("Deleting user:", userToDelete);
+
+      setUsers(users.filter((user) => user.user_id !== userToDelete.user_id));
       setDeleteDialogOpen(false);
       setUserToDelete(null);
     } catch (err) {
       console.error("Error deleting user:", err);
       setError(err.message || "Failed to delete user");
     }
-  };
-
-  const handleAddUser = () => {
-    // Navigate to add user page
-    console.log("Add new user");
   };
 
   const filteredUsers = users.filter((user) => {
@@ -137,24 +235,24 @@ const UserManagementPage = () => {
           <button
             onClick={(e) => {
               e.stopPropagation(); // MENCEGAH event bubbling
-              handleDropdownToggle(user.id);
+              handleDropdownToggle(user.user_id);
             }}
             className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
           >
             <MoreVertical className="h-5 w-5" />
           </button>
 
-          {activeDropdown === user.id && (
+          {activeDropdown === user.user_id && (
             <div className="absolute right-0 z-10 mt-2 w-48 rounded-lg bg-white py-2 shadow-lg ring-1 ring-gray-200">
               <button
-                onClick={() => handleViewUser(user.id)}
+                onClick={() => handleViewUser(user.user_id)}
                 className="flex w-full items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 <Eye className="h-4 w-4" />
                 <span>View Details</span>
               </button>
               <button
-                onClick={() => handleEditUser(user.id)}
+                onClick={() => handleEditUser(user.user_id)}
                 className="flex w-full items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 <Edit className="h-4 w-4" />
@@ -212,19 +310,7 @@ const UserManagementPage = () => {
               Kelola pengguna sistem monitoring air
             </p>
           </div>
-          <div className="flex space-x-3">
-            <button className="flex items-center space-x-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-              <Download className="h-4 w-4" />
-              <span>Export</span>
-            </button>
-            <button
-              onClick={handleAddUser}
-              className="flex items-center space-x-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-            >
-              <UserPlus className="h-4 w-4" />
-              <span>Add User</span>
-            </button>
-          </div>
+          
         </div>
 
         {/* Filters and Search */}
@@ -262,7 +348,7 @@ const UserManagementPage = () => {
         {/* Users Grid */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filteredUsers.map((user) => (
-            <UserCard key={user.id} user={user} />
+            <UserCard key={user.user_id} user={user} />
           ))}
         </div>
 
@@ -330,6 +416,71 @@ const UserManagementPage = () => {
           className="fixed inset-0 z-0"
           onClick={() => setActiveDropdown(null)}
         ></div>
+      )}
+      {editDialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+              Edit User
+            </h2>
+            <div className="space-y-4">
+              <input
+                name="name"
+                value={editFormData.name}
+                onChange={handleEditInputChange}
+                placeholder="Name"
+                className="w-full rounded border px-4 py-2"
+              />
+              <input
+                name="email"
+                value={editFormData.email}
+                onChange={handleEditInputChange}
+                placeholder="Email"
+                className="w-full rounded border px-4 py-2"
+              />
+              <input
+                name="password"
+                value={editFormData.password}
+                onChange={handleEditInputChange}
+                placeholder="Password (leave blank to keep current)"
+                type="password"
+                className="w-full rounded border px-4 py-2"
+              />
+              <input
+                name="phone"
+                value={editFormData.phone}
+                onChange={handleEditInputChange}
+                placeholder="Phone"
+                className="w-full rounded border px-4 py-2"
+              />
+              <select
+                name="role"
+                value={editFormData.role}
+                onChange={handleEditInputChange}
+                className="w-full rounded border px-4 py-2"
+              >
+                <option value="Admin">Admin</option>
+                <option value="Petugas">Petugas</option>
+                <option value="Warga">Warga</option>
+              </select>
+            </div>
+
+            <div className="mt-6 flex justify-end space-x-3">
+              <button
+                onClick={() => setEditDialogOpen(false)}
+                className="rounded bg-gray-100 px-4 py-2 text-gray-700"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleEditSubmit}
+                className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
