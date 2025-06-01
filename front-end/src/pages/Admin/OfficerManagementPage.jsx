@@ -38,23 +38,22 @@ const OfficerManagementPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchOfficers = async () => {
-      try {
-        setLoading(true);
-        const data = await userService.getOfficers();
-        setOfficers(Array.isArray(data) ? data : data.officers || []);
-        console.log("Fetched officers:", data);
-      } catch (err) {
-        console.error("Error fetching officers:", err);
-        setError(err.message || "Failed to load officers");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchOfficers = async () => {
+    try {
+      setLoading(true);
+      const data = await userService.getOfficers();
+      const officersData = Array.isArray(data) ? data : data.officers || [];
+      setOfficers(officersData);
+    } catch (err) {
+      console.error("Error fetching officers:", err);
+      setError(err.message || "Failed to load officers");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchOfficers();
-  }, []);
-
+  fetchOfficers();
+}, []);
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
@@ -116,8 +115,8 @@ const OfficerManagementPage = () => {
 
   const filteredOfficers = officers.filter((officer) => {
     const matchesSearch =
-      officer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      officer.email.toLowerCase().includes(searchTerm.toLowerCase());
+      officer.name?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
+      officer.email?.toLowerCase()?.includes(searchTerm.toLowerCase());
 
     const matchesFilter =
       filterStatus === "all" ||
@@ -126,7 +125,6 @@ const OfficerManagementPage = () => {
 
     return matchesSearch && matchesFilter;
   });
-
   const activeOfficersCount = officers.filter((o) => o.active).length;
   const totalReports = officers.reduce(
     (sum, o) => sum + (o.assigned_reports_count || 0),
