@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import {
    Droplets,
    ChevronRight,
@@ -7,12 +8,18 @@ import {
 } from 'lucide-react';
 
 export const Hero = () => {
+  const navigate = useNavigate();
   const [currentText, setCurrentText] = useState(0);
   const texts = [
     "Informasi Kualitas Air Bersih PDAM",
     "Mudah dan Cepat Diakses",
     "Transparan dan Real-Time"
   ];
+  
+  const handleStartNow = () => {
+    navigate('/login');
+  };
+
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -87,7 +94,10 @@ export const Hero = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button className="group bg-white text-blue-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-blue-50 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-2">
+            <button 
+              onClick={handleStartNow}
+              className="group bg-white text-blue-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-blue-50 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-2"
+            >
               <Play className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               Mulai Sekarang
             </button>
