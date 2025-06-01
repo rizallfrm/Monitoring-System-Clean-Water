@@ -1,6 +1,7 @@
 const { User } = require("../../../common/models");
 const { generateToken } = require("../../../common/middleware/auth");
 const { Op } = require("sequelize");
+const bcrypt = require('bcrypt');
 
 // Controller untuk pengelolaan user
 const userController = {
@@ -234,53 +235,46 @@ const userController = {
 
   // Update user
   updateUser: async (req, res) => {
-    try {
-      const user_id = req.user.id;
-      const { name, email, password, phone, role } = req.body;
+  try {
+    const { id } = req.params;
+    const { name, email, password, phone, role } = req.body;
 
-      // Cari user berdasarkan user_ID
-      const user = await User.findByPk(user_id);
-
-      if (!user) {
-        return res.status(404).json({
-          status: "error",
-          message: "User tidak ditemukan",
-        });
-      }
-
-      // Jika user bukan admin dan mencoba mengubah role
-      if (req.user.role !== "Admin" && role && role !== user.role) {
-        return res.status(403).json({
-          status: "error",
-          message: "Hanya Admin yang dapat mengubah role user",
-        });
-      }
-
-      // Update data user
-      await user.update({
-        name: name || user.name,
-        email: email || user.email,
-        password: password ? password : undefined,
-        phone: phone !== undefined ? phone : user.phone,
-        role: role || user.role,
-      });
-
-      // Response data user (tanpa password)
-      const { password: _, ...userWithoutPassword } = user.toJSON();
-
-      return res.status(200).json({
-        status: "success",
-        message: "User berhasil diperbarui",
-        data: userWithoutPassword,
-      });
-    } catch (error) {
-      return res.status(500).json({
-        status: "error",
-        message: "Terjadi kesalahan saat memperbarui user",
-        error: error.message,
-      });
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
     }
-  },
+
+    // Update data
+    const updateData = {
+      name: name || user.name,
+      email: email || user.email,
+      phone: phone || user.phone,
+      role: role || user.role
+    };
+
+    // Hash password jika ada
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      updateData.password = await bcrypt.hash(password, salt);
+    }
+
+    await user.update(updateData);
+
+    return res.json({
+      success: true,
+      data: {
+        user_id: user.user_id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        phone: user.phone
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+},
 
   // Delete user
   deleteUser: async (req, res) => {
