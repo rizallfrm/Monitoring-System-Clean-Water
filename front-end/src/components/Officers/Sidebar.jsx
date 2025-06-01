@@ -1,9 +1,51 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
-  Home, FileText, CheckCircle, LogOut, Activity 
+  Home, FileText, CheckCircle, LogOut, Activity, User 
 } from 'lucide-react';
+import authService from '../../services/authService'; // Sesuaikan path dengan struktur folder Anda
 
 const Sidebar = ({ activeTab, setActiveTab }) => {
+  const [userProfile, setUserProfile] = useState({
+    name: 'Loading...',
+    role: 'Loading...'
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        setLoading(true);
+        const profile = await authService.getProfile();
+        setUserProfile({
+          name: profile.name || 'Unknown User',
+          role: profile.role || 'Unknown Role'
+        });
+      } catch (error) {
+        console.error('Failed to fetch user profile:', error);
+        // Fallback ke data default jika gagal
+        setUserProfile({
+          name: 'Petugas',
+          role: 'Petugas Lapangan'
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
+  // Function untuk mendapatkan inisial nama
+  const getInitials = (name) => {
+    if (!name || name === 'Loading...') return 'JP';
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   return (
     <div className="fixed inset-y-0 left-0 w-64 bg-gradient-to-b from-white via-gray-50/50 to-white shadow-2xl border-r border-gray-200 flex flex-col overflow-hidden">
       {/* Background decorative elements */}
@@ -68,15 +110,25 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
       <div className="p-4 border-t border-gray-200 relative z-10">
         <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-4 border border-gray-200">
           <div className="flex items-center">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
-              <span className="text-white text-lg font-bold">JP</span>
+            <div className="w-12 h-12 bg-gray-400 rounded-2xl flex items-center justify-center shadow-lg">
+              <User className="h-6 w-6 text-white" />
             </div>
             <div className="ml-3 flex-1">
-              <p className="text-sm font-bold text-gray-900">Joko Purnomo</p>
-              <p className="text-xs text-gray-500">Petugas Lapangan</p>
+              <p className="text-sm font-bold text-gray-900">
+                {loading ? 'Loading...' : userProfile.name}
+              </p>
+              <p className="text-xs text-gray-500">
+                {loading ? 'Loading...' : userProfile.role}
+              </p>
             </div>
           </div>
-          <button className="flex items-center justify-center w-full mt-3 px-3 py-2 text-xs text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 font-medium border border-gray-200 hover:border-red-200">
+          <button 
+            onClick={() => {
+              localStorage.removeItem('token');
+              window.location.href = '/login';
+            }}
+            className="flex items-center justify-center w-full mt-3 px-3 py-2 text-xs text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 font-medium border border-gray-200 hover:border-red-200"
+          >
             <LogOut className="h-4 w-4 mr-2" />
             Keluar
           </button>
