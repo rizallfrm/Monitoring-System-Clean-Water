@@ -494,7 +494,7 @@ const OfficerPage = () => {
                 )}
 
                 {activeTab === "reports" && (
-                  <div className="space-y-6">update:modify ReportCard to handle officer page
+                  <div className="space-y-6">
                     {/* Enhanced Filter Section */}
                     <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 p-6">
                       <ReportsFilter
