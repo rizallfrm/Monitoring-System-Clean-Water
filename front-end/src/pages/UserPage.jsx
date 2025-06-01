@@ -7,7 +7,7 @@ import ReportList from "../components/UserPage/ReportList";
 import ReportForm from "../components/UserPage/ReportForm";
 import authService from "../services/authService";
 import reportService from "../services/reportService";
-import { Droplets, FileText, Plus, AlertCircle, Activity } from "lucide-react";
+import { Droplets, FileText, Plus, AlertCircle, Activity, RefreshCw } from "lucide-react";
 
 export default function UserPage() {
   const { user, logout } = useAuth();
@@ -16,6 +16,7 @@ export default function UserPage() {
   const [activeTab, setActiveTab] = useState("reports");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [retryCount, setRetryCount] = useState(0);
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
@@ -23,40 +24,89 @@ export default function UserPage() {
     inProgress: 0
   });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [profileData, reportsData] = await Promise.all([
-          authService.getProfile(),
-          reportService.getAllReports(),
-        ]);
-        console.log("Fetched reports:", reportsData);
+  const calculateStats = (reportsData) => {
+    if (!Array.isArray(reportsData)) {
+      return { total: 0, pending: 0, resolved: 0, inProgress: 0 };
+    }
 
-        setProfile(profileData);
-        setReports(reportsData);
-        
-        // Calculate stats
-        const statsData = {
-          total: reportsData.length,
-          pending: reportsData.filter(r => r.status === 'pending').length,
-          resolved: reportsData.filter(r => r.status === 'resolved').length,
-          inProgress: reportsData.filter(r => r.status === 'in_progress').length
-        };
-        setStats(statsData);
-      } catch (err) {
-        console.error("Fetch error:", err);
-        setError(err.message || "Failed to fetch data");
-      } finally {
-        setLoading(false);
-      }
+    return {
+      total: reportsData.length,
+      pending: reportsData.filter(r => r.status === 'pending').length,
+      resolved: reportsData.filter(r => r.status === 'resolved').length,
+      inProgress: reportsData.filter(r => r.status === 'in_progress').length
     };
+  };
 
+  const fetchData = async (isRetry = false) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      console.log(`Fetching data... ${isRetry ? '(retry)' : ''}`);
+      
+      // Fetch profile first
+      let profileData = null;
+      let reportsData = [];
+      
+      try {
+        profileData = await authService.getProfile();
+        console.log("Profile data fetched:", profileData);
+      } catch (profileError) {
+        console.warn("Failed to fetch profile:", profileError);
+        // Continue even if profile fails
+      }
+      
+      // Fetch reports with retry logic
+      try {
+        reportsData = await reportService.getAllReports();
+        console.log("Reports data fetched:", reportsData);
+        
+        // Ensure it's an array
+        if (!Array.isArray(reportsData)) {
+          console.warn("Reports data is not an array, converting:", reportsData);
+          reportsData = [];
+        }
+      } catch (reportsError) {
+        console.error("Failed to fetch reports:", reportsError);
+        
+        // If this is the first attempt, try to handle gracefully
+        if (!isRetry) {
+          reportsData = [];
+          console.log("Setting empty reports array as fallback");
+        } else {
+          throw reportsError; // Re-throw on retry
+        }
+      }
+
+      // Update state
+      setProfile(profileData);
+      setReports(reportsData);
+      setStats(calculateStats(reportsData));
+      setRetryCount(0); // Reset retry count on success
+      
+    } catch (err) {
+      console.error("Fetch error:", err);
+      const errorMessage = err.message || "Failed to fetch data";
+      setError(errorMessage);
+      
+      // Increment retry count
+      setRetryCount(prev => prev + 1);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRetry = () => {
+    fetchData(true);
+  };
+
+  useEffect(() => {
     if (user) {
       fetchData();
     }
   }, [user]);
 
+  // Loading state for user authentication
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50">
@@ -68,28 +118,44 @@ export default function UserPage() {
     );
   }
 
+  // Loading state for data fetching
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50">
         <div className="flex flex-col items-center space-y-4">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 border-t-blue-600"></div>
-          <p className="text-blue-600 font-medium">Memuat dashboard...</p>
+          <p className="text-blue-600 font-medium">
+            Memuat dashboard... {retryCount > 0 && `(Percobaan ${retryCount + 1})`}
+          </p>
         </div>
       </div>
     );
   }
 
+  // Error state with retry option
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-red-50 to-orange-50">
         <div className="bg-white border border-red-200 text-red-700 px-8 py-6 rounded-xl shadow-lg max-w-md">
-          <div className="flex items-center space-x-3">
-            <AlertCircle className="h-6 w-6 text-red-500" />
-            <div>
+          <div className="flex items-center space-x-3 mb-4">
+            <AlertCircle className="h-6 w-6 text-red-500 flex-shrink-0" />
+            <div className="flex-1">
               <h3 className="font-semibold">Terjadi Kesalahan</h3>
-              <p className="text-sm text-red-600">{error}</p>
+              <p className="text-sm text-red-600 mt-1">{error}</p>
+              {retryCount > 0 && (
+                <p className="text-xs text-red-500 mt-1">
+                  Percobaan ke-{retryCount + 1}
+                </p>
+              )}
             </div>
           </div>
+          <button
+            onClick={handleRetry}
+            className="w-full flex items-center justify-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            <RefreshCw className="h-4 w-4" />
+            <span>Coba Lagi</span>
+          </button>
         </div>
       </div>
     );
@@ -221,14 +287,10 @@ export default function UserPage() {
                       </div>
                       <ReportForm
                         onReportCreated={(newReport) => {
-                          setReports([newReport, ...reports]);
+                          const updatedReports = [newReport, ...reports];
+                          setReports(updatedReports);
                           setActiveTab("reports");
-                          // Update stats
-                          setStats(prev => ({
-                            ...prev,
-                            total: prev.total + 1,
-                            pending: prev.pending + 1
-                          }));
+                          setStats(calculateStats(updatedReports));
                         }}
                       />
                     </div>

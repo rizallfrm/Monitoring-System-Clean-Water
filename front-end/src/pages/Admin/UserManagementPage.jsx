@@ -250,7 +250,7 @@ const UserManagementPage = () => {
                 <option value="all">All Roles</option>
                 <option value="Admin">Admin</option>
                 <option value="Petugas">Petugas</option>
-                <option value="User">User</option>
+                <option value="Warga">Warga</option>
               </select>
             </div>
           </div>

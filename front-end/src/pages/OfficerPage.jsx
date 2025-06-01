@@ -48,55 +48,72 @@ const OfficerPage = () => {
 
   // Load data from API
   const loadData = async () => {
-    setIsLoading(true);
-    setError(null);
+  setIsLoading(true);
+  setError(null);
+  
+  try {
+    // Load reports dengan retry mechanism
+    let reportsResponse = [];
     try {
-      // Load reports dengan error handling yang lebih baik
-      const reportsResponse = await reportService.getAllReports();
+      reportsResponse = await reportService.getAllReports();
+      console.log('Reports loaded successfully:', reportsResponse.length);
+      setReports(Array.isArray(reportsResponse) ? reportsResponse : []);
+    } catch (reportError) {
+      console.error("Reports loading failed:", reportError.message);
+      setError(`Gagal memuat laporan: ${reportError.message}`);
+      setReports([]); // Set empty array as fallback
+    }
 
-      if (Array.isArray(reportsResponse)) {
-        setReports(reportsResponse);
-      } else {
-        console.error("Failed to load reports:", reportsResponse.message);
-        setError("Gagal memuat data laporan");
-      }
-
-      // Load actions
+    // Load actions - tetap lanjutkan meski reports gagal
+    try {
       const actionsResponse = await actionService.getAllActions();
       console.log("Actions response:", actionsResponse);
 
-      if (actionsResponse.success) {
-        setActions(actionsResponse.data?.actions || actionsResponse.data || []);
+      if (actionsResponse && actionsResponse.success !== false) {
+        const actionsData = actionsResponse.data?.actions || 
+                           actionsResponse.data || 
+                           actionsResponse.actions || 
+                           [];
+        setActions(Array.isArray(actionsData) ? actionsData : []);
       } else {
-        console.error("Failed to load actions:", actionsResponse.message);
+        console.warn("Actions response not successful:", actionsResponse);
+        setActions([]);
       }
+    } catch (actionError) {
+      console.error("Actions loading failed:", actionError);
+      setActions([]);
+    }
 
-      // Load statistics
+    // Load statistics - tetap lanjutkan meski ada error sebelumnya
+    try {
       const statsResponse = await statusService.getStatusStatistics();
       console.log("Stats response:", statsResponse);
 
-      if (statsResponse.success) {
+      if (statsResponse && statsResponse.success !== false) {
         const statsData = statsResponse.data || statsResponse;
         setStats({
-          pending: statsData.pending || 0,
-          onGoing: statsData.onGoing || statsData.ongoing || 0,
-          completed: statsData.completed || 0,
-          cancelled: statsData.cancelled || 0,
+          pending: parseInt(statsData.pending || 0),
+          onGoing: parseInt(statsData.onGoing || statsData.ongoing || 0),
+          completed: parseInt(statsData.completed || 0),
+          cancelled: parseInt(statsData.cancelled || 0),
         });
       } else {
-        console.error("Failed to load statistics:", statsResponse.message);
+        console.warn("Stats response not successful:", statsResponse);
+        // Set default stats
+        setStats({ pending: 0, onGoing: 0, completed: 0, cancelled: 0 });
       }
-    } catch (error) {
-      console.error("Error loading data:", error);
-      setError("Terjadi kesalahan saat memuat data");
-    } finally {
-      setIsLoading(false);
+    } catch (statsError) {
+      console.error("Stats loading failed:", statsError);
+      setStats({ pending: 0, onGoing: 0, completed: 0, cancelled: 0 });
     }
-  };
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  } catch (error) {
+    console.error("Critical error in loadData:", error);
+    setError("Terjadi kesalahan sistem. Silakan coba lagi.");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   // Handle create new action dengan validasi yang lebih baik
   const handleCreateAction = async () => {
