@@ -38,9 +38,12 @@ const userService = {
     }
   },
 
-  updateUser: async (id, userData) => {
+  updateUser: async (userId, userData) => {
     try {
-      const response = await api("user").put(`/users/users/${id}`, userData);
+      const response = await api("user").put(
+        `/users/users/${userId}`,
+        userData
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -59,7 +62,7 @@ const userService = {
   getOfficers: async () => {
     try {
       const response = await api("user").get("/users/officers");
-      return response.data.data;
+      return response.data.data.officer || [];
     } catch (error) {
       throw error.response?.data || error.message;
     }
