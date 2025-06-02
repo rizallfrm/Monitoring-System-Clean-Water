@@ -35,32 +35,7 @@ const ReportsFilter = ({ searchTerm, setSearchTerm, filterStatus, setFilterStatu
               </kbd>
             </div>
           </div>
-          
-          {/* Status Filter */}
-          <div className="flex items-center space-x-3 bg-gray-50 rounded-xl p-2 border border-gray-200">
-            <div className="flex items-center space-x-2 text-gray-600">
-              <Filter className="h-5 w-5" />
-              <span className="text-sm font-medium">Status:</span>
-            </div>
-            <div className="relative">
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="appearance-none bg-white px-4 py-2 pr-8 border-2 border-gray-200 rounded-lg focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 text-sm font-medium cursor-pointer hover:bg-gray-50"
-              >
-                <option value="all">Semua Status</option>
-                <option value="pending">🟡 Menunggu</option>
-                <option value="onGoing">🔵 Dikerjakan</option>
-                <option value="completed">🟢 Selesai</option>
-                <option value="cancelled">🔴 Dibatalkan</option>
-              </select>
-              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
-          </div>
+
         </div>
         
         {/* Quick Stats */}
