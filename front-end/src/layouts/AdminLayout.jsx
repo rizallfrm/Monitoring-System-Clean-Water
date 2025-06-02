@@ -32,11 +32,6 @@ const menuItems = [
     icon: FileText,
     path: "/reports",
   },
-  {
-    text: "Action Management",
-    icon: Settings,
-    path: "/actions",
-  },
 ];
 
 export default function AdminLayout() {
