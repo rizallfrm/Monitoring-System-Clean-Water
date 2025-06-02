@@ -5,31 +5,37 @@ const reportService = {
     try {
       // 1. Handle file upload terpisah jika diperlukan
       const formPayload = new FormData();
-      
+
       // Append form data
-      formPayload.append('description', formData.description);
-      formPayload.append('location', formData.location);
-      
+      formPayload.append("description", formData.description);
+      formPayload.append("location", formData.location);
+
       // Append files jika ada
       if (files && files.length > 0) {
-        files.forEach(file => {
-          formPayload.append('images', file);
+        files.forEach((file) => {
+          formPayload.append("images", file);
         });
       }
 
       // 2. Kirim ke endpoint yang benar dengan content-type multipart
-      const response = await api("report").post("/reports/reports", formPayload, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
+      const response = await api("report").post(
+        "/reports/reports",
+        formPayload,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
-      });
+      );
 
       return response.data;
     } catch (error) {
-      throw error.response?.data || { 
-        status: 'error', 
-        message: error.message || 'Failed to create report' 
-      };
+      throw (
+        error.response?.data || {
+          status: "error",
+          message: error.message || "Failed to create report",
+        }
+      );
     }
   },
 
@@ -48,20 +54,37 @@ const reportService = {
       const apiInstance = api("report");
       console.log("Api instance methods:", {
         get: typeof apiInstance.get,
-        post: typeof apiInstance.post
+        post: typeof apiInstance.post,
       });
 
       const response = await apiInstance.get(`/reports/reports/${id}`);
       console.log("Full API response:", response);
-      
+
       // Pastikan struktur data sesuai
-      if (response.data && response.data.status === 'success') {
+      if (response.data && response.data.status === "success") {
         return response.data.data; // Ambil data dari response
       }
       throw new Error("Invalid response structure");
     } catch (error) {
       console.error("Error in getReportById:", error);
       throw error.response?.data || error.message;
+    }
+  },
+
+  getReportsByOfficer: async (officerId) => {
+    try {
+      if (!officerId) {
+        throw new Error("Officer ID is required");
+      }
+
+      const response = await api("report").get(
+        `/reports/reports/officer/${officerId}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error in getReportsByOfficer:", error);
+
+      throw error;
     }
   },
 

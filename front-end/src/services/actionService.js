@@ -1,9 +1,9 @@
-import {api} from './apiService';
+import { api } from "./apiService";
 
 const actionService = {
   createAction: async (actionData) => {
     try {
-      const response = await api("action").post('/actions/actions', actionData);
+      const response = await api("action").post("/actions/actions", actionData);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -12,16 +12,25 @@ const actionService = {
 
   getActionsByReportId: async (reportId) => {
     try {
-      const response = await api("action").get(`/reports/${reportId}/actions`);
-      return response.data;
+      const response = await api("action").get(
+        `/actions/reports/${reportId}/actions`
+      );
+
+      // Debugging response structure
+      console.log("Raw API response:", response);
+
+      if (response.data && response.data.status === "success") {
+        return response.data;
+      }
+      throw new Error("Format respons tidak valid");
     } catch (error) {
+      console.error("API error:", error);
       throw error.response?.data || error.message;
     }
   },
-
   getAllActions: async (params = {}) => {
     try {
-      const response = await api("action").get('/actions/actions', { params });
+      const response = await api("action").get("/actions/actions", { params });
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -39,19 +48,27 @@ const actionService = {
 
   updateAction: async (id, actionData) => {
     try {
-      const response = await api("action").put(`/actions/actions/${id}`, actionData);
+      const response = await api("action").put(
+        `/actions/actions/${id}`,
+        actionData
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
     }
   },
 
-  deleteAction: async (id) => {
+  deleteAction: async (actionId) => {
     try {
-      const response = await api("action").delete(`/actions/actions/${id}`);
+      const response = await api("action").delete(
+        `/actions/actions/${actionId}`
+      );
       return response.data;
     } catch (error) {
-      throw error.response?.data || error.message;
+      if (error.response?.data) {
+        return error.response.data;
+      }
+      throw error;
     }
   },
 };
