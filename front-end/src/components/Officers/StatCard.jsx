@@ -1,7 +1,7 @@
 import React from 'react';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 
-const StatCard = ({ icon: Icon, title, value, color, trend, trendDirection = 'up' }) => {
+const StatCard = ({ icon: Icon, title, value, color, trend, reports, trendDirection = 'up' }) => {
   const getGradientColors = (color) => {
     const gradients = {
       'text-blue-600': 'from-blue-500 to-indigo-600',
