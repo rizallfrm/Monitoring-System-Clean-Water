@@ -6,6 +6,7 @@ const reportService = {
       // 1. Handle file upload terpisah jika diperlukan
       const formPayload = new FormData();
 
+
       // Append form data
       formPayload.append("description", formData.description);
       formPayload.append("location", formData.location);
@@ -60,6 +61,7 @@ const reportService = {
       const response = await apiInstance.get(`/reports/reports/${id}`);
       console.log("Full API response:", response);
 
+
       // Pastikan struktur data sesuai
       if (response.data && response.data.status === "success") {
         return response.data.data; // Ambil data dari response
@@ -102,16 +104,24 @@ const reportService = {
 
   assignOfficer: async (reportId, officerId) => {
     try {
+      // Konversi officerId ke number jika diperlukan
+      const numericOfficerId = Number(officerId);
+      if (isNaN(numericOfficerId)) {
+        throw new Error('ID petugas harus berupa angka');
+      }
+
       const response = await api("report").post(
         `/reports/reports/${reportId}/assign`,
-        { officerId }
+        { officerId: numericOfficerId } // Pastikan mengirim number
       );
       return response.data;
     } catch (error) {
-      throw error.response?.data || error.message;
+      throw error.response?.data || {
+        status: 'error',
+        message: error.message || 'Failed to assign officer'
+      };
     }
   },
-
   cancelReport: async (reportId) => {
     try {
       const response = await api("report").post(

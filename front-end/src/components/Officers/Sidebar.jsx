@@ -1,25 +1,49 @@
-import React from "react";
-import { Home, FileText, CheckCircle, LogOut, Activity } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { 
+  Home, FileText, CheckCircle, LogOut, Activity, User 
+} from 'lucide-react';
+import authService from '../../services/authService'; // Sesuaikan path dengan struktur folder Anda
 
-const Sidebar = ({ activeTab, setActiveTab, profile }) => {
-  const navigate = useNavigate();
+const Sidebar = ({ activeTab, setActiveTab }) => {
+  const [userProfile, setUserProfile] = useState({
+    name: 'Loading...',
+    role: 'Loading...'
+  });
+  const [loading, setLoading] = useState(true);
 
-  const handleLogout = () => {
-    // Remove token from localStorage
-    localStorage.removeItem("token");
-    // Redirect to login page
-    navigate("/login");
-  };
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        setLoading(true);
+        const profile = await authService.getProfile();
+        setUserProfile({
+          name: profile.name || 'Unknown User',
+          role: profile.role || 'Unknown Role'
+        });
+      } catch (error) {
+        console.error('Failed to fetch user profile:', error);
+        // Fallback ke data default jika gagal
+        setUserProfile({
+          name: 'Petugas',
+          role: 'Petugas Lapangan'
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Function to get initials from name
+    fetchUserProfile();
+  }, []);
+
+  // Function untuk mendapatkan inisial nama
   const getInitials = (name) => {
-    if (!name) return "U";
-    const names = name.split(" ");
-    return names
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase();
+    if (!name || name === 'Loading...') return 'JP';
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   return (
@@ -110,25 +134,23 @@ const Sidebar = ({ activeTab, setActiveTab, profile }) => {
       <div className="p-4 border-t border-gray-200 relative z-10">
         <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-4 border border-gray-200">
           <div className="flex items-center">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
-              <span className="text-white text-lg font-bold">
-                {getInitials(profile?.name)}
-              </span>
+            <div className="w-12 h-12 bg-gray-400 rounded-2xl flex items-center justify-center shadow-lg">
+              <User className="h-6 w-6 text-white" />
             </div>
             <div className="ml-3 flex-1">
-              <div>
-                <h3 className="text-xl font-bold text-gray-900">
-                  {profile?.name || "User"}
-                </h3>
-                
-              </div>
+              <p className="text-sm font-bold text-gray-900">
+                {loading ? 'Loading...' : userProfile.name}
+              </p>
               <p className="text-xs text-gray-500">
-                {profile?.role || "Petugas Lapangan"}
+                {loading ? 'Loading...' : userProfile.role}
               </p>
             </div>
           </div>
-          <button
-            onClick={handleLogout}
+          <button 
+            onClick={() => {
+              localStorage.removeItem('token');
+              window.location.href = '/login';
+            }}
             className="flex items-center justify-center w-full mt-3 px-3 py-2 text-xs text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 font-medium border border-gray-200 hover:border-red-200"
           >
             <LogOut className="h-4 w-4 mr-2" />
