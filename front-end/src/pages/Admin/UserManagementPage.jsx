@@ -125,41 +125,41 @@ const UserManagementPage = () => {
     setEditFormData((prev) => ({ ...prev, [name]: value }));
   };
 
- const handleEditSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    if (!userToEdit || !userToEdit.user_id) {
-      throw new Error("User data is incomplete");
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (!userToEdit || !userToEdit.user_id) {
+        throw new Error("User data is incomplete");
+      }
+
+      // Siapkan data untuk dikirim ke backend
+      const payload = {
+        name: editFormData.name,
+        email: editFormData.email,
+        phone: editFormData.phone,
+        role: editFormData.role,
+      };
+
+      // Hanya kirim password jika diisi
+      if (editFormData.password) {
+        payload.password = editFormData.password;
+      }
+
+      await userService.updateUser(userToEdit.user_id, payload);
+
+      // Update state
+      const updatedUsers = users.map((u) =>
+        u.user_id === userToEdit.user_id ? { ...u, ...payload } : u
+      );
+
+      setUsers(updatedUsers);
+      setEditDialogOpen(false);
+      setUserToEdit(null);
+    } catch (err) {
+      console.error("Failed to update user:", err);
+      setError(err.message || "Gagal update user");
     }
-
-    // Siapkan data untuk dikirim ke backend
-    const payload = {
-      name: editFormData.name,
-      email: editFormData.email,
-      phone: editFormData.phone,
-      role: editFormData.role
-    };
-
-    // Hanya kirim password jika diisi
-    if (editFormData.password) {
-      payload.password = editFormData.password;
-    }
-
-    await userService.updateUser(userToEdit.user_id, payload);
-
-    // Update state
-    const updatedUsers = users.map((u) => 
-      u.user_id === userToEdit.user_id ? { ...u, ...payload } : u
-    );
-    
-    setUsers(updatedUsers);
-    setEditDialogOpen(false);
-    setUserToEdit(null);
-  } catch (err) {
-    console.error("Failed to update user:", err);
-    setError(err.message || "Gagal update user");
-  }
-};
+  };
 
   const handleDeleteClick = (user) => {
     setUserToDelete(user);
@@ -197,11 +197,6 @@ const UserManagementPage = () => {
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold text-lg">
               {user.name.charAt(0).toUpperCase()}
             </div>
-            <div
-              className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white ${
-                user.active ? "bg-green-500" : "bg-gray-400"
-              }`}
-            ></div>
           </div>
           <div>
             <h3 className="font-semibold text-gray-900">{user.name}</h3>
@@ -219,13 +214,9 @@ const UserManagementPage = () => {
                 {user.role}
               </span>
               <span
-                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                  user.active
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
-                }`}
+                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${user.phone}`}
               >
-                {user.active ? "Active" : "Inactive"}
+                {user.phone}
               </span>
             </div>
           </div>
@@ -244,13 +235,6 @@ const UserManagementPage = () => {
 
           {activeDropdown === user.user_id && (
             <div className="absolute right-0 z-10 mt-2 w-48 rounded-lg bg-white py-2 shadow-lg ring-1 ring-gray-200">
-              <button
-                onClick={() => handleViewUser(user.user_id)}
-                className="flex w-full items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                <Eye className="h-4 w-4" />
-                <span>View Details</span>
-              </button>
               <button
                 onClick={() => handleEditUser(user.user_id)}
                 className="flex w-full items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -310,7 +294,6 @@ const UserManagementPage = () => {
               Kelola pengguna sistem monitoring air
             </p>
           </div>
-          
         </div>
 
         {/* Filters and Search */}
@@ -436,14 +419,6 @@ const UserManagementPage = () => {
                 value={editFormData.email}
                 onChange={handleEditInputChange}
                 placeholder="Email"
-                className="w-full rounded border px-4 py-2"
-              />
-              <input
-                name="password"
-                value={editFormData.password}
-                onChange={handleEditInputChange}
-                placeholder="Password (leave blank to keep current)"
-                type="password"
                 className="w-full rounded border px-4 py-2"
               />
               <input
