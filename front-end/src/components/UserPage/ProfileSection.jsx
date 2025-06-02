@@ -7,35 +7,7 @@ const WaterDropIcon = ({ className = "w-6 h-6" }) => (
   </svg>
 );
 
-// Stats Card Component
-const StatsCard = ({ icon, title, value, trend, color = "blue" }) => {
-  const colorClasses = {
-    blue: "bg-gradient-to-br from-blue-500 to-blue-600 shadow-blue-200",
-    green: "bg-gradient-to-br from-green-500 to-green-600 shadow-green-200",
-    purple: "bg-gradient-to-br from-purple-500 to-purple-600 shadow-purple-200",
-    cyan: "bg-gradient-to-br from-cyan-500 to-cyan-600 shadow-cyan-200",
-  };
 
-  return (
-    <div
-      className={`${colorClasses[color]} text-white p-6 rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-300`}
-    >
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-blue-100 text-sm font-medium">{title}</p>
-          <p className="text-3xl font-bold mt-2">{value}</p>
-          {trend && (
-            <p className="text-blue-100 text-sm mt-1 flex items-center">
-              <span className="inline-block w-2 h-2 bg-green-400 rounded-full mr-2"></span>
-              {trend}
-            </p>
-          )}
-        </div>
-        <div className="text-4xl opacity-80">{icon}</div>
-      </div>
-    </div>
-  );
-};
 
 const ProfileSection = ({ profile }) => {
   const [isEditing, setIsEditing] = useState(false);

@@ -3,13 +3,17 @@ import { api } from "./apiService";
 const statusService = {
   createStatusUpdate: async (statusData) => {
     try {
-      const response = await api("status").post("/status-updates", statusData);
+      const response = await api("status").post("/status/status-updates", {
+        reportId: statusData.reportId,
+        status: statusData.status,
+      });
       return response.data;
     } catch (error) {
-      throw error.response?.data || error.message;
+      const errorMessage =
+        error.response?.data?.message || "Gagal memperbarui status";
+      throw new Error(errorMessage);
     }
   },
-
   getStatusHistoryByReportId: async (reportId) => {
     try {
       const response = await api("status").get(

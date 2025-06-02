@@ -21,12 +21,16 @@ import ReportCard from "../components/Officers/ReportCard";
 import ReportsFilter from "../components/Officers/ReportsFilter";
 import ActionModal from "../components/Officers/ActionModal";
 import ReportDetailModal from "../components/Officers/ReportDetailModal";
+import authService from "../services/authService";
+import userService from "../services/userService";
+import ActionsList from "../components/Officers/ActionList";
+import ActionList from "../components/Officers/ActionList";
 
-const OfficerPage = () => {
-  const [activeTab, setActiveTab] = useState("dashboard");
+const OfficerPage = (response) => {
+  const [activeTab, setActiveTab] = useState("actions");
   const [reports, setReports] = useState([]);
-  const [actions, setActions] = useState([]);
-  const [stats, setStats] = useState({
+  const [statusHistory, setStatusHistory] = useState([]); // Tambahkan state untuk riwayat status
+  const [status, setStatus] = useState({
     pending: 0,
     onGoing: 0,
     completed: 0,
@@ -34,97 +38,194 @@ const OfficerPage = () => {
   });
   const [selectedReport, setSelectedReport] = useState(null);
   const [showActionModal, setShowActionModal] = useState(false);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [currentStatus, setCurrentStatus] = useState("Pending");
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [currentOfficerId, setCurrentOfficerId] = useState(null);
+  const [currentOfficer, setCurrentOfficer] = useState(null);
   const [actionForm, setActionForm] = useState({
     reportId: "",
-    description: "",
-    assignedTo: "",
+    actionDescription: "",
     dueDate: "",
-    priority: "medium",
   });
+  const [statusForm, setStatusForm] = useState({
+    reportId: "",
+    status: "On-Going",
+  });
+  const [actions, setActions] = useState([]);
+  const [selectedReportId, setSelectedReportId] = useState(null);
+  const [isLoadingActions, setIsLoadingActions] = useState(false);
+  const [actionsError, setActionsError] = useState(null);
+  const [currentReportId, setCurrentReportId] = useState(5); // Ganti dengan ID report yang sesuai
 
+  const loadCurrentOfficer = async () => {
+    try {
+      const officerData = await userService.getProfile();
+      setCurrentOfficer({
+        id: officerData.data?.user_id,
+        name: officerData.data?.name,
+        email: officerData.data?.email,
+      });
+    } catch (error) {
+      console.error("Gagal memuat data petugas:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "actions") {
+    }
+  }, [activeTab, currentOfficerId]);
+  const handleReportClick = (report) => {
+    console.log("Selected report:", report); // Check if report exists and has report_id
+    setSelectedReport(report);
+  };
+  const loadActionsForReportWithDebug = async (reportId) => {
+    console.log("Loading actions for report ID:", reportId);
+    setIsLoadingActions(true);
+    setActionsError(null);
+    try {
+      const response = await actionService.getActionsByReportId(reportId);
+      console.log("Response dari API:", response);
+
+      if (response.status === "success") {
+        console.log("Response data:", response.data);
+        console.log("Is array?", Array.isArray(response.data));
+
+        const actionsData = Array.isArray(response.data) ? response.data : [];
+        console.log("Actions data to set:", actionsData);
+
+        setActions(actionsData);
+        setSelectedReportId(reportId);
+      } else {
+        throw new Error(response.message || "Gagal memuat tindakan");
+      }
+    } catch (error) {
+      console.error("Gagal memuat tindakan:", error);
+      setActionsError(error.message);
+      setActions([]);
+    } finally {
+      setIsLoadingActions(false);
+    }
+  };
+
+  // 4. TAMBAHKAN BUTTON DI REPORT CARD UNTUK LOAD ACTIONS
+  const handleViewActionsFromReport = (reportId) => {
+    console.log("View actions for report:", reportId);
+    setSelectedReportId(reportId);
+    loadActionsForReport(reportId);
+    setActiveTab("actions"); // Switch to actions tab
+  };
+
+  useEffect(() => {
+    loadData();
+    loadCurrentOfficer();
+  }, []);
+  // useEffect(() => {
+  //   if (activeTab === "actions") {
+  //     // Memuat semua tindakan untuk petugas ini
+  //     const loadAllActions = async () => {
+  //       try {
+  //         const response = await actionService.getActionsByOfficer(
+  //           currentOfficerId
+  //         );
+  //         setActions(response.data || []);
+  //       } catch (error) {
+  //         console.error("Gagal memuat tindakan:", error);
+  //         setActions([]);
+  //       }
+  //     };
+
+  //     loadAllActions();
+  //   }
+  // }, [activeTab, currentOfficerId]);
   // Load data from API
   const loadData = async () => {
-  setIsLoading(true);
-  setError(null);
-  
-  try {
-    // Load reports dengan retry mechanism
-    let reportsResponse = [];
-    try {
-      reportsResponse = await reportService.getAllReports();
-      console.log('Reports loaded successfully:', reportsResponse.length);
-      setReports(Array.isArray(reportsResponse) ? reportsResponse : []);
-    } catch (reportError) {
-      console.error("Reports loading failed:", reportError.message);
-      setError(`Gagal memuat laporan: ${reportError.message}`);
-      setReports([]); // Set empty array as fallback
-    }
+    setIsLoading(true);
+    setError(null);
 
-    // Load actions - tetap lanjutkan meski reports gagal
     try {
-      const actionsResponse = await actionService.getAllActions();
-      console.log("Actions response:", actionsResponse);
+      // Ambil officerId dari user yang login
+      const userData = await authService.getProfile();
+      setCurrentOfficerId(userData.user_id);
 
-      if (actionsResponse && actionsResponse.success !== false) {
-        const actionsData = actionsResponse.data?.actions || 
-                           actionsResponse.data || 
-                           actionsResponse.actions || 
-                           [];
-        setActions(Array.isArray(actionsData) ? actionsData : []);
-      } else {
-        console.warn("Actions response not successful:", actionsResponse);
-        setActions([]);
+      // Load reports yang ditugaskan ke officer ini
+      try {
+        const reportsResponse = await reportService.getReportsByOfficer(
+          userData.user_id
+        );
+        setReports(reportsResponse.data?.reports || []);
+      } catch (reportError) {
+        setError(`Gagal memuat laporan: ${reportError.message}`);
+        setReports([]);
       }
-    } catch (actionError) {
-      console.error("Actions loading failed:", actionError);
+
+      // // Load actions untuk officer ini
+      // try {
+      //   const actionsResponse = await actionService.getActionsByOfficer(
+      //     userData.id
+      //   );
+      //   setActions(actionsResponse.data?.actions || []);
+      // } catch (actionError) {
+      //   console.error("Actions loading failed:", actionError);
+      //   setActions([]);
+      // }
+
+      // Load statistics untuk officer ini
+      // try {
+      //   const statsResponse = await statusService.getOfficerStatistics(
+      //     userData.user_id
+      //   );
+      //   setStats({
+      //     pending: parseInt(statsResponse.data?.pending || 0),
+      //     onGoing: parseInt(statsResponse.data?.onGoing || 0),
+      //     completed: parseInt(statsResponse.data?.completed || 0),
+      //     cancelled: parseInt(statsResponse.data?.cancelled || 0),
+      //   });
+      // } catch (statsError) {
+      //   console.error("Stats loading failed:", statsError);
+      //   setStats({ pending: 0, onGoing: 0, completed: 0, cancelled: 0 });
+      // }
+    } catch (error) {
+      console.error("Critical error in loadData:", error);
+      setError("Terjadi kesalahan sistem. Silakan coba lagi.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loadActionsForReport = async (reportId) => {
+    setIsLoadingActions(true);
+    setActionsError(null);
+    try {
+      const response = await actionService.getActionsByReportId(reportId);
+      console.log("Response dari API:", response);
+      if (response.status === "success") {
+        setActions(Array.isArray(response.data) ? response.data : []);
+        setSelectedReportId(reportId);
+      } else {
+        throw new Error(response.message || "Gagal memuat tindakan");
+      }
+    } catch (error) {
+      console.error("Gagal memuat tindakan:", error);
+      setActionsError(error.message);
       setActions([]);
+    } finally {
+      setIsLoadingActions(false);
     }
-
-    // Load statistics - tetap lanjutkan meski ada error sebelumnya
-    try {
-      const statsResponse = await statusService.getStatusStatistics();
-      console.log("Stats response:", statsResponse);
-
-      if (statsResponse && statsResponse.success !== false) {
-        const statsData = statsResponse.data || statsResponse;
-        setStats({
-          pending: parseInt(statsData.pending || 0),
-          onGoing: parseInt(statsData.onGoing || statsData.ongoing || 0),
-          completed: parseInt(statsData.completed || 0),
-          cancelled: parseInt(statsData.cancelled || 0),
-        });
-      } else {
-        console.warn("Stats response not successful:", statsResponse);
-        // Set default stats
-        setStats({ pending: 0, onGoing: 0, completed: 0, cancelled: 0 });
-      }
-    } catch (statsError) {
-      console.error("Stats loading failed:", statsError);
-      setStats({ pending: 0, onGoing: 0, completed: 0, cancelled: 0 });
-    }
-
-  } catch (error) {
-    console.error("Critical error in loadData:", error);
-    setError("Terjadi kesalahan sistem. Silakan coba lagi.");
-  } finally {
-    setIsLoading(false);
-  }
-};
-
+  };
+  const handleViewActions = (reportId) => {
+    setSelectedReportId(reportId);
+    loadActionsForReport(reportId);
+    setActiveTab("actions"); // Switch to actions tab
+  };
   // Handle create new action dengan validasi yang lebih baik
   const handleCreateAction = async () => {
-    // Validasi form
-    if (
-      !actionForm.reportId ||
-      !actionForm.description ||
-      !actionForm.assignedTo ||
-      !actionForm.dueDate
-    ) {
-      alert("Semua field harus diisi!");
+    // Validasi
+    if (!actionForm.reportId || !actionForm.actionDescription) {
+      alert("ID laporan dan deskripsi tindakan harus diisi!");
       return;
     }
 
@@ -132,52 +233,66 @@ const OfficerPage = () => {
     try {
       const actionData = {
         reportId: actionForm.reportId,
-        description: actionForm.description,
-        assignedTo: actionForm.assignedTo,
-        dueDate: actionForm.dueDate,
-        priority: actionForm.priority || "medium",
-        status: "planned",
+        actionDescription: actionForm.actionDescription, // Pastikan nama field sesuai
+        // Jika backend membutuhkan performed_by (ID petugas)
+        performed_by: currentOfficer.user_id || currentOfficer.id,
       };
 
-      console.log("Creating action with data:", actionData);
       const response = await actionService.createAction(actionData);
 
-      if (response.success) {
-        // Refresh actions list
-        const updatedActionsResponse = await actionService.getAllActions();
-        if (updatedActionsResponse.success) {
-          setActions(
-            updatedActionsResponse.data?.actions ||
-              updatedActionsResponse.data ||
-              []
-          );
-        }
-
-        // Reset form dan tutup modal
+      if (response.status === "success") {
+        await loadData();
+        setShowActionModal(false);
         setActionForm({
           reportId: "",
-          description: "",
-          assignedTo: "",
+          actionDescription: "", // Sesuaikan dengan nama field
           dueDate: "",
-          priority: "medium",
         });
-        setShowActionModal(false);
-
-        // Refresh data untuk update statistik
-        await loadData();
-
-        alert("Tindakan berhasil dibuat!");
+        alert("Tindakan berhasil ditambahkan!");
       } else {
-        console.error("Failed to create action:", response.message);
-        alert(
-          "Gagal membuat tindakan: " + (response.message || "Terjadi kesalahan")
-        );
+        throw new Error(response.message || "Gagal membuat tindakan");
       }
     } catch (error) {
       console.error("Error creating action:", error);
-      alert("Terjadi kesalahan saat membuat tindakan");
+      alert(`Terjadi kesalahan: ${error.message}`);
     } finally {
       setIsLoading(false);
+    }
+  };
+  const handleUpdateStatus = async (reportId, newStatus) => {
+    setIsLoading(true);
+    try {
+      const response = await statusService.createStatusUpdate({
+        reportId: reportId, // Use the reportId passed from the modal
+        status: newStatus, // Use the newStatus passed from the modal
+      });
+
+      if (response.status === "success") {
+        // Refresh data
+        await loadData();
+        setSelectedReport(null); // Close the modal
+        toast.success("Status berhasil diperbarui!");
+      } else {
+        throw new Error(response.message || "Gagal memperbarui status");
+      }
+    } catch (error) {
+      console.error("Error updating status:", error);
+      toast.error(
+        "Terjadi kesalahan saat memperbarui status: " + error.message
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Load status history untuk laporan tertentu
+  const loadStatusHistory = async (reportId) => {
+    try {
+      const response = await statusService.getStatusHistoryByReportId(reportId);
+      setStatusHistory(response.data || []);
+      setCurrentStatus(response.data[0]?.status || "Pending");
+    } catch (error) {
+      console.error("Error loading status history:", error);
     }
   };
 
@@ -218,36 +333,34 @@ const OfficerPage = () => {
   const handleUpdateActionStatus = async (actionId, newStatus) => {
     setIsLoading(true);
     try {
+      // Sesuaikan dengan status yang diterima backend
+      const statusMap = {
+        planned: "On-Going",
+        in_progress: "Completed",
+        completed: "Completed",
+      };
+
       const response = await actionService.updateAction(actionId, {
-        status: newStatus,
+        status: statusMap[newStatus] || newStatus,
       });
 
-      if (response.success) {
-        // Refresh actions list
-        const updatedActionsResponse = await actionService.getAllActions();
-        if (updatedActionsResponse.success) {
-          setActions(
-            updatedActionsResponse.data?.actions ||
-              updatedActionsResponse.data ||
-              []
-          );
-        }
-
-        // Refresh stats
-        await loadData();
-        alert("Status tindakan berhasil diperbarui!");
-      } else {
-        console.error("Failed to update action:", response.message);
-        alert("Gagal memperbarui status tindakan");
+      if (response.status === "success") {
+        // Update state secara manual
+        setActions((prevActions) =>
+          prevActions.map((action) =>
+            action.action_id === actionId
+              ? { ...action, status: response.data.status }
+              : action
+          )
+        );
+        toast.success("Status berhasil diperbarui!");
       }
     } catch (error) {
-      console.error("Error updating action:", error);
-      alert("Terjadi kesalahan saat memperbarui status tindakan");
+      toast.error("Gagal memperbarui status: " + error.message);
     } finally {
       setIsLoading(false);
     }
   };
-
   // Handle delete action
   const handleDeleteAction = async (actionId) => {
     if (!confirm("Apakah Anda yakin ingin menghapus tindakan ini?")) {
@@ -258,25 +371,24 @@ const OfficerPage = () => {
     try {
       const response = await actionService.deleteAction(actionId);
 
-      if (response.success) {
+      if (response.status === "success") {
+        // Ubah dari response.success ke response.status
         // Refresh actions list
-        const updatedActionsResponse = await actionService.getAllActions();
-        if (updatedActionsResponse.success) {
-          setActions(
-            updatedActionsResponse.data?.actions ||
-              updatedActionsResponse.data ||
-              []
-          );
+        const updatedActionsResponse = await actionService.getActionsByReportId(
+          selectedReportId
+        ); // Lebih baik gunakan ini daripada getAllActions
+        if (updatedActionsResponse.status === "success") {
+          setActions(updatedActionsResponse.data || []);
         }
 
         alert("Tindakan berhasil dihapus!");
       } else {
         console.error("Failed to delete action:", response.message);
-        alert("Gagal menghapus tindakan");
+        alert(response.message || "Gagal menghapus tindakan");
       }
     } catch (error) {
       console.error("Error deleting action:", error);
-      alert("Terjadi kesalahan saat menghapus tindakan");
+      alert(error.message || "Terjadi kesalahan saat menghapus tindakan");
     } finally {
       setIsLoading(false);
     }
@@ -284,22 +396,26 @@ const OfficerPage = () => {
 
   // Handle action form change
   const handleActionFormChange = (field, value) => {
-    setActionForm({
-      ...actionForm,
+    setActionForm((prev) => ({
+      ...prev,
       [field]: value,
-    });
+    }));
   };
 
   // Filter reports
   const filteredReports = reports.filter((report) => {
+    // Pastikan report ditugaskan ke officer yang login
+    const isAssignedToMe = report.assigned_to === currentOfficerId;
+
     const matchesSearch =
-      report.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       report.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      report.reporter?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      report.reporter?.toLowerCase().includes(searchTerm.toLowerCase());
+      report.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      report.reporter?.name?.toLowerCase().includes(searchTerm.toLowerCase());
+
     const matchesFilter =
       filterStatus === "all" || report.status === filterStatus;
-    return matchesSearch && matchesFilter;
+
+    return isAssignedToMe && matchesSearch && matchesFilter;
   });
 
   // Status and priority color helpers
@@ -328,7 +444,6 @@ const OfficerPage = () => {
     const statusTexts = {
       pending: "Menunggu",
       onGoing: "Dikerjakan",
-      ongoing: "Dikerjakan",
       completed: "Selesai",
       cancelled: "Dibatalkan",
     };
@@ -343,7 +458,6 @@ const OfficerPage = () => {
         <div className="absolute top-1/2 -left-20 w-60 h-60 bg-gradient-to-br from-indigo-200/20 to-blue-300/20 rounded-full blur-2xl"></div>
         <div className="absolute bottom-20 right-1/4 w-40 h-40 bg-gradient-to-br from-purple-200/25 to-pink-300/25 rounded-full blur-xl"></div>
       </div>
-
       <div className="flex relative z-10">
         <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
@@ -384,7 +498,7 @@ const OfficerPage = () => {
                         <StatCard
                           icon={Clock}
                           title="Menunggu"
-                          value={stats.pending}
+                          value={status.pending}
                           color="text-yellow-600"
                           trend="+2 hari ini"
                         />
@@ -394,7 +508,7 @@ const OfficerPage = () => {
                         <StatCard
                           icon={Activity}
                           title="Dikerjakan"
-                          value={stats.onGoing}
+                          value={status.onGoing}
                           color="text-blue-600"
                           trend="+3 hari ini"
                         />
@@ -404,7 +518,7 @@ const OfficerPage = () => {
                         <StatCard
                           icon={CheckCircle}
                           title="Selesai"
-                          value={stats.completed}
+                          value={status.completed}
                           color="text-green-600"
                           trend="+5 hari ini"
                         />
@@ -414,7 +528,7 @@ const OfficerPage = () => {
                         <StatCard
                           icon={XCircle}
                           title="Dibatalkan"
-                          value={stats.cancelled}
+                          value={status.cancelled}
                           color="text-red-600"
                         />
                       </div>
@@ -451,7 +565,10 @@ const OfficerPage = () => {
                         <div className="p-6">
                           <div className="space-y-4">
                             {reports.slice(0, 3).map((report, index) => (
-                              <div key={report.id} className="group relative">
+                              <div
+                                key={report.report_id}
+                                className="group relative"
+                              >
                                 <div className="absolute inset-0 bg-gradient-to-r from-gray-50 to-blue-50/30 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
                                 <div className="relative flex items-center justify-between p-4 bg-gray-50/50 backdrop-blur-sm rounded-xl border border-gray-100 group-hover:shadow-md transition-all duration-300">
                                   <div className="flex items-center space-x-4">
@@ -507,7 +624,7 @@ const OfficerPage = () => {
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       {filteredReports.map((report) => (
-                        <div key={report.id} className="relative group">
+                        <div key={report.report_id} className="relative group">
                           <div className="absolute inset-0 bg-gradient-to-r from-blue-400/10 to-purple-400/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
                           <ReportCard
                             report={report}
@@ -516,7 +633,7 @@ const OfficerPage = () => {
                             onAddAction={(report) => {
                               setActionForm({
                                 ...actionForm,
-                                reportId: report.id,
+                                reportId: report.report_id,
                               });
                               setShowActionModal(true);
                             }}
@@ -559,125 +676,79 @@ const OfficerPage = () => {
                             </h2>
                           </div>
                           <div className="flex items-center space-x-3">
+                            {/* Dropdown untuk memilih report */}
+                            <select
+                              value={selectedReportId || ""}
+                              onChange={(e) => {
+                                const reportId = e.target.value;
+                                if (reportId) {
+                                  loadActionsForReport(parseInt(reportId));
+                                } else {
+                                  setActions([]);
+                                  setSelectedReportId(null);
+                                }
+                              }}
+                              className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                            >
+                              <option value="">Pilih Laporan</option>
+                              {reports.map((report) => (
+                                <option
+                                  key={report.report_id}
+                                  value={report.report_id}
+                                >
+                                  #{report.report_id} - {report.title}
+                                </option>
+                              ))}
+                            </select>
+
                             <span className="px-3 py-1 bg-gradient-to-r from-indigo-50 to-blue-50 text-indigo-700 rounded-full text-sm font-medium border border-indigo-200">
                               {actions.length} Total
                             </span>
                             <button
-                              onClick={() => setShowActionModal(true)}
-                              className="group relative flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                              onClick={() => {
+                                setActionForm({
+                                  reportId: selectedReportId || "",
+                                  actionDescription: "",
+                                });
+                                setShowActionModal(true);
+                              }}
+                              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+                              disabled={!selectedReportId}
                             >
-                              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-400 rounded-xl blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
-                              <Plus className="h-4 w-4 mr-2 relative z-10" />
-                              <span className="relative z-10 font-medium">
-                                Tambah Tindakan
-                              </span>
+                              <Plus className="h-4 w-4 mr-1" />
+                              Tambah Tindakan
                             </button>
                           </div>
                         </div>
-                        <div className="p-6">
-                          <div className="space-y-4">
-                            {actions.map((action, index) => (
-                              <div key={action.id} className="group relative">
-                                <div className="absolute inset-0 bg-gradient-to-r from-gray-50 to-indigo-50/30 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
-                                <div className="relative border border-gray-200 rounded-xl p-5 bg-white/50 backdrop-blur-sm group-hover:shadow-lg transition-all duration-300">
-                                  <div className="flex justify-between items-start mb-4">
-                                    <div className="flex items-start space-x-3">
-                                      <div className="w-8 h-8 bg-gradient-to-br from-indigo-100 to-blue-100 rounded-full flex items-center justify-center text-sm font-bold text-indigo-600">
-                                        {index + 1}
-                                      </div>
-                                      <div className="flex-1">
-                                        <h3 className="font-semibold text-gray-900 text-lg">
-                                          {action.description}
-                                        </h3>
-                                        <p className="text-sm text-gray-600 mt-1">
-                                          👤 Ditugaskan ke:{" "}
-                                          <span className="font-medium">
-                                            {action.assignedTo}
-                                          </span>
-                                        </p>
-                                        {action.reportId && (
-                                          <p className="text-sm text-gray-500 mt-1">
-                                            📋 Laporan:{" "}
-                                            <span className="font-medium">
-                                              {reports.find(
-                                                (r) => r.id === action.reportId
-                                              )?.title || action.reportId}
-                                            </span>
-                                          </p>
-                                        )}
-                                      </div>
-                                    </div>
-                                    <div className="flex flex-col items-end space-y-2">
-                                      <span
-                                        className={`px-4 py-2 rounded-xl text-xs font-medium shadow-sm ${
-                                          action.status === "planned"
-                                            ? "bg-yellow-100 text-yellow-800 border border-yellow-200"
-                                            : action.status === "in_progress"
-                                            ? "bg-blue-100 text-blue-800 border border-blue-200"
-                                            : "bg-green-100 text-green-800 border border-green-200"
-                                        }`}
-                                      >
-                                        {action.status === "planned"
-                                          ? "📋 Direncanakan"
-                                          : action.status === "in_progress"
-                                          ? "⚡ Sedang Dikerjakan"
-                                          : "✅ Selesai"}
-                                      </span>
-                                    
-                                    </div>
-                                  </div>
-                                  <div className="flex justify-between items-center text-sm">
-                                    <span className="text-gray-600 flex items-center">
-                                      🗓️ Tenggat:{" "}
-                                      <span className="font-medium ml-1">
-                                        {new Date(
-                                          action.dueDate
-                                        ).toLocaleDateString("id-ID")}
-                                      </span>
-                                    </span>
-                                    <div className="flex space-x-3">
-                                      {action.status !== "completed" && (
-                                        <button
-                                          onClick={() =>
-                                            handleUpdateActionStatus(
-                                              action.id,
-                                              action.status === "planned"
-                                                ? "in_progress"
-                                                : "completed"
-                                            )
-                                          }
-                                          className="px-3 py-1 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all duration-200 font-medium"
-                                        >
-                                          {action.status === "planned"
-                                            ? "▶️ Mulai"
-                                            : "✅ Selesai"}
-                                        </button>
-                                      )}
-                                      <button
-                                        onClick={() =>
-                                          handleDeleteAction(action.id)
-                                        }
-                                        className="px-3 py-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200 font-medium"
-                                      >
-                                        🗑️ Hapus
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
 
-                          {actions.length === 0 && !isLoading && (
+                        <div className="p-6">
+                          {isLoadingActions ? (
+                            <div className="flex justify-center py-8">
+                              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+                            </div>
+                          ) : actionsError ? (
+                            <div className="text-red-500 text-center py-4">
+                              {actionsError}
+                              <button
+                                onClick={() =>
+                                  loadActionsForReport(selectedReportId)
+                                }
+                                className="ml-2 text-blue-500 hover:text-blue-700"
+                              >
+                                Coba Lagi
+                              </button>
+                            </div>
+                          ) : actions.length === 0 ? (
                             <div className="text-center py-12">
                               <div className="text-gray-400 mb-4">
                                 <Target className="h-16 w-16 mx-auto" />
                               </div>
                               <h3 className="text-lg font-medium text-gray-900 mb-2">
-                                Belum ada tindakan
+                                Pilih Laporan Terlebih Dahulu
                               </h3>
-                              <p className="text-gray-500 mb-4">
-                                Mulai dengan membuat tindakan baru untuk laporan
+                              <p className="text-gray-500 pb-6">
+                                Gunakan dropdown di atas untuk memilih laporan
+                                dan melihat tindakannya
                               </p>
                               <button
                                 onClick={() => setShowActionModal(true)}
@@ -686,6 +757,103 @@ const OfficerPage = () => {
                                 <Plus className="h-4 w-4 mr-2" />
                                 Tambah Tindakan Pertama
                               </button>
+                            </div>
+                          ) : (
+                            <div className="space-y-4">
+                              {actions.map((action) => {
+                                const report = reports.find(
+                                  (r) => r.report_id === action.report_id
+                                );
+                                return (
+                                  <div
+                                    key={action.action_id}
+                                    className="group relative"
+                                  >
+                                    <div className="absolute inset-0 bg-gradient-to-r from-gray-50 to-indigo-50/30 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
+                                    <div className="relative border border-gray-200 rounded-xl p-5 bg-white/50 backdrop-blur-sm group-hover:shadow-lg transition-all duration-300">
+                                      <div className="flex justify-between items-start mb-4">
+                                        <div className="flex items-start space-x-3 flex-1">
+                                          <div className="w-10 h-10 bg-gradient-to-br from-indigo-100 to-blue-100 rounded-full flex items-center justify-center text-sm font-bold text-indigo-600">
+                                            {action.action_id}
+                                          </div>
+                                          <div className="flex-1 min-w-0">
+                                            <h3 className="font-semibold text-gray-900 text-lg truncate">
+                                              {action.action_description}
+                                            </h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                                              <p className="text-sm text-gray-600">
+                                                <span className="font-medium">
+                                                  Laporan:
+                                                </span>{" "}
+                                                <span className="truncate">
+                                                  {report?.title ||
+                                                    `#${action.report_id}`}
+                                                </span>
+                                              </p>
+                                              <p className="text-sm text-gray-600">
+                                                <span className="font-medium">
+                                                  Petugas:
+                                                </span>{" "}
+                                                {action.performer?.name ||
+                                                  "Tidak diketahui"}
+                                              </p>
+                                              <p className="text-sm text-gray-600">
+                                                <span className="font-medium">
+                                                  Tanggal:
+                                                </span>{" "}
+                                                {new Date(
+                                                  action.performed_at
+                                                ).toLocaleDateString("id-ID")}
+                                              </p>
+                                              <p className="text-sm text-gray-600">
+                                                <span className="font-medium">
+                                                  Status:
+                                                </span>{" "}
+                                                <span
+                                                  className={`px-2 py-4 text-xs font-medium${getStatusColor(
+                                                    report.status
+                                                  )}`}
+                                                >
+                                                  {getStatusText(report.status)}
+                                                </span>
+                                              </p>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      <div className="flex justify-between items-center pt-3 border-t border-gray-100">
+                                        <div className="flex space-x-2">
+                                          <button
+                                            onClick={() => {
+                                              setSelectedReport(report);
+                                              loadStatusHistory(
+                                                action.report_id
+                                              );
+                                            }}
+                                            className="px-3 py-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200 font-medium text-sm"
+                                          >
+                                            Lihat Laporan
+                                          </button>
+                                        </div>
+                                        <div className="flex space-x-2">
+                                          
+                                          <button
+                                            onClick={() =>
+                                              handleDeleteAction(
+                                                action.action_id
+                                              )
+                                            }
+                                            className="px-3 py-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200 font-medium text-sm"
+                                          >
+                                            Hapus
+                                          </button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })}
                             </div>
                           )}
                         </div>
@@ -696,36 +864,93 @@ const OfficerPage = () => {
               </>
             )}
           </main>
-
           <ActionModal
             show={showActionModal}
-            onClose={() => {
-              setShowActionModal(false);
-              setActionForm({
-                reportId: "",
-                description: "",
-                assignedTo: "",
-                dueDate: "",
-                priority: "medium",
-              });
-            }}
+            onClose={() => setShowActionModal(false)}
             actionForm={actionForm}
             onFormChange={handleActionFormChange}
             onSubmit={handleCreateAction}
             reports={reports}
             isLoading={isLoading}
+            currentOfficer={currentOfficer} // Kirim data petugas
           />
-
           <ReportDetailModal
             report={selectedReport}
             onClose={() => setSelectedReport(null)}
             onAssign={handleAssignReport}
+            onUpdateStatus={handleUpdateStatus} // Pass the updated handler
             getStatusColor={getStatusColor}
             getPriorityColor={getPriorityColor}
             getStatusText={getStatusText}
           />
         </div>
       </div>
+      {showStatusModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">Update Status Laporan</h2>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">
+                Status Saat Ini
+              </label>
+              <div className="p-2 bg-gray-100 rounded">{currentStatus}</div>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">
+                Status Baru
+              </label>
+              <select
+                value={statusForm.status}
+                onChange={(e) =>
+                  setStatusForm({ ...statusForm, status: e.target.value })
+                }
+                className="w-full p-2 border rounded"
+              >
+                <option value="On-Going">On-Going</option>
+                <option value="Completed">Completed</option>
+                <option value="Cancel">Cancel</option>
+              </select>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">
+                Riwayat Status
+              </label>
+              <div className="max-h-40 overflow-y-auto">
+                {statusHistory.map((status, index) => (
+                  <div key={index} className="p-2 border-b">
+                    <p>
+                      {status.status} -{" "}
+                      {new Date(status.updated_at).toLocaleString()}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Oleh: {status.updater?.name}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={() => setShowStatusModal(false)}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleUpdateStatus}
+                disabled={isLoading}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
+              >
+                {isLoading ? "Memproses..." : "Simpan"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

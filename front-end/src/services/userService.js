@@ -62,7 +62,7 @@ const userService = {
   getOfficers: async () => {
     try {
       const response = await api("user").get("/users/officers");
-      return response.data.data?.officers || response.data || [];
+      return response.data.data.officers || [];
     } catch (error) {
       throw error.response?.data || error.message;
     }
