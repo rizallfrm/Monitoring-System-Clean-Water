@@ -25,6 +25,7 @@ import authService from "../services/authService";
 import userService from "../services/userService";
 import ActionsList from "../components/Officers/ActionList";
 import ActionList from "../components/Officers/ActionList";
+import { toast } from "react-toastify";
 
 const OfficerPage = (response) => {
   const [activeTab, setActiveTab] = useState("actions");
@@ -704,20 +705,7 @@ const OfficerPage = (response) => {
                             <span className="px-3 py-1 bg-gradient-to-r from-indigo-50 to-blue-50 text-indigo-700 rounded-full text-sm font-medium border border-indigo-200">
                               {actions.length} Total
                             </span>
-                            <button
-                              onClick={() => {
-                                setActionForm({
-                                  reportId: selectedReportId || "",
-                                  actionDescription: "",
-                                });
-                                setShowActionModal(true);
-                              }}
-                              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
-                              disabled={!selectedReportId}
-                            >
-                              <Plus className="h-4 w-4 mr-1" />
-                              Tambah Tindakan
-                            </button>
+                            
                           </div>
                         </div>
 
@@ -823,19 +811,7 @@ const OfficerPage = (response) => {
                                       </div>
 
                                       <div className="flex justify-between items-center pt-3 border-t border-gray-100">
-                                        <div className="flex space-x-2">
-                                          <button
-                                            onClick={() => {
-                                              setSelectedReport(report);
-                                              loadStatusHistory(
-                                                action.report_id
-                                              );
-                                            }}
-                                            className="px-3 py-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200 font-medium text-sm"
-                                          >
-                                            Lihat Laporan
-                                          </button>
-                                        </div>
+                                        
                                         <div className="flex space-x-2">
                                           
                                           <button
@@ -844,9 +820,9 @@ const OfficerPage = (response) => {
                                                 action.action_id
                                               )
                                             }
-                                            className="px-3 py-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200 font-medium text-sm"
+                                            className="px-2 py-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200 font-medium text-sm"
                                           >
-                                            Hapus
+                                            Hapus Tindakan
                                           </button>
                                         </div>
                                       </div>
