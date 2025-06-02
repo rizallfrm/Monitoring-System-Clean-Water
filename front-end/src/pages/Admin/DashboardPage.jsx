@@ -317,25 +317,7 @@ const DashboardPage = () => {
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 p-6 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-xl font-semibold">Aksi Cepat</h3>
-              <p className="mt-1 text-blue-100">
-                Kelola sistem monitoring air bersih dengan mudah
-              </p>
-            </div>
-            <div className="flex space-x-4">
-              <button className="rounded-lg bg-white/20 px-4 py-2 font-medium transition-colors hover:bg-white/30">
-                Tambah Laporan
-              </button>
-              <button className="rounded-lg bg-white/20 px-4 py-2 font-medium transition-colors hover:bg-white/30">
-                Kelola Petugas
-              </button>
-            </div>
-          </div>
-        </div>
+        
       </div>
     </div>
   );

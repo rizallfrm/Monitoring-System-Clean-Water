@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import reportService from "../../services/reportService";
 import userService from "../../services/userService";
+import Navbar from "../../components/Navbar";
 
 const statusColors = {
   Pending: {
@@ -284,24 +285,7 @@ const ReportManagementPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="bg-gradient-to-r from-blue-600 to-cyan-600 p-4 rounded-2xl shadow-lg">
-                <Droplets className="w-10 h-10 text-white" />
-              </div>
-              <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                  PDAM Water Monitoring
-                </h1>
-                <p className="text-gray-600 text-lg">
-                  Sistem Monitoring Kualitas Air & Penanganan Laporan
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Navbar/>
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

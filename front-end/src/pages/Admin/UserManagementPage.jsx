@@ -12,6 +12,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import userService from "../../services/userService";
+import Navbar from "../../components/Navbar";
 
 const UserManagementPage = () => {
   const [users, setUsers] = useState([]);
@@ -283,6 +284,7 @@ const UserManagementPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
+      <Navbar />
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-8 flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">

@@ -268,7 +268,6 @@ const reportController = {
        let whereClause = {
             [Op.or]: [
                 { assigned_to: officerId },
-                { reporter_id: officerId } 
             ]
         };
 

@@ -20,6 +20,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import userService from "../../services/userService";
 import reportService from "../../services/reportService";
 import AddOfficerModal from "./AddOfficerModal";
+import Navbar from "../../components/Navbar";
 
 // Mock service untuk demo - ganti dengan import asli Anda
 
@@ -171,26 +172,7 @@ const OfficerManagementPage = () => {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onOfficerAdded={handleOfficerAdded}
-      />
-      <div className="bg-white/80 backdrop-blur-sm border-b border-blue-100 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Droplets className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                  Officer Management
-                </h1>
-                <p className="text-gray-600 text-sm">
-                  PDAM Water Monitoring System
-                </p>
-              </div>
-            </div>{" "}
-          </div>
-        </div>
-      </div>
+      />            <Navbar/>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Search and Filter */}

@@ -6,7 +6,6 @@ const reportService = {
       // 1. Handle file upload terpisah jika diperlukan
       const formPayload = new FormData();
 
-
       // Append form data
       formPayload.append("description", formData.description);
       formPayload.append("location", formData.location);
@@ -61,7 +60,6 @@ const reportService = {
       const response = await apiInstance.get(`/reports/reports/${id}`);
       console.log("Full API response:", response);
 
-
       // Pastikan struktur data sesuai
       if (response.data && response.data.status === "success") {
         return response.data.data; // Ambil data dari response
@@ -89,7 +87,6 @@ const reportService = {
       throw error;
     }
   },
-
   updateReport: async (id, reportData) => {
     try {
       const response = await api("report").put(
@@ -105,8 +102,8 @@ const reportService = {
   assignOfficer: async (reportId, officerId) => {
     try {
       const response = await api("report").post(
-        `/reports/reports/${reportId}/assign`,{ officerId }
-
+        `/reports/reports/${reportId}/assign`,
+        { officerId }
       );
       return response.data;
     } catch (error) {
