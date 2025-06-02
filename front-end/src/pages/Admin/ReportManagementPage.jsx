@@ -1,39 +1,53 @@
 import React, { useState, useEffect } from "react";
 import {
-  Search, Plus, UserCheck, CheckCircle, XCircle,
-  Droplets, Activity, AlertTriangle, Calendar, Filter, ChevronDown, MapPin
+  Search,
+  Plus,
+  UserCheck,
+  CheckCircle,
+  XCircle,
+  Droplets,
+  Activity,
+  AlertTriangle,
+  Calendar,
+  Filter,
+  ChevronDown,
+  MapPin,
 } from "lucide-react";
 import reportService from "../../services/reportService";
 import userService from "../../services/userService";
 
 const statusColors = {
   Pending: {
+    displayText: "Menunggu", // Tambahkan displayText
     bg: "bg-amber-100",
     text: "text-amber-800",
     border: "border-amber-200",
     icon: AlertTriangle,
-    gradient: "from-amber-400 to-orange-500"
+    gradient: "from-amber-400 to-orange-500",
   },
   "On-Going": {
+    displayText: "Dikerjakan", // Ganti On-Going menjadi Dikerjakan
     bg: "bg-blue-100",
     text: "text-blue-800",
     border: "border-blue-200",
     icon: Activity,
-    gradient: "from-blue-400 to-cyan-500"
+    gradient: "from-blue-400 to-cyan-500",
   },
   Completed: {
+    displayText: "Selesai", // Tetap Selesai
     bg: "bg-green-100",
     text: "text-green-800",
     border: "border-green-200",
     icon: CheckCircle,
-    gradient: "from-green-400 to-emerald-500"
+    gradient: "from-green-400 to-emerald-500",
   },
   Cancelled: {
+    displayText: "Dibatalkan", // Tetap Dibatalkan
     bg: "bg-red-100",
     text: "text-red-800",
     border: "border-red-200",
     icon: XCircle,
-    gradient: "from-red-400 to-pink-500"
+    gradient: "from-red-400 to-pink-500",
   },
 };
 
@@ -56,13 +70,13 @@ const ReportManagementPage = () => {
       setOfficersLoading(true);
       const data = await userService.getOfficers();
 
-      console.log('Raw officers data:', data);
+      console.log("Raw officers data:", data);
 
       const validOfficers = Array.isArray(data)
-        ? data.filter(officer => officer?.user_id && officer?.name)
+        ? data.filter((officer) => officer?.user_id && officer?.name)
         : [];
 
-      console.log('Valid officers:', validOfficers);
+      console.log("Valid officers:", validOfficers);
       setOfficers(validOfficers);
     } catch (err) {
       console.error("Gagal mengambil data petugas:", err);
@@ -78,10 +92,12 @@ const ReportManagementPage = () => {
         setLoading(true);
         const data = await reportService.getAllReports();
 
-        const normalizedReports = Array.isArray(data) ? data.map((report, index) => ({
-          ...report,
-          id: report.report_id || index + 1
-        })) : [];
+        const normalizedReports = Array.isArray(data)
+          ? data.map((report, index) => ({
+              ...report,
+              id: report.report_id || index + 1,
+            }))
+          : [];
 
         setReports(normalizedReports);
       } catch (err) {
@@ -101,7 +117,7 @@ const ReportManagementPage = () => {
   };
 
   const handleAssignClick = (reportId) => {
-    console.log('Opening assign dialog for report:', reportId);
+    console.log("Opening assign dialog for report:", reportId);
     setSelectedReportId(reportId);
     setAssignDialogOpen(true);
     setSelectedOfficer(null);
@@ -114,15 +130,18 @@ const ReportManagementPage = () => {
       setAssignLoading(true);
       await reportService.assignOfficer(selectedReportId, selectedOfficer);
       // Update UI
-      setReports(reports.map(report =>
-        report.report_id === selectedReportId
-          ? {
-            ...report,
-            status: "On-Going",
-            assigned_to: officers.find(o => o.user_id === selectedOfficer)?.name
-          }
-          : report
-      ));
+      setReports(
+        reports.map((report) =>
+          report.report_id === selectedReportId
+            ? {
+                ...report,
+                status: "On-Going",
+                assigned_to: officers.find((o) => o.user_id === selectedOfficer)
+                  ?.name,
+              }
+            : report
+        )
+      );
 
       setAssignDialogOpen(false);
       setSelectedReportId(null);
@@ -163,10 +182,10 @@ const ReportManagementPage = () => {
 
   const stats = {
     total: reports.length,
-    pending: reports.filter(r => r.status === "Pending").length,
-    ongoing: reports.filter(r => r.status === "On-Going").length,
-    completed: reports.filter(r => r.status === "Completed").length,
-    cancelled: reports.filter(r => r.status === "Cancelled").length
+    pending: reports.filter((r) => r.status === "Pending").length,
+    ongoing: reports.filter((r) => r.status === "On-Going").length,
+    completed: reports.filter((r) => r.status === "Completed").length,
+    cancelled: reports.filter((r) => r.status === "Cancelled").length,
   };
 
   const StatusBadge = ({ status }) => {
@@ -174,15 +193,18 @@ const ReportManagementPage = () => {
     const IconComponent = config.icon;
 
     return (
-      <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium ${config.bg} ${config.text} ${config.border} border`}>
+      <span
+        className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium ${config.bg} ${config.text} ${config.border} border`}
+      >
         <IconComponent className="w-3 h-3 mr-1.5" />
-        {status}
+        {config.displayText} {/* Gunakan displayText bukan status langsung */}
       </span>
     );
   };
-
   const StatCard = ({ title, value, status, icon: Icon }) => {
-    const config = statusColors[status] || { gradient: "from-gray-400 to-gray-600" };
+    const config = statusColors[status] || {
+      gradient: "from-gray-400 to-gray-600",
+    };
 
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
@@ -210,13 +232,23 @@ const ReportManagementPage = () => {
               </div>
               <div className="absolute inset-0 w-20 h-20 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full animate-ping opacity-20"></div>
             </div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">Loading Water Monitoring System</h3>
-            <p className="text-gray-600">Please wait while we fetch the latest reports...</p>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">
+              Loading Water Monitoring System
+            </h3>
+            <p className="text-gray-600">
+              Please wait while we fetch the latest reports...
+            </p>
             <div className="mt-4 flex justify-center">
               <div className="flex space-x-1">
                 <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                <div
+                  className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                  style={{ animationDelay: "0.1s" }}
+                ></div>
+                <div
+                  className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                  style={{ animationDelay: "0.2s" }}
+                ></div>
               </div>
             </div>
           </div>
@@ -233,7 +265,9 @@ const ReportManagementPage = () => {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
               <AlertTriangle className="w-8 h-8 text-red-600" />
             </div>
-            <h3 className="text-lg font-semibold text-red-800 mb-2">System Error</h3>
+            <h3 className="text-lg font-semibold text-red-800 mb-2">
+              System Error
+            </h3>
             <p className="text-red-600 mb-4">{error}</p>
             <button
               onClick={() => window.location.reload()}
@@ -261,16 +295,11 @@ const ReportManagementPage = () => {
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
                   PDAM Water Monitoring
                 </h1>
-                <p className="text-gray-600 text-lg">Sistem Monitoring Kualitas Air & Penanganan Laporan</p>
+                <p className="text-gray-600 text-lg">
+                  Sistem Monitoring Kualitas Air & Penanganan Laporan
+                </p>
               </div>
             </div>
-            <button
-              onClick={() => alert('Navigate to create new report')}
-              className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-6 py-3 rounded-xl flex items-center space-x-2 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-            >
-              <Plus className="w-5 h-5" />
-              <span className="font-medium">Buat Laporan Baru</span>
-            </button>
           </div>
         </div>
 
@@ -315,34 +344,6 @@ const ReportManagementPage = () => {
                 onChange={handleSearchChange}
               />
             </div>
-            <div className="relative">
-              <button
-                onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-                className="flex items-center space-x-2 px-6 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 min-w-[180px] transition-colors"
-              >
-                <Filter className="w-4 h-4" />
-                <span>{statusFilter === "All" ? "Semua Status" : statusFilter}</span>
-                <ChevronDown className="w-4 h-4" />
-              </button>
-              {showFilterDropdown && (
-                <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 z-10">
-                  <div className="py-2">
-                    {["All", "Pending", "On-Going", "Completed", "Cancelled"].map((status) => (
-                      <button
-                        key={`filter-${status}`}  // Perbaikan key di sini
-                        onClick={() => {
-                          setStatusFilter(status);
-                          setShowFilterDropdown(false);
-                        }}
-                        className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors"
-                      >
-                        {status === "All" ? "Semua Status" : status}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
         </div>
 
@@ -353,8 +354,12 @@ const ReportManagementPage = () => {
               <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-6">
                 <Droplets className="w-10 h-10 text-gray-400" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Tidak ada laporan ditemukan</h3>
-              <p className="text-gray-500 mb-6">Coba sesuaikan kriteria pencarian atau filter Anda</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Tidak ada laporan ditemukan
+              </h3>
+              <p className="text-gray-500 mb-6">
+                Coba sesuaikan kriteria pencarian atau filter Anda
+              </p>
               <button
                 onClick={() => {
                   setSearchTerm("");
@@ -368,37 +373,79 @@ const ReportManagementPage = () => {
           ) : (
             filteredReports.map((report) => (
               <div
-                key={`report-${report.id}`}  // Pastikan report.id unik
+                key={`report-${report.id}`} // Pastikan report.id unik
                 className="bg-white rounded-2xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 hover:transform hover:-translate-y-1"
               >
-                <div className="p-6">
-                  <div>
-                    <div className="flex items-center space-x-3 mb-4">
-                      <h3 className="text-xl font-semibold text-gray-900">{report.title}</h3>
-                      <StatusBadge status={report.status} />
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 hover:transform hover:-translate-y-1">
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-4">
+                      {/* Bagian kiri - Status dan Deskripsi */}
+                      <div className="space-y-2 flex-1">
+                        <StatusBadge status={report.status} />
+                        <h3 className="text-l pt-2 font-light text-gray-900">
+                          Deskripsi Laporan:
+                        </h3>
+                        <p className="text-gray-600 leading-relaxed">
+                          {report.description && report.description.length > 150
+                            ? `${report.description.substring(0, 150)}...`
+                            : report.description || "Tidak ada deskripsi"}
+                        </p>
+                      </div>
+
+                      {/* Informasi Reporter */}
+                      {report.reporter && (
+                        <div className="ml-4 flex items-center space-x-2 bg-transparent rounded-xl p-3 border border-gray-100">
+                          <div className="flex-shrink-0">
+                            <div className="w-8 h-8 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center shadow-inner">
+                              <span className="text-sm font-semibold text-blue-600">
+                                {report.reporter.name.charAt(0).toUpperCase()}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-gray-900 truncate">
+                              {report.reporter.name}
+                            </p>
+                            {report.reporter.email && (
+                              <p className="text-xs text-gray-500 truncate">
+                                {report.reporter.email}
+                              </p>
+                            )}
+                            <p className="text-xs mt-1 text-blue-600 font-medium">
+                              Pelapor
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <p className="text-gray-600 mb-6 leading-relaxed">
-                      {report.description && report.description.length > 150
-                        ? `${report.description.substring(0, 150)}...`
-                        : report.description || 'Tidak ada deskripsi'}
-                    </p>
-                    <div className="flex items-center justify-between">
+
+                    {/* Informasi tambahan (tanggal, lokasi, petugas) */}
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-500">
                         <div className="flex items-center space-x-2">
                           <Calendar className="w-4 h-4 text-blue-500" />
-                          <span>{new Date(report.created_at).toLocaleDateString('id-ID', {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric'
-                          })}</span>
+                          <span>
+                            {new Date(report.created_at).toLocaleDateString(
+                              "id-ID",
+                              {
+                                day: "numeric",
+                                month: "long",
+                                year: "numeric",
+                              }
+                            )}
+                          </span>
                         </div>
                         <div className="flex items-center space-x-2">
                           <MapPin className="w-4 h-4 text-green-500" />
-                          <span className="truncate">{report.location || 'Lokasi tidak diketahui'}</span>
+                          <span className="truncate">
+                            {report.location || "Lokasi tidak diketahui"}
+                          </span>
                         </div>
                         <div className="flex items-center space-x-2">
                           <UserCheck className="w-4 h-4 text-purple-500" />
-                          <span>{report.assigned_to || "Belum ditugaskan"}</span>
+                          <span>
+                            {report.assigned_to || "Belum ditugaskan"}
+                          </span>
                         </div>
                       </div>
                       {report.status === "Pending" && (
@@ -408,7 +455,9 @@ const ReportManagementPage = () => {
                             className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl space-x-2 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
                           >
                             <UserCheck className="w-4 h-4" />
-                            <span className="font-medium">Tugaskan Petugas</span>
+                            <span className="font-medium">
+                              Tugaskan Petugas
+                            </span>
                           </button>
                         </div>
                       )}
@@ -427,8 +476,13 @@ const ReportManagementPage = () => {
           <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl">
             {/* Dialog Header */}
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">Tugaskan Petugas</h2>
-              <button onClick={handleCloseAssignDialog} className="text-gray-400 hover:text-gray-600">
+              <h2 className="text-xl font-semibold text-gray-900">
+                Tugaskan Petugas
+              </h2>
+              <button
+                onClick={handleCloseAssignDialog}
+                className="text-gray-400 hover:text-gray-600"
+              >
                 <XCircle className="w-6 h-6" />
               </button>
             </div>
@@ -454,15 +508,20 @@ const ReportManagementPage = () => {
                 {officers.map((officer) => (
                   <div
                     key={`officer-${officer.user_id}`}
-                    onClick={() => !assignLoading && setSelectedOfficer(officer.user_id)}
-                    className={`p-4 border rounded-xl cursor-pointer transition-all ${selectedOfficer === officer.user_id
-                      ? 'border-blue-500 bg-blue-50 shadow-sm'
-                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                      } ${assignLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    onClick={() =>
+                      !assignLoading && setSelectedOfficer(officer.user_id)
+                    }
+                    className={`p-4 border rounded-xl cursor-pointer transition-all ${
+                      selectedOfficer === officer.user_id
+                        ? "border-blue-500 bg-blue-50 shadow-sm"
+                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                    } ${assignLoading ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-gray-900">{officer.name}</p>
+                        <p className="font-medium text-gray-900">
+                          {officer.name}
+                        </p>
                         <p className="text-sm text-gray-500">
                           {officer.username && `@${officer.username}`}
                           {officer.email && ` • ${officer.email}`}
@@ -501,12 +560,13 @@ const ReportManagementPage = () => {
               <button
                 onClick={handleAssignConfirm}
                 disabled={!selectedOfficer || assignLoading}
-                className={`px-6 py-2 rounded-xl text-white ${selectedOfficer && !assignLoading
-                  ? 'bg-blue-600 hover:bg-blue-700'
-                  : 'bg-gray-400 cursor-not-allowed'
-                  }`}
+                className={`px-6 py-2 rounded-xl text-white ${
+                  selectedOfficer && !assignLoading
+                    ? "bg-blue-600 hover:bg-blue-700"
+                    : "bg-gray-400 cursor-not-allowed"
+                }`}
               >
-                {assignLoading ? 'Menugaskan...' : 'Tugaskan'}
+                {assignLoading ? "Menugaskan..." : "Tugaskan"}
               </button>
             </div>
           </div>
