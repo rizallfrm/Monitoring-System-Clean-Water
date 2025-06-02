@@ -330,7 +330,7 @@ const actionController = {
       }
 
       // Hanya Admin yang bisa menghapus action
-      if (req.user.role !== "Admin") {
+      if (req.user.role !== "Admin" && req.user.role !== "Petugas") {
         return res.status(403).json({
           status: "error",
           message: "Hanya Admin yang dapat menghapus tindakan",
