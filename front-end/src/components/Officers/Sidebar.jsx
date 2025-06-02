@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Home, FileText, CheckCircle, LogOut, Activity, User 
 } from 'lucide-react';
-import authService from '../../services/authService'; // Sesuaikan path dengan struktur folder Anda
+import authService from '../../services/authService';
 
 const Sidebar = ({ activeTab, setActiveTab }) => {
   const [userProfile, setUserProfile] = useState({
@@ -22,7 +22,6 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
         });
       } catch (error) {
         console.error('Failed to fetch user profile:', error);
-        // Fallback ke data default jika gagal
         setUserProfile({
           name: 'Petugas',
           role: 'Petugas Lapangan'
@@ -35,7 +34,6 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
     fetchUserProfile();
   }, []);
 
-  // Function untuk mendapatkan inisial nama
   const getInitials = (name) => {
     if (!name || name === 'Loading...') return 'JP';
     return name
@@ -47,7 +45,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
   };
 
   return (
-    <div className="fixed inset-y-0 left-0 w-64 bg-gradient-to-b from-white via-gray-50/50 to-white shadow-2xl border-r border-gray-200 flex flex-col overflow-hidden">
+    <div className="fixed inset-y-0 left-0 w-64 bg-gradient-to-b from-white via-gray-50/50 to-white shadow-2xl border-r border-gray-200 flex flex-col overflow-hidden pt-11"> {/* Tambahkan pt-4 di sini */}
       {/* Background decorative elements */}
       <div className="absolute top-0 right-0 w-32 h-64 bg-gradient-to-bl from-blue-50/40 to-transparent"></div>
       <div className="absolute bottom-0 left-0 w-40 h-48 bg-gradient-to-tr from-purple-50/40 to-transparent"></div>
@@ -128,35 +126,6 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
             )}
           </button>
         ))}
-      </div>
-
-      {/* User Profile */}
-      <div className="p-4 border-t border-gray-200 relative z-10">
-        <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-4 border border-gray-200">
-          <div className="flex items-center">
-            <div className="w-12 h-12 bg-gray-400 rounded-2xl flex items-center justify-center shadow-lg">
-              <User className="h-6 w-6 text-white" />
-            </div>
-            <div className="ml-3 flex-1">
-              <p className="text-sm font-bold text-gray-900">
-                {loading ? 'Loading...' : userProfile.name}
-              </p>
-              <p className="text-xs text-gray-500">
-                {loading ? 'Loading...' : userProfile.role}
-              </p>
-            </div>
-          </div>
-          <button 
-            onClick={() => {
-              localStorage.removeItem('token');
-              window.location.href = '/login';
-            }}
-            className="flex items-center justify-center w-full mt-3 px-3 py-2 text-xs text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 font-medium border border-gray-200 hover:border-red-200"
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Keluar
-          </button>
-        </div>
       </div>
     </div>
   );
