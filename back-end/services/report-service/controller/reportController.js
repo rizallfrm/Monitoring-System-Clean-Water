@@ -257,7 +257,7 @@ const reportController = {
 
       // Validasi officerId
       const officer = await User.findByPk(officerId);
-      if (!officer || officer.role !== "Petugas") {
+      if (!officer) {
         return res.status(400).json({
           status: "error",
           message: "Petugas tidak valid",
@@ -265,9 +265,13 @@ const reportController = {
       }
 
       // Siapkan filter
-      let whereClause = {
-        assigned_to: officerId,
-      };
+       let whereClause = {
+            [Op.or]: [
+                { assigned_to: officerId },
+                { reporter_id: officerId } 
+            ]
+        };
+
 
       if (status) {
         whereClause.status = status;
