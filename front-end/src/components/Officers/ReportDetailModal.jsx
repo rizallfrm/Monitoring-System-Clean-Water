@@ -242,19 +242,6 @@ const ReportDetailModal = ({
                 {formatStatusDisplay(report.status)}
               </span>
             </StatusCard>
-
-            <StatusCard icon={Flag} title="Tingkat Prioritas">
-              <div className="flex items-center">
-                <div
-                  className={`w-4 h-4 rounded-full ${getPriorityColor(
-                    report.priority
-                  )} mr-3 shadow-sm`}
-                ></div>
-                <span className="text-lg font-bold capitalize text-gray-800">
-                  {report.priority}
-                </span>
-              </div>
-            </StatusCard>
           </div>
 
           {/* Description Card */}
@@ -325,7 +312,6 @@ const ReportDetailModal = ({
                 <option value="Pending">Menunggu</option>
                 <option value="On-Going">Dikerjakan</option>
                 <option value="Completed">Selesai</option>
-                <option value="Cancelled">Dibatalkan</option>
               </select>
               <button
                 onClick={handleStatusUpdate}
