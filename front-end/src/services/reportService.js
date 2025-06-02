@@ -79,24 +79,16 @@ const reportService = {
 
   assignOfficer: async (reportId, officerId) => {
     try {
-      // Konversi officerId ke number jika diperlukan
-      const numericOfficerId = Number(officerId);
-      if (isNaN(numericOfficerId)) {
-        throw new Error('ID petugas harus berupa angka');
-      }
-
       const response = await api("report").post(
-        `/reports/reports/${reportId}/assign`,
-        { officerId: numericOfficerId } // Pastikan mengirim number
+        `/reports/reports/${reportId}/assign`,{ officerId }
+
       );
       return response.data;
     } catch (error) {
-      throw error.response?.data || {
-        status: 'error',
-        message: error.message || 'Failed to assign officer'
-      };
+      throw error.response?.data || error.message;
     }
   },
+
   cancelReport: async (reportId) => {
     try {
       const response = await api("report").post(

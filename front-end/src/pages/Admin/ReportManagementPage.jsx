@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
-  Search, Plus, MoreVertical, Eye, UserCheck, XCircle, CheckCircle, Droplets, Activity, AlertTriangle, Calendar, Filter, ChevronDown, MapPin
+  Search, Plus, UserCheck, CheckCircle, XCircle,
+  Droplets, Activity, AlertTriangle, Calendar, Filter, ChevronDown, MapPin
 } from "lucide-react";
 import reportService from "../../services/reportService";
 import userService from "../../services/userService";
@@ -42,27 +43,44 @@ const ReportManagementPage = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedReportId, setSelectedReportId] = useState(null);
-  const [showActionMenu, setShowActionMenu] = useState(false);
   const [assignDialogOpen, setAssignDialogOpen] = useState(false);
-  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
-  const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState("All");
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [officers, setOfficers] = useState([]);
-  const [selectedOfficer, setSelectedOfficer] = useState("");
+  const [selectedOfficer, setSelectedOfficer] = useState(null);
   const [assignLoading, setAssignLoading] = useState(false);
+  const [officersLoading, setOfficersLoading] = useState(false);
 
-  // Fetch data from API
+  const fetchOfficers = async () => {
+    try {
+      setOfficersLoading(true);
+      const data = await userService.getOfficers();
+
+      console.log('Raw officers data:', data);
+
+      const validOfficers = Array.isArray(data)
+        ? data.filter(officer => officer?.user_id && officer?.name)
+        : [];
+
+      console.log('Valid officers:', validOfficers);
+      setOfficers(validOfficers);
+    } catch (err) {
+      console.error("Gagal mengambil data petugas:", err);
+      setError(err.message || "Gagal memuat daftar petugas");
+    } finally {
+      setOfficersLoading(false);
+    }
+  };
+
   useEffect(() => {
     const fetchReports = async () => {
       try {
         setLoading(true);
         const data = await reportService.getAllReports();
 
-        // Validasi dan normalisasi data
         const normalizedReports = Array.isArray(data) ? data.map((report, index) => ({
           ...report,
-          id: report.report_id ? (report.report_id) : `temp-${Date.now()}-${index}` // Fallback ID unik
+          id: report.report_id || index + 1
         })) : [];
 
         setReports(normalizedReports);
@@ -73,114 +91,56 @@ const ReportManagementPage = () => {
         setLoading(false);
       }
     };
-    
+
     fetchReports();
+    fetchOfficers(); // Now we can call it here
   }, []);
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
 
-  const handleActionClick = (reportId) => {
-    const normalizedReportId = String(reportId);
-    if (selectedReportId === normalizedReportId && showActionMenu) {
-      setShowActionMenu(false);
-      setSelectedReportId(null);
-    } else {
-      setSelectedReportId(normalizedReportId);
-      setShowActionMenu(true);
-    }
-  };
-
-  const handleViewReport = () => {
-    alert(`Viewing report ${selectedReportId}`);
-    setShowActionMenu(false);
-    setSelectedReportId(null);
-  };
-
-  const handleAssignClick = () => {
-    console.log('Opening assign dialog for report:', selectedReportId);
+  const handleAssignClick = (reportId) => {
+    console.log('Opening assign dialog for report:', reportId);
+    setSelectedReportId(reportId);
     setAssignDialogOpen(true);
-    setShowActionMenu(false);
-    setSelectedOfficer("");
-  };
-
-  const handleCancelClick = () => {
-    setCancelDialogOpen(true);
-    setShowActionMenu(false);
-  };
-
-  const handleCompleteClick = () => {
-    setCompleteDialogOpen(true);
-    setShowActionMenu(false);
+    setSelectedOfficer(null);
   };
 
   const handleAssignConfirm = async () => {
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+    if (!selectedReportId || !selectedOfficer) return;
 
-      setReports(
-        reports.map((report) =>
-          report.id === selectedReportId
-            ? { ...report, status: "On-Going", assigned_to: "Officer Rahman" }
-            : report
-        )
-      );
+    try {
+      setAssignLoading(true);
+      await reportService.assignOfficer(selectedReportId, selectedOfficer);
+      // Update UI
+      setReports(reports.map(report =>
+        report.report_id === selectedReportId
+          ? {
+            ...report,
+            status: "On-Going",
+            assigned_to: officers.find(o => o.user_id === selectedOfficer)?.name
+          }
+          : report
+      ));
 
       setAssignDialogOpen(false);
-    } catch (err) {
-      console.error("Error assigning officer:", err);
-      setError(err.message || "Failed to assign officer");
-    }
-  };
-
-  const handleCancelConfirm = async () => {
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      setReports(
-        reports.map((report) =>
-          (report.report_id) === (selectedReportId)
-            ? { ...report, status: "Cancelled" }
-            : report
-        )
-      );
-
-      setCancelDialogOpen(false);
       setSelectedReportId(null);
+      setSelectedOfficer(null);
+
+      // Notifikasi sukses
+      console.log("Petugas berhasil ditugaskan!");
     } catch (err) {
-      console.error("Error cancelling report:", err);
-      setError(err.message || "Failed to cancel report");
+      console.error("Gagal menugaskan petugas:", err);
+      console.log(err.message || "Gagal menugaskan petugas");
+    } finally {
+      setAssignLoading(false);
     }
   };
 
-  const handleCompleteConfirm = async () => {
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      setReports(
-        reports.map((report) =>
-          (report.id) === (selectedReportId)
-            ? { ...report, status: "Completed" }
-            : report
-        )
-      );
-
-      setCompleteDialogOpen(false);
-      setSelectedReportId(null);
-    } catch (err) {
-      console.error("Error completing report:", err);
-      setError(err.message || "Failed to complete report");
-    }
-  };
-
-  // Handler untuk menutup dialog assign
   const handleCloseAssignDialog = () => {
     setAssignDialogOpen(false);
-    setSelectedOfficer("");
+    setSelectedOfficer(null);
     setSelectedReportId(null);
   };
 
@@ -201,7 +161,6 @@ const ReportManagementPage = () => {
       (report) => statusFilter === "All" || report.status === statusFilter
     );
 
-  // Statistics
   const stats = {
     total: reports.length,
     pending: reports.filter(r => r.status === "Pending").length,
@@ -235,56 +194,6 @@ const ReportManagementPage = () => {
           <div className={`p-3 rounded-xl bg-gradient-to-r ${config.gradient}`}>
             <Icon className="w-6 h-6 text-white" />
           </div>
-        </div>
-      </div>
-    );
-  };
-
-
-  const ActionMenu = ({ report }) => {
-    if (!report.id) return null; // Skip jika tidak ada ID
-
-    return (
-      <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-20">
-        <div className="py-1">
-          <button
-            onClick={handleViewReport}
-            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 flex items-center transition-colors"
-          >
-            <Eye className="w-4 h-4 mr-2" />
-            View Details
-          </button>
-          {report.status === "Pending" && (
-            <button
-              onClick={() => {
-                console.log('Assign clicked for report:', report.id);
-                setSelectedReportId(String(report.id)); // Pastikan ID string
-                handleAssignClick();
-              }}
-              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 flex items-center transition-colors"
-            >
-              <UserCheck className="w-4 h-4 mr-2" />
-              Assign Officer
-            </button>
-          )}
-          {report.status === "On-Going" && (
-            <button
-              onClick={handleCompleteClick}
-              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 flex items-center transition-colors"
-            >
-              <CheckCircle className="w-4 h-4 mr-2" />
-              Mark as Complete
-            </button>
-          )}
-          {report.status !== "Cancelled" && report.status !== "Completed" && (
-            <button
-              onClick={handleCancelClick}
-              className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center transition-colors"
-            >
-              <XCircle className="w-4 h-4 mr-2" />
-              Cancel Report
-            </button>
-          )}
         </div>
       </div>
     );
@@ -420,7 +329,7 @@ const ReportManagementPage = () => {
                   <div className="py-2">
                     {["All", "Pending", "On-Going", "Completed", "Cancelled"].map((status) => (
                       <button
-                        key={status}
+                        key={`filter-${status}`}  // Perbaikan key di sini
                         onClick={() => {
                           setStatusFilter(status);
                           setShowFilterDropdown(false);
@@ -459,21 +368,21 @@ const ReportManagementPage = () => {
           ) : (
             filteredReports.map((report) => (
               <div
-                key={`report-${report.id || `temp-${index}`}`} // Gunakan ID atau fallback ke index sementara
+                key={`report-${report.id}`}  // Pastikan report.id unik
                 className="bg-white rounded-2xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 hover:transform hover:-translate-y-1"
               >
                 <div className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-4">
-                        <h3 className="text-xl font-semibold text-gray-900">{report.title}</h3>
-                        <StatusBadge status={report.status} />
-                      </div>
-                      <p className="text-gray-600 mb-6 leading-relaxed">
-                        {report.description && report.description.length > 150
-                          ? `${report.description.substring(0, 150)}...`
-                          : report.description || 'Tidak ada deskripsi'}
-                      </p>
+                  <div>
+                    <div className="flex items-center space-x-3 mb-4">
+                      <h3 className="text-xl font-semibold text-gray-900">{report.title}</h3>
+                      <StatusBadge status={report.status} />
+                    </div>
+                    <p className="text-gray-600 mb-6 leading-relaxed">
+                      {report.description && report.description.length > 150
+                        ? `${report.description.substring(0, 150)}...`
+                        : report.description || 'Tidak ada deskripsi'}
+                    </p>
+                    <div className="flex items-center justify-between">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-500">
                         <div className="flex items-center space-x-2">
                           <Calendar className="w-4 h-4 text-blue-500" />
@@ -492,16 +401,16 @@ const ReportManagementPage = () => {
                           <span>{report.assigned_to || "Belum ditugaskan"}</span>
                         </div>
                       </div>
-                    </div>
-                    <div className="relative ml-4">
-                      <button
-                        onClick={() => handleActionClick(report.id)}
-                        className="p-3 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-all duration-200"
-                      >
-                        <MoreVertical className="w-5 h-5" />
-                      </button>
-                      {showActionMenu && String(selectedReportId) === String(report.id) && (
-                        <ActionMenu report={report} />
+                      {report.status === "Pending" && (
+                        <div className="ml-6 flex-shrink-0">
+                          <button
+                            onClick={() => handleAssignClick(report.id)}
+                            className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl space-x-2 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
+                          >
+                            <UserCheck className="w-4 h-4" />
+                            <span className="font-medium">Tugaskan Petugas</span>
+                          </button>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -516,17 +425,15 @@ const ReportManagementPage = () => {
       {assignDialogOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl">
+            {/* Dialog Header */}
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-gray-900">Tugaskan Petugas</h2>
-              <button
-                onClick={handleCloseAssignDialog}
-                disabled={assignLoading}
-                className="text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
+              <button onClick={handleCloseAssignDialog} className="text-gray-400 hover:text-gray-600">
                 <XCircle className="w-6 h-6" />
               </button>
             </div>
 
+            {/* Dialog Content */}
             <p className="text-gray-600 mb-6">
               Pilih petugas untuk menangani laporan ini
               {selectedReportId && (
@@ -536,141 +443,81 @@ const ReportManagementPage = () => {
               )}
             </p>
 
-            {officers.length === 0 ? (
+            {/* Daftar Petugas - BAGIAN INI YANG DIPERBAIKI */}
+            {officersLoading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                <p>Memuat daftar petugas...</p>
+              </div>
+            ) : officers.length > 0 ? (
+              <div className="space-y-2 mb-6 max-h-60 overflow-y-auto">
+                {officers.map((officer) => (
+                  <div
+                    key={`officer-${officer.user_id}`}
+                    onClick={() => !assignLoading && setSelectedOfficer(officer.user_id)}
+                    className={`p-4 border rounded-xl cursor-pointer transition-all ${selectedOfficer === officer.user_id
+                      ? 'border-blue-500 bg-blue-50 shadow-sm'
+                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                      } ${assignLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-gray-900">{officer.name}</p>
+                        <p className="text-sm text-gray-500">
+                          {officer.username && `@${officer.username}`}
+                          {officer.email && ` • ${officer.email}`}
+                        </p>
+                      </div>
+                      {selectedOfficer === officer.id && (
+                        <CheckCircle className="w-5 h-5 text-blue-500" />
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
               <div className="text-center py-8">
                 <div className="inline-flex items-center justify-center w-12 h-12 bg-gray-100 rounded-full mb-4">
                   <UserCheck className="w-6 h-6 text-gray-400" />
                 </div>
                 <p className="text-gray-500">Tidak ada petugas tersedia</p>
-              </div>
-            ) : (
-              <div className="space-y-2 mb-6 max-h-60 overflow-y-auto">
-                {officers.map((officer) => {
-                  const isSelected = String(selectedOfficer) === String(officer.id);
-
-                  return (
-                    <div
-                      key={`officer-${officer.id}`}
-                      onClick={() => {
-                        if (!assignLoading) {
-                          setSelectedOfficer(isSelected ? "" : String(officer.id));
-                        }
-                      }}
-                      className={`p-4 border rounded-xl cursor-pointer transition-all ${isSelected
-                        ? 'border-blue-500 bg-blue-50 shadow-sm'
-                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                        } ${assignLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium text-gray-900">{officer.name}</p>
-                          <p className="text-sm text-gray-500">
-                            {officer.username && `@${officer.username}`}
-                            {officer.email && ` • ${officer.email}`}
-                          </p>
-                        </div>
-                        {isSelected && (
-                          <CheckCircle className="w-5 h-5 text-blue-500" />
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+                <button
+                  onClick={fetchOfficers}
+                  className="mt-4 text-blue-600 hover:text-blue-800 text-sm font-medium"
+                >
+                  Coba Muat Ulang
+                </button>
               </div>
             )}
 
+            {/* Dialog Footer */}
             <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
               <button
                 onClick={handleCloseAssignDialog}
-                disabled={assignLoading}
-                className="px-6 py-2 text-gray-700 rounded-xl hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2 text-gray-700 rounded-xl hover:bg-gray-100"
               >
                 Batal
               </button>
               <button
                 onClick={handleAssignConfirm}
-                disabled={!selectedOfficer || assignLoading || officers.length === 0}
-                className={`px-6 py-2 rounded-xl text-white transition-all flex items-center space-x-2 ${selectedOfficer && !assignLoading && officers.length > 0
-                  ? 'bg-blue-600 hover:bg-blue-700 shadow-sm hover:shadow-md'
+                disabled={!selectedOfficer || assignLoading}
+                className={`px-6 py-2 rounded-xl text-white ${selectedOfficer && !assignLoading
+                  ? 'bg-blue-600 hover:bg-blue-700'
                   : 'bg-gray-400 cursor-not-allowed'
                   }`}
               >
-                {assignLoading && (
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                )}
-                <span>{assignLoading ? 'Menugaskan...' : 'Tugaskan'}</span>
+                {assignLoading ? 'Menugaskan...' : 'Tugaskan'}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Cancel Dialog */}
-      {cancelDialogOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
-                <XCircle className="w-8 h-8 text-red-600" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Batalkan Laporan</h3>
-              <p className="text-gray-600">Apakah Anda yakin ingin membatalkan laporan ini?</p>
-            </div>
-            <div className="flex space-x-3">
-              <button
-                onClick={() => setCancelDialogOpen(false)}
-                className="flex-1 px-6 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
-              >
-                Tidak
-              </button>
-              <button
-                onClick={handleCancelConfirm}
-                className="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors"
-              >
-                Ya, Batalkan
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {completeDialogOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-                <CheckCircle className="w-8 h-8 text-green-600" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Selesaikan Laporan</h3>
-              <p className="text-gray-600">Apakah Anda yakin ingin menandai laporan ini sebagai selesai?</p>
-            </div>
-            <div className="flex space-x-3">
-              <button
-                onClick={() => setCompleteDialogOpen(false)}
-                className="flex-1 px-6 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
-              >
-                Tidak
-              </button>
-              <button
-                onClick={handleCompleteConfirm}
-                className="flex-1 px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors"
-              >
-                Ya, Selesaikan
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Click outside to close menus */}
-      {(showActionMenu || showFilterDropdown) && (
+      {/* Click outside to close filter dropdown */}
+      {showFilterDropdown && (
         <div
           className="fixed inset-0 z-10"
-          onClick={() => {
-            setShowActionMenu(false);
-            setShowFilterDropdown(false);
-            setSelectedReportId(null);
-          }}
+          onClick={() => setShowFilterDropdown(false)}
         />
       )}
     </div>
