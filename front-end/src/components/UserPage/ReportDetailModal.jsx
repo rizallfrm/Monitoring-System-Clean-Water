@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import reportService from "../../services/reportService";
 import {
   AlertCircle,
@@ -22,77 +22,94 @@ import {
   TrendingUp,
   Shield,
 } from "lucide-react";
+import actionService from "../../services/actionService";
 
 // StatusTimeline Component with enhanced visual design
-const StatusTimeline = ({ statusHistory }) => {
-  const getStatusIcon = (status) => {
-    switch (status?.toLowerCase()) {
-      case "pending":
-        return <Clock className="w-5 h-5 text-amber-500" />;
-      case "in_progress":
-        return <Activity className="w-5 h-5 text-blue-500" />;
-      case "resolved":
-        return <CheckCircle className="w-5 h-5 text-green-500" />;
-      case "cancelled":
-        return <XCircle className="w-5 h-5 text-red-500" />;
-      default:
-        return <Clock className="w-5 h-5 text-gray-400" />;
-    }
-  };
 
-  const getStatusColor = (status) => {
-    switch (status?.toLowerCase()) {
-      case "pending":
-        return "border-amber-200 bg-amber-50";
-      case "in_progress":
-        return "border-blue-200 bg-blue-50";
-      case "resolved":
-        return "border-green-200 bg-green-50";
-      case "cancelled":
-        return "border-red-200 bg-red-50";
-      default:
-        return "border-gray-200 bg-gray-50";
-    }
-  };
+const ActionsList = ({ actions, isLoading, error }) => {
+  if (isLoading) {
+    return (
+      <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-8 text-center border-2 border-gray-200 shadow-lg mb-8">
+        <div className="animate-pulse flex flex-col items-center">
+          <Activity className="w-8 h-8 text-gray-400 mb-4" />
+          <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-gradient-to-br from-red-50 to-rose-50 rounded-2xl p-8 border-2 border-red-200 shadow-lg mb-8">
+        <div className="flex items-center justify-center text-red-600">
+          <AlertTriangle className="w-6 h-6 mr-3" />
+          <p className="font-medium">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!actions || actions.length === 0) {
+    return (
+      <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-8 text-center border-2 border-gray-200 shadow-lg mb-8">
+        <FileText className="w-8 h-8 text-gray-400 mx-auto mb-3" />
+        <p className="text-gray-500 font-medium">
+          Belum ada tindakan yang dilakukan
+        </p>
+        <p className="text-gray-400 text-sm mt-1">
+          Petugas belum menambahkan tindakan
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-4">
-      {statusHistory?.map((item, index) => (
-        <div
-          key={index}
-          className={`relative flex items-start space-x-4 p-4 rounded-xl border ${getStatusColor(
-            item.status
-          )} transition-all duration-300 hover:shadow-md`}
-        >
-          <div className="flex-shrink-0 p-2 bg-white rounded-full shadow-sm border-2 border-white">
-            {getStatusIcon(item.status)}
+    <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 shadow-lg mb-8">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center">
+          <div className="p-3 bg-green-100 rounded-xl">
+            <CheckCircle className="h-6 w-6 text-green-600" />
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-sm font-semibold text-gray-900 capitalize">
-                {item.status?.replace("_", " ")}
-              </p>
-              <span className="text-xs font-medium text-gray-500 bg-white px-2 py-1 rounded-full">
-                {new Date(item.timestamp).toLocaleDateString("id-ID")}
-              </span>
-            </div>
-            <p className="text-xs text-gray-600 mb-2">
-              {new Date(item.timestamp).toLocaleTimeString("id-ID", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </p>
-            {item.note && (
-              <div className="bg-white/70 rounded-lg p-3 mt-2">
-                <p className="text-sm text-gray-700">{item.note}</p>
-              </div>
-            )}
-          </div>
-          {index < statusHistory.length - 1 && (
-            <div className="absolute left-6 top-16 w-0.5 h-8 bg-gradient-to-b from-gray-300 to-transparent"></div>
-          )}
+          <h4 className="ml-4 text-xl font-bold text-gray-900">
+            Tindakan yang Dilakukan
+          </h4>
         </div>
-      ))}
+        <span className="bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">
+          {actions.length} Tindakan
+        </span>
+      </div>
+
+      <div className="space-y-6">
+        {actions.map((action, index) => (
+          <div key={index} className="border-l-4 border-green-500 pl-6 py-2">
+            <div className="flex items-start">
+              <div className="flex-shrink-0 bg-green-100 p-2 rounded-full">
+                <User className="h-5 w-5 text-green-600" />
+              </div>
+              <div className="ml-4 flex-1">
+                <div className="flex items-center justify-between">
+                  <p className="font-medium text-gray-900">
+                    {action.performer?.name || "Petugas tidak diketahui"}
+                  </p>
+                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                    {new Date(action.performed_at).toLocaleDateString("id-ID")}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-600 mt-1">
+                  {action.action_description}
+                </p>
+                <p className="text-xs text-gray-400 mt-2">
+                  {new Date(action.performed_at).toLocaleTimeString("id-ID", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
@@ -171,6 +188,35 @@ const ImageGallery = ({ images }) => {
 const ReportDetail = ({ report, statusHistory, onClose, loading }) => {
   const [error, setError] = useState(null);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [actions, setActions] = useState([]);
+  const [isLoadingActions, setIsLoadingActions] = useState(false);
+  const [actionsError, setActionsError] = useState(null);
+
+  const loadActionsForReport = async (reportId) => {
+    setIsLoadingActions(true);
+    setActionsError(null);
+    try {
+      const response = await actionService.getActionsByReportId(reportId);
+      console.log("Response dari API:", response);
+      if (response.status === "success") {
+        setActions(Array.isArray(response.data) ? response.data : []);
+      } else {
+        throw new Error(response.message || "Gagal memuat tindakan");
+      }
+    } catch (error) {
+      console.error("Gagal memuat tindakan:", error);
+      setActionsError(error.message);
+      setActions([]);
+    } finally {
+      setIsLoadingActions(false);
+    }
+  };
+
+  useEffect(() => {
+    if (report?.report_id) {
+      loadActionsForReport(report.report_id);
+    }
+  }, [report]);
 
   const handleCancelReport = async () => {
     if (!window.confirm("Apakah Anda yakin ingin membatalkan laporan ini?"))
@@ -193,90 +239,61 @@ const ReportDetail = ({ report, statusHistory, onClose, loading }) => {
 
   const formattedReport = {
     ...report,
-    status: (report.status || "").toLowerCase(),
+    status: (report.status || "Pending").toLowerCase(),
     createdAt: report.created_at,
     updatedAt: report.updated_at || report.created_at,
   };
-
   const getStatusBadge = (status) => {
-    const statusConfig = {
-      pending: {
-        bg: "bg-gradient-to-r from-amber-100 via-yellow-100 to-amber-100",
-        text: "text-amber-800",
-        border: "border-amber-300 shadow-amber-100",
-        icon: <Clock className="w-4 h-4" />,
-        pulse: "animate-pulse",
-      },
-      in_progress: {
-        bg: "bg-gradient-to-r from-blue-100 via-cyan-100 to-blue-100",
-        text: "text-blue-800",
-        border: "border-blue-300 shadow-blue-100",
-        icon: <Activity className="w-4 h-4" />,
-        pulse: "",
-      },
-      resolved: {
-        bg: "bg-gradient-to-r from-green-100 via-emerald-100 to-green-100",
-        text: "text-green-800",
-        border: "border-green-300 shadow-green-100",
-        icon: <CheckCircle className="w-4 h-4" />,
-        pulse: "",
-      },
-      cancelled: {
-        bg: "bg-gradient-to-r from-red-100 via-rose-100 to-red-100",
-        text: "text-red-800",
-        border: "border-red-300 shadow-red-100",
-        icon: <XCircle className="w-4 h-4" />,
-        pulse: "",
-      },
-    };
-
-    const config = statusConfig[status] || statusConfig.pending;
-
-    return (
-      <div
-        className={`inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold border-2 shadow-lg ${config.bg} ${config.text} ${config.border} ${config.pulse}`}
-      >
-        {config.icon}
-        <span className="ml-2 capitalize">{status.replace("_", " ")}</span>
-      </div>
-    );
+  // Konversi status ke lowercase untuk memudahkan pengecekan
+  const statusLower = (status || "").toLowerCase();
+  
+  const statusConfig = {
+    pending: {
+      bg: "bg-gradient-to-r from-amber-100 via-yellow-100 to-amber-100",
+      text: "text-amber-800",
+      border: "border-amber-300 shadow-amber-100",
+      icon: <Clock className="w-4 h-4" />,
+      pulse: "animate-pulse",
+      displayText: "Menunggu" // Teks yang akan ditampilkan
+    },
+    "on-going": {
+      bg: "bg-gradient-to-r from-blue-100 via-cyan-100 to-blue-100",
+      text: "text-blue-800",
+      border: "border-blue-300 shadow-blue-100",
+      icon: <Activity className="w-4 h-4" />,
+      pulse: "",
+      displayText: "Dikerjakan"
+    },
+    completed: {
+      bg: "bg-gradient-to-r from-green-100 via-emerald-100 to-green-100",
+      text: "text-green-800",
+      border: "border-green-300 shadow-green-100",
+      icon: <CheckCircle className="w-4 h-4" />,
+      pulse: "",
+      displayText: "Selesai"
+    },
+    cancel: {
+      bg: "bg-gradient-to-r from-red-100 via-rose-100 to-red-100",
+      text: "text-red-800",
+      border: "border-red-300 shadow-red-100",
+      icon: <XCircle className="w-4 h-4" />,
+      pulse: "",
+      displayText: "Dibatalkan"
+    },
   };
 
-  const getPriorityBadge = (priority) => {
-    const priorityConfig = {
-      low: {
-        bg: "bg-gradient-to-r from-gray-100 to-slate-100",
-        text: "text-gray-700",
-        border: "border-gray-300",
-        icon: "🔵",
-      },
-      medium: {
-        bg: "bg-gradient-to-r from-yellow-100 to-amber-100",
-        text: "text-yellow-700",
-        border: "border-yellow-300",
-        icon: "🟡",
-      },
-      high: {
-        bg: "bg-gradient-to-r from-red-100 to-rose-100",
-        text: "text-red-700",
-        border: "border-red-300",
-        icon: "🔴",
-      },
-    };
+  // Cari konfigurasi yang sesuai, gunakan pending sebagai default
+  const config = statusConfig[statusLower] || statusConfig.pending;
 
-    const config =
-      priorityConfig[priority?.toLowerCase()] || priorityConfig.medium;
-
-    return (
-      <span
-        className={`inline-flex items-center px-3 py-2 rounded-xl text-sm font-semibold border-2 shadow-sm ${config.bg} ${config.text} ${config.border}`}
-      >
-        <span className="mr-2">{config.icon}</span>
-        <Flag className="w-3 h-3 mr-1" />
-        {priority || "Medium"}
-      </span>
-    );
-  };
+  return (
+    <div
+      className={`inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold border-2 shadow-lg ${config.bg} ${config.text} ${config.border} ${config.pulse}`}
+    >
+      {config.icon}
+      <span className="ml-2">{config.displayText}</span>
+    </div>
+  );
+};
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
@@ -387,16 +404,12 @@ const ReportDetail = ({ report, statusHistory, onClose, loading }) => {
                 <div className="bg-gradient-to-br from-gray-50 via-blue-50 to-cyan-50 rounded-2xl p-8 border-2 border-gray-200 shadow-lg">
                   <div className="flex items-start justify-between mb-6">
                     <div className="flex-1">
-                      <h3 className="text-2xl font-bold text-gray-900 mb-4 leading-tight">
-                        {formattedReport.title || "Laporan Monitoring Air PDAM"}
-                      </h3>
                       {getStatusBadge(formattedReport.status)}
                     </div>
-                    <div className="ml-6 flex flex-col items-end space-y-3">
-                      {getPriorityBadge(formattedReport.priority)}
-                    </div>
                   </div>
-
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 leading-tight">
+                    {formattedReport.title || "Deskripsi Laporan:"}
+                  </h3>
                   <div className="bg-white/60 rounded-xl p-6 border border-white/50">
                     <p className="text-gray-800 leading-relaxed text-base">
                       {formattedReport.description ||
@@ -488,7 +501,11 @@ const ReportDetail = ({ report, statusHistory, onClose, loading }) => {
                     </p>
                   </div>
                 </div>
-
+                <ActionsList
+                  actions={actions}
+                  isLoading={isLoadingActions}
+                  error={actionsError}
+                />
                 {/* Images Section */}
                 <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 shadow-lg">
                   <div className="flex items-center justify-between mb-6">
