@@ -102,9 +102,10 @@ const ImageGallery = ({ images }) => {
   const [selectedImage, setSelectedImage] = useState(null);
 
   // Ekstrak URL gambar dari array images
-  const imageUrls = images?.map(img => 
-    typeof img === 'string' ? img : img?.url
-  ).filter(url => url) || [];
+  const imageUrls =
+    images
+      ?.map((img) => (typeof img === "string" ? img : img?.url))
+      .filter((url) => url) || [];
 
   if (imageUrls.length === 0) {
     return (
@@ -129,7 +130,8 @@ const ImageGallery = ({ images }) => {
               alt={`Lampiran ${index + 1}`}
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
               onError={(e) => {
-                e.target.src = 'https://via.placeholder.com/300?text=Gambar+Tidak+Tersedia';
+                e.target.src =
+                  "https://via.placeholder.com/300?text=Gambar+Tidak+Tersedia";
               }}
             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
@@ -392,7 +394,6 @@ const ReportDetail = ({ report, statusHistory, onClose, loading }) => {
                     </div>
                     <div className="ml-6 flex flex-col items-end space-y-3">
                       {getPriorityBadge(formattedReport.priority)}
-                      
                     </div>
                   </div>
 
