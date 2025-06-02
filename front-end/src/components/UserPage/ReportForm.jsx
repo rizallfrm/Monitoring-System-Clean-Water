@@ -109,12 +109,11 @@ const ReportForm = ({ onReportCreated }) => {
             </div>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Sistem Monitoring Air PDAM
           </h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
             Laporkan masalah atau keluhan terkait layanan air PDAM dengan mudah
             dan cepat. Tim kami akan menindaklanjuti laporan Anda dengan
-            prioritas sesuai tingkat urgensi.
+            cepat.
           </p>
         </div>
 
@@ -190,57 +189,6 @@ const ReportForm = ({ onReportCreated }) => {
           </div>
 
           <div className="p-8 space-y-8">
-            {/* Title Field */}
-            <div className="group">
-              <label
-                htmlFor="title"
-                className="block text-sm font-semibold text-gray-700 mb-2 flex items-center"
-              >
-                <svg
-                  className="w-4 h-4 mr-2 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-                  />
-                </svg>
-                Judul Laporan
-                <span className="text-red-500 ml-1">*</span>
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  name="title"
-                  id="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  placeholder="Contoh: Air keruh di wilayah Perumahan ABC"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 group-hover:border-gray-400"
-                  required
-                />
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <svg
-                    className="h-5 w-5 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
             {/* Description Field */}
             <div className="group">
               <label
@@ -313,75 +261,6 @@ const ReportForm = ({ onReportCreated }) => {
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 group-hover:border-gray-400 resize-none"
                 required
               />
-            </div>
-
-            {/* Priority Field */}
-            <div className="group">
-              <label
-                htmlFor="priority"
-                className="block text-sm font-semibold text-gray-700 mb-2 flex items-center"
-              >
-                <svg
-                  className="w-4 h-4 mr-2 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.664-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"
-                  />
-                </svg>
-                Tingkat Prioritas
-              </label>
-              <div className="relative">
-                <select
-                  name="priority"
-                  id="priority"
-                  value={formData.priority}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 group-hover:border-gray-400 appearance-none bg-white"
-                >
-                  <option value="low">
-                    🟢 Rendah - Tidak mengganggu aktivitas sehari-hari
-                  </option>
-                  <option value="medium">
-                    🟡 Sedang - Mengganggu sebagian aktivitas
-                  </option>
-                  <option value="high">
-                    🔴 Tinggi - Sangat mengganggu atau darurat
-                  </option>
-                </select>
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <svg
-                    className="h-5 w-5 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </div>
-              </div>
-              <div
-                className={`mt-2 px-3 py-2 rounded-lg text-xs font-medium inline-block ${getPriorityColor(
-                  formData.priority
-                )}`}
-              >
-                Prioritas:{" "}
-                {formData.priority === "low"
-                  ? "Rendah"
-                  : formData.priority === "medium"
-                  ? "Sedang"
-                  : "Tinggi"}
-              </div>
             </div>
 
             {/* File Upload Field */}
