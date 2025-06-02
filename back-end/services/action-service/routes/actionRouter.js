@@ -22,6 +22,6 @@ router.get('/actions/:id', actionController.getActionById);
 router.put('/actions/:id', checkRole(['Admin', 'Petugas']), actionController.updateAction);
 
 // Delete action (hanya Admin)
-router.delete('/actions/:id', checkRole(['Admin']), actionController.deleteAction);
+router.delete('/actions/:id', checkRole(['Admin', 'Petugas']), actionController.deleteAction);
 
 module.exports = router; 
