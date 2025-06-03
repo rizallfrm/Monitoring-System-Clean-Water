@@ -388,8 +388,7 @@ const RegisterPage = () => {
 
           {/* Footer info */}
           <div className="text-center text-xs text-blue-300 opacity-75 mt-4">
-            <p>© 2024 PDAM Monitoring System</p>
-            <p>Sistem Pemantauan Distribusi Air Bersih</p>
+            <p>© 2025 HydroFlow</p>
           </div>
         </div>
       </div>

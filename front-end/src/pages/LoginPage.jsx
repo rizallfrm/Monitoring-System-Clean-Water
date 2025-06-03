@@ -273,7 +273,6 @@ const LoginPage = () => {
           {/* Footer info */}
           <div className="text-center text-xs text-blue-300 opacity-75 mt-4">
             <p>© 2025 Hydroflow</p>
-            <p>Sistem Pemantauan PDAM</p>
           </div>
         </div>
       </div>
