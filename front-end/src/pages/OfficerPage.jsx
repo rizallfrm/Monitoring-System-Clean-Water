@@ -12,6 +12,7 @@ import authService from "../services/authService";
 import userService from "../services/userService";
 import NavSideBarOfficer from "../components/NavSideBarOfficer"; // Import the new component
 import Footer from "../components/LandingPage/Footer";
+import { toast } from "react-toastify";
 
 const OfficerPage = (response) => {
   const [activeTab, setActiveTab] = useState("actions");
@@ -40,7 +41,7 @@ const OfficerPage = (response) => {
   });
   const [statusForm, setStatusForm] = useState({
     reportId: "",
-    status: "On-Going",
+    status: "Pending",
   });
   const [actions, setActions] = useState([]);
   const [selectedReportId, setSelectedReportId] = useState(null);
@@ -72,19 +73,15 @@ const OfficerPage = (response) => {
   };
 
   const loadActionsForReportWithDebug = async (reportId) => {
-    console.log("Loading actions for report ID:", reportId);
     setIsLoadingActions(true);
     setActionsError(null);
     try {
       const response = await actionService.getActionsByReportId(reportId);
-      console.log("Response dari API:", response);
 
       if (response.status === "success") {
-        console.log("Response data:", response.data);
-        console.log("Is array?", Array.isArray(response.data));
+      
 
         const actionsData = Array.isArray(response.data) ? response.data : [];
-        console.log("Actions data to set:", actionsData);
 
         setActions(actionsData);
         setSelectedReportId(reportId);
@@ -165,40 +162,44 @@ const OfficerPage = (response) => {
   };
 
   const handleCreateAction = async () => {
-    if (!actionForm.reportId || !actionForm.actionDescription) {
-      alert("ID laporan dan deskripsi tindakan harus diisi!");
-      return;
+  if (!actionForm.reportId || !actionForm.actionDescription) {
+    alert("ID laporan dan deskripsi tindakan harus diisi!");
+    return;
+  }
+
+  setIsLoading(true);
+  try {
+    const actionData = {
+      reportId: actionForm.reportId,
+      actionDescription: actionForm.actionDescription,
+      performed_by: currentOfficer.user_id || currentOfficer.id,
+      status: "Pending" // Tambahkan status Pending secara default
+    };
+
+    const response = await actionService.createAction(actionData);
+
+    if (response.status === "success") {
+      await loadData();
+      // Jika ingin memperbarui status laporan juga ke Pending
+      await handleUpdateStatus(actionForm.reportId, "Pending");
+      
+      setShowActionModal(false);
+      setActionForm({
+        reportId: "",
+        actionDescription: "",
+        dueDate: "",
+      });
+      alert("Tindakan berhasil ditambahkan!");
+    } else {
+      throw new Error(response.message || "Gagal membuat tindakan");
     }
-
-    setIsLoading(true);
-    try {
-      const actionData = {
-        reportId: actionForm.reportId,
-        actionDescription: actionForm.actionDescription,
-        performed_by: currentOfficer.user_id || currentOfficer.id,
-      };
-
-      const response = await actionService.createAction(actionData);
-
-      if (response.status === "success") {
-        await loadData();
-        setShowActionModal(false);
-        setActionForm({
-          reportId: "",
-          actionDescription: "",
-          dueDate: "",
-        });
-        alert("Tindakan berhasil ditambahkan!");
-      } else {
-        throw new Error(response.message || "Gagal membuat tindakan");
-      }
-    } catch (error) {
-      console.error("Error creating action:", error);
-      alert(`Terjadi kesalahan: ${error.message}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  } catch (error) {
+    console.error("Error creating action:", error);
+    alert(`Terjadi kesalahan: ${error.message}`);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const handleUpdateStatus = async (reportId, newStatus) => {
     setIsLoading(true);
@@ -634,13 +635,7 @@ const OfficerPage = (response) => {
                                 Gunakan dropdown di atas untuk memilih laporan
                                 dan melihat tindakannya
                               </p>
-                              <button
-                                onClick={() => setShowActionModal(true)}
-                                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                              >
-                                <Plus className="h-4 w-4 mr-2" />
-                                Tambah Tindakan Pertama
-                              </button>
+                             
                             </div>
                           ) : (
                             <div className="space-y-4">
