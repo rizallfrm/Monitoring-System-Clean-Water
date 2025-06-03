@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import {Activity,XCircle,Plus,Target,RefreshCw} from "lucide-react";
+import { Activity, XCircle, Plus, Target, RefreshCw } from "lucide-react";
 import reportService from "../services/reportService";
 import actionService from "../services/actionService";
 import statusService from "../services/statusService";
@@ -11,6 +11,7 @@ import ReportDetailModal from "../components/Officers/ReportDetailModal";
 import authService from "../services/authService";
 import userService from "../services/userService";
 import NavSideBarOfficer from "../components/NavSideBarOfficer"; // Import the new component
+import Footer from "../components/LandingPage/Footer";
 
 const OfficerPage = (response) => {
   const [activeTab, setActiveTab] = useState("actions");
@@ -376,462 +377,464 @@ const OfficerPage = (response) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 relative overflow-hidden">
-      {/* Background Decorations */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-200/30 to-purple-300/30 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 -left-20 w-60 h-60 bg-gradient-to-br from-indigo-200/20 to-blue-300/20 rounded-full blur-2xl"></div>
-        <div className="absolute bottom-20 right-1/4 w-40 h-40 bg-gradient-to-br from-purple-200/25 to-pink-300/25 rounded-full blur-xl"></div>
-      </div>
-      
-      {/* Integrated NavSideBarOfficer */}
-      <NavSideBarOfficer activeTab={activeTab} setActiveTab={setActiveTab} />
+    <>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 relative overflow-hidden">
+        {/* Background Decorations */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-200/30 to-purple-300/30 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 -left-20 w-60 h-60 bg-gradient-to-br from-indigo-200/20 to-blue-300/20 rounded-full blur-2xl"></div>
+          <div className="absolute bottom-20 right-1/4 w-40 h-40 bg-gradient-to-br from-purple-200/25 to-pink-300/25 rounded-full blur-xl"></div>
+        </div>
 
-      <div className="flex-1 ml-72">
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Error Message */}
-          {error && (
-            <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-center justify-between">
-              <div className="flex items-center">
-                <XCircle className="h-5 w-5 text-red-500 mr-2" />
-                <span className="text-red-700">{error}</span>
-              </div>
-              <button
-                onClick={loadData}
-                className="text-red-600 hover:text-red-800 flex items-center"
-              >
-                <RefreshCw className="h-4 w-4 mr-1" />
-                Coba Lagi
-              </button>
-            </div>
-          )}
+        {/* Integrated NavSideBarOfficer */}
+        <NavSideBarOfficer activeTab={activeTab} setActiveTab={setActiveTab} />
 
-          {isLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="flex items-center space-x-4">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                <p className="text-gray-600 font-medium">Memuat data...</p>
+        <div className="flex-1 ml-72">
+          <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {/* Error Message */}
+            {error && (
+              <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-center justify-between">
+                <div className="flex items-center">
+                  <XCircle className="h-5 w-5 text-red-500 mr-2" />
+                  <span className="text-red-700">{error}</span>
+                </div>
+                <button
+                  onClick={loadData}
+                  className="text-red-600 hover:text-red-800 flex items-center"
+                >
+                  <RefreshCw className="h-4 w-4 mr-1" />
+                  Coba Lagi
+                </button>
               </div>
-            </div>
-          ) : (
-            <>
-              {activeTab === "dashboard" && (
-                <div className="space-y-8">
-                  {/* Enhanced Recent Reports */}
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-purple-600/5 rounded-2xl"></div>
-                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 relative">
-                      <div className="p-6 border-b border-gray-100/50">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-3">
-                            <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg">
-                              <Activity className="h-5 w-5 text-white" />
+            )}
+
+            {isLoading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="flex items-center space-x-4">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  <p className="text-gray-600 font-medium">Memuat data...</p>
+                </div>
+              </div>
+            ) : (
+              <>
+                {activeTab === "dashboard" && (
+                  <div className="space-y-8">
+                    {/* Enhanced Recent Reports */}
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-purple-600/5 rounded-2xl"></div>
+                      <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 relative">
+                        <div className="p-6 border-b border-gray-100/50">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                              <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg">
+                                <Activity className="h-5 w-5 text-white" />
+                              </div>
+                              <h2 className="text-xl font-bold text-gray-900">
+                                Laporan Terbaru
+                              </h2>
                             </div>
-                            <h2 className="text-xl font-bold text-gray-900">
-                              Laporan Terbaru
-                            </h2>
-                          </div>
-                          <div className="flex items-center space-x-3">
-                            <span className="px-3 py-1 bg-gradient-to-r from-blue-50 to-purple-50 text-blue-700 rounded-full text-sm font-medium border border-blue-200">
-                              {reports.length} Total
-                            </span>
-                            <button
-                              onClick={loadData}
-                              className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                              title="Refresh Data"
-                            >
-                              <RefreshCw className="h-4 w-4" />
-                            </button>
+                            <div className="flex items-center space-x-3">
+                              <span className="px-3 py-1 bg-gradient-to-r from-blue-50 to-purple-50 text-blue-700 rounded-full text-sm font-medium border border-blue-200">
+                                {reports.length} Total
+                              </span>
+                              <button
+                                onClick={loadData}
+                                className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                title="Refresh Data"
+                              >
+                                <RefreshCw className="h-4 w-4" />
+                              </button>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="p-6">
-                        <div className="space-y-4">
-                          {reports.slice(0, 3).map((report, index) => (
-                            <div
-                              key={report.report_id}
-                              className="group relative"
-                            >
-                              <div className="absolute inset-0 bg-gradient-to-r from-gray-50 to-blue-50/30 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
-                              <div className="relative flex items-center justify-between p-4 bg-gray-50/50 backdrop-blur-sm rounded-xl border border-gray-100 group-hover:shadow-md transition-all duration-300">
-                                <div className="flex items-center space-x-4">
-                                  <div className="flex items-center space-x-3">
-                                    <div
-                                      className={`w-4 h-4 rounded-full ${getPriorityColor(
-                                        report.priority
-                                      )} shadow-sm`}
-                                    ></div>
-                                    <div className="w-6 h-6 bg-gradient-to-br from-indigo-100 to-blue-100 rounded-full flex items-center justify-center text-xs font-bold text-indigo-600">
-                                      {index + 1}
+                        <div className="p-6">
+                          <div className="space-y-4">
+                            {reports.slice(0, 3).map((report, index) => (
+                              <div
+                                key={report.report_id}
+                                className="group relative"
+                              >
+                                <div className="absolute inset-0 bg-gradient-to-r from-gray-50 to-blue-50/30 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
+                                <div className="relative flex items-center justify-between p-4 bg-gray-50/50 backdrop-blur-sm rounded-xl border border-gray-100 group-hover:shadow-md transition-all duration-300">
+                                  <div className="flex items-center space-x-4">
+                                    <div className="flex items-center space-x-3">
+                                      <div
+                                        className={`w-4 h-4 rounded-full ${getPriorityColor(
+                                          report.priority
+                                        )} shadow-sm`}
+                                      ></div>
+                                      <div className="w-6 h-6 bg-gradient-to-br from-indigo-100 to-blue-100 rounded-full flex items-center justify-center text-xs font-bold text-indigo-600">
+                                        {index + 1}
+                                      </div>
+                                    </div>
+                                    <div>
+                                      <p className="font-semibold text-gray-900">
+                                        {report.title}
+                                      </p>
+                                      <p className="text-sm text-gray-500 flex items-center">
+                                        📍 {report.location} • 👤{" "}
+                                        {report.reporter?.name ||
+                                          report.reporter}
+                                      </p>
                                     </div>
                                   </div>
-                                  <div>
-                                    <p className="font-semibold text-gray-900">
-                                      {report.title}
-                                    </p>
-                                    <p className="text-sm text-gray-500 flex items-center">
-                                      📍 {report.location} • 👤{" "}
-                                      {report.reporter?.name ||
-                                        report.reporter}
-                                    </p>
-                                  </div>
+                                  <span
+                                    className={`px-4 py-2 rounded-xl text-xs font-medium border shadow-sm ${getStatusColor(
+                                      report.status
+                                    )}`}
+                                  >
+                                    {getStatusText(report.status)}
+                                  </span>
                                 </div>
-                                <span
-                                  className={`px-4 py-2 rounded-xl text-xs font-medium border shadow-sm ${getStatusColor(
-                                    report.status
-                                  )}`}
-                                >
-                                  {getStatusText(report.status)}
-                                </span>
                               </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === "reports" && (
-                <div className="space-y-6">
-                  {/* Enhanced Filter Section */}
-                  <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 p-6">
-                    <ReportsFilter
-                      searchTerm={searchTerm}
-                      setSearchTerm={setSearchTerm}
-                      filterStatus={filterStatus}
-                      setFilterStatus={setFilterStatus}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {filteredReports.map((report) => (
-                      <div key={report.report_id} className="relative group">
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-400/10 to-purple-400/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
-                        <ReportCard
-                          report={report}
-                          onView={setSelectedReport}
-                          onAssign={handleAssignReport}
-                          onAddAction={(report) => {
-                            setActionForm({
-                              ...actionForm,
-                              reportId: report.report_id,
-                            });
-                            setShowActionModal(true);
-                          }}
-                          getStatusColor={getStatusColor}
-                          getPriorityColor={getPriorityColor}
-                          getStatusText={getStatusText}
-                        />
-                      </div>
-                    ))}
-                  </div>
-
-                  {filteredReports.length === 0 && !isLoading && (
-                    <div className="text-center py-12">
-                      <div className="text-gray-400 mb-4">
-                        <Activity className="h-16 w-16 mx-auto" />
-                      </div>
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">
-                        Tidak ada laporan ditemukan
-                      </h3>
-                      <p className="text-gray-500">
-                        Coba ubah filter atau kata kunci pencarian
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {activeTab === "actions" && (
-                <div className="space-y-6">
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/5 to-blue-600/5 rounded-2xl"></div>
-                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 relative">
-                      <div className="p-6 border-b border-gray-100/50 flex justify-between items-center">
-                        <div className="flex items-center space-x-3">
-                          <div className="p-2 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-lg">
-                            <Target className="h-5 w-5 text-white" />
-                          </div>
-                          <h2 className="text-xl font-bold text-gray-900">
-                            Daftar Tindakan
-                          </h2>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                          <select
-                            value={selectedReportId || ""}
-                            onChange={(e) => {
-                              const reportId = e.target.value;
-                              if (reportId) {
-                                loadActionsForReport(parseInt(reportId));
-                              } else {
-                                setActions([]);
-                                setSelectedReportId(null);
-                              }
-                            }}
-                            className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                          >
-                            <option value="">Pilih Laporan</option>
-                            {reports.map((report) => (
-                              <option
-                                key={report.report_id}
-                                value={report.report_id}
-                              >
-                                #{report.report_id} - {report.title}
-                              </option>
                             ))}
-                          </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
-                          <span className="px-3 py-1 bg-gradient-to-r from-indigo-50 to-blue-50 text-indigo-700 rounded-full text-sm font-medium border border-indigo-200">
-                            {actions.length} Total
-                          </span>
-                          <button
-                            onClick={() => {
+                {activeTab === "reports" && (
+                  <div className="space-y-6">
+                    {/* Enhanced Filter Section */}
+                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 p-6">
+                      <ReportsFilter
+                        searchTerm={searchTerm}
+                        setSearchTerm={setSearchTerm}
+                        filterStatus={filterStatus}
+                        setFilterStatus={setFilterStatus}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {filteredReports.map((report) => (
+                        <div key={report.report_id} className="relative group">
+                          <div className="absolute inset-0 bg-gradient-to-r from-blue-400/10 to-purple-400/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+                          <ReportCard
+                            report={report}
+                            onView={setSelectedReport}
+                            onAssign={handleAssignReport}
+                            onAddAction={(report) => {
                               setActionForm({
-                                reportId: selectedReportId || "",
-                                actionDescription: "",
+                                ...actionForm,
+                                reportId: report.report_id,
                               });
                               setShowActionModal(true);
                             }}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
-                            disabled={!selectedReportId}
-                          >
-                            <Plus className="h-4 w-4 mr-1" />
-                            Tambah Tindakan
-                          </button>
+                            getStatusColor={getStatusColor}
+                            getPriorityColor={getPriorityColor}
+                            getStatusText={getStatusText}
+                          />
                         </div>
-                      </div>
+                      ))}
+                    </div>
 
-                      <div className="p-6">
-                        {isLoadingActions ? (
-                          <div className="flex justify-center py-8">
-                            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
-                          </div>
-                        ) : actionsError ? (
-                          <div className="text-red-500 text-center py-4">
-                            {actionsError}
-                            <button
-                              onClick={() =>
-                                loadActionsForReport(selectedReportId)
-                              }
-                              className="ml-2 text-blue-500 hover:text-blue-700"
-                            >
-                              Coba Lagi
-                            </button>
-                          </div>
-                        ) : actions.length === 0 ? (
-                          <div className="text-center py-12">
-                            <div className="text-gray-400 mb-4">
-                              <Target className="h-16 w-16 mx-auto" />
+                    {filteredReports.length === 0 && !isLoading && (
+                      <div className="text-center py-12">
+                        <div className="text-gray-400 mb-4">
+                          <Activity className="h-16 w-16 mx-auto" />
+                        </div>
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">
+                          Tidak ada laporan ditemukan
+                        </h3>
+                        <p className="text-gray-500">
+                          Coba ubah filter atau kata kunci pencarian
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {activeTab === "actions" && (
+                  <div className="space-y-6">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/5 to-blue-600/5 rounded-2xl"></div>
+                      <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 relative">
+                        <div className="p-6 border-b border-gray-100/50 flex justify-between items-center">
+                          <div className="flex items-center space-x-3">
+                            <div className="p-2 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-lg">
+                              <Target className="h-5 w-5 text-white" />
                             </div>
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">
-                              Pilih Laporan Terlebih Dahulu
-                            </h3>
-                            <p className="text-gray-500 pb-6">
-                              Gunakan dropdown di atas untuk memilih laporan
-                              dan melihat tindakannya
-                            </p>
-                            <button
-                              onClick={() => setShowActionModal(true)}
-                              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                            <h2 className="text-xl font-bold text-gray-900">
+                              Daftar Tindakan
+                            </h2>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            <select
+                              value={selectedReportId || ""}
+                              onChange={(e) => {
+                                const reportId = e.target.value;
+                                if (reportId) {
+                                  loadActionsForReport(parseInt(reportId));
+                                } else {
+                                  setActions([]);
+                                  setSelectedReportId(null);
+                                }
+                              }}
+                              className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
                             >
-                              <Plus className="h-4 w-4 mr-2" />
-                              Tambah Tindakan Pertama
+                              <option value="">Pilih Laporan</option>
+                              {reports.map((report) => (
+                                <option
+                                  key={report.report_id}
+                                  value={report.report_id}
+                                >
+                                  #{report.report_id} - {report.title}
+                                </option>
+                              ))}
+                            </select>
+
+                            <span className="px-3 py-1 bg-gradient-to-r from-indigo-50 to-blue-50 text-indigo-700 rounded-full text-sm font-medium border border-indigo-200">
+                              {actions.length} Total
+                            </span>
+                            <button
+                              onClick={() => {
+                                setActionForm({
+                                  reportId: selectedReportId || "",
+                                  actionDescription: "",
+                                });
+                                setShowActionModal(true);
+                              }}
+                              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+                              disabled={!selectedReportId}
+                            >
+                              <Plus className="h-4 w-4 mr-1" />
+                              Tambah Tindakan
                             </button>
                           </div>
-                        ) : (
-                          <div className="space-y-4">
-                            {actions.map((action) => {
-                              const report = reports.find(
-                                (r) => r.report_id === action.report_id
-                              );
-                              return (
-                                <div
-                                  key={action.action_id}
-                                  className="group relative"
-                                >
-                                  <div className="absolute inset-0 bg-gradient-to-r from-gray-50 to-indigo-50/30 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
-                                  <div className="relative border border-gray-200 rounded-xl p-5 bg-white/50 backdrop-blur-sm group-hover:shadow-lg transition-all duration-300">
-                                    <div className="flex justify-between items-start mb-4">
-                                      <div className="flex items-start space-x-3 flex-1">
-                                        <div className="w-10 h-10 bg-gradient-to-br from-indigo-100 to-blue-100 rounded-full flex items-center justify-center text-sm font-bold text-indigo-600">
-                                          {action.action_id}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                          <h3 className="font-semibold text-gray-900 text-lg truncate">
-                                            {action.action_description}
-                                          </h3>
-                                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
-                                            <p className="text-sm text-gray-600">
-                                              <span className="font-medium">
-                                                Laporan:
-                                              </span>{" "}
-                                              <span className="truncate">
-                                                {report?.title ||
-                                                  `#${action.report_id}`}
-                                              </span>
-                                            </p>
-                                            <p className="text-sm text-gray-600">
-                                              <span className="font-medium">
-                                                Petugas:
-                                              </span>{" "}
-                                              {action.performer?.name ||
-                                                "Tidak diketahui"}
-                                            </p>
-                                            <p className="text-sm text-gray-600">
-                                              <span className="font-medium">
-                                                Tanggal:
-                                              </span>{" "}
-                                              {new Date(
-                                                action.performed_at
-                                              ).toLocaleDateString("id-ID")}
-                                            </p>
-                                            <p className="text-sm text-gray-600">
-                                              <span className="font-medium">
-                                                Status:
-                                              </span>{" "}
-                                              <span
-                                                className={`px-2 py-4 text-xs font-medium${getStatusColor(
-                                                  report.status
-                                                )}`}
-                                              >
-                                                {getStatusText(report.status)}
-                                              </span>
-                                            </p>
+                        </div>
+
+                        <div className="p-6">
+                          {isLoadingActions ? (
+                            <div className="flex justify-center py-8">
+                              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+                            </div>
+                          ) : actionsError ? (
+                            <div className="text-red-500 text-center py-4">
+                              {actionsError}
+                              <button
+                                onClick={() =>
+                                  loadActionsForReport(selectedReportId)
+                                }
+                                className="ml-2 text-blue-500 hover:text-blue-700"
+                              >
+                                Coba Lagi
+                              </button>
+                            </div>
+                          ) : actions.length === 0 ? (
+                            <div className="text-center py-12">
+                              <div className="text-gray-400 mb-4">
+                                <Target className="h-16 w-16 mx-auto" />
+                              </div>
+                              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                                Pilih Laporan Terlebih Dahulu
+                              </h3>
+                              <p className="text-gray-500 pb-6">
+                                Gunakan dropdown di atas untuk memilih laporan
+                                dan melihat tindakannya
+                              </p>
+                              <button
+                                onClick={() => setShowActionModal(true)}
+                                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                              >
+                                <Plus className="h-4 w-4 mr-2" />
+                                Tambah Tindakan Pertama
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="space-y-4">
+                              {actions.map((action) => {
+                                const report = reports.find(
+                                  (r) => r.report_id === action.report_id
+                                );
+                                return (
+                                  <div
+                                    key={action.action_id}
+                                    className="group relative"
+                                  >
+                                    <div className="absolute inset-0 bg-gradient-to-r from-gray-50 to-indigo-50/30 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
+                                    <div className="relative border border-gray-200 rounded-xl p-5 bg-white/50 backdrop-blur-sm group-hover:shadow-lg transition-all duration-300">
+                                      <div className="flex justify-between items-start mb-4">
+                                        <div className="flex items-start space-x-3 flex-1">
+                                          <div className="w-10 h-10 bg-gradient-to-br from-indigo-100 to-blue-100 rounded-full flex items-center justify-center text-sm font-bold text-indigo-600">
+                                            {action.action_id}
+                                          </div>
+                                          <div className="flex-1 min-w-0">
+                                            <h3 className="font-semibold text-gray-900 text-lg truncate">
+                                              {action.action_description}
+                                            </h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                                              <p className="text-sm text-gray-600">
+                                                <span className="font-medium">
+                                                  Laporan:
+                                                </span>{" "}
+                                                <span className="truncate">
+                                                  {report?.title ||
+                                                    `#${action.report_id}`}
+                                                </span>
+                                              </p>
+                                              <p className="text-sm text-gray-600">
+                                                <span className="font-medium">
+                                                  Petugas:
+                                                </span>{" "}
+                                                {action.performer?.name ||
+                                                  "Tidak diketahui"}
+                                              </p>
+                                              <p className="text-sm text-gray-600">
+                                                <span className="font-medium">
+                                                  Tanggal:
+                                                </span>{" "}
+                                                {new Date(
+                                                  action.performed_at
+                                                ).toLocaleDateString("id-ID")}
+                                              </p>
+                                              <p className="text-sm text-gray-600">
+                                                <span className="font-medium">
+                                                  Status:
+                                                </span>{" "}
+                                                <span
+                                                  className={`px-2 py-4 text-xs font-medium${getStatusColor(
+                                                    report.status
+                                                  )}`}
+                                                >
+                                                  {getStatusText(report.status)}
+                                                </span>
+                                              </p>
+                                            </div>
                                           </div>
                                         </div>
                                       </div>
-                                    </div>
 
-                                    <div className="flex justify-between items-center pt-3 border-t border-gray-100">
-                                      <div className="flex space-x-2">
-                                        <button
-                                          onClick={() => {
-                                            setSelectedReport(report);
-                                            loadStatusHistory(
-                                              action.report_id
-                                            );
-                                          }}
-                                          className="px-3 py-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200 font-medium text-sm"
-                                        >
-                                          Lihat Laporan
-                                        </button>
-                                      </div>
-                                      <div className="flex space-x-2">
-                                        <button
-                                          onClick={() =>
-                                            handleDeleteAction(
-                                              action.action_id
-                                            )
-                                          }
-                                          className="px-3 py-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200 font-medium text-sm"
-                                        >
-                                          Hapus
-                                        </button>
+                                      <div className="flex justify-between items-center pt-3 border-t border-gray-100">
+                                        <div className="flex space-x-2">
+                                          <button
+                                            onClick={() => {
+                                              setSelectedReport(report);
+                                              loadStatusHistory(
+                                                action.report_id
+                                              );
+                                            }}
+                                            className="px-3 py-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200 font-medium text-sm"
+                                          >
+                                            Lihat Laporan
+                                          </button>
+                                        </div>
+                                        <div className="flex space-x-2">
+                                          <button
+                                            onClick={() =>
+                                              handleDeleteAction(
+                                                action.action_id
+                                              )
+                                            }
+                                            className="px-3 py-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200 font-medium text-sm"
+                                          >
+                                            Hapus
+                                          </button>
+                                        </div>
                                       </div>
                                     </div>
                                   </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
+                )}
+              </>
+            )}
+          </main>
+          <ActionModal
+            show={showActionModal}
+            onClose={() => setShowActionModal(false)}
+            actionForm={actionForm}
+            onFormChange={handleActionFormChange}
+            onSubmit={handleCreateAction}
+            reports={reports}
+            isLoading={isLoading}
+            currentOfficer={currentOfficer}
+          />
+          <ReportDetailModal
+            report={selectedReport}
+            onClose={() => setSelectedReport(null)}
+            onAssign={handleAssignReport}
+            onUpdateStatus={handleUpdateStatus}
+            getStatusColor={getStatusColor}
+            getPriorityColor={getPriorityColor}
+            getStatusText={getStatusText}
+          />
+        </div>
+        {showStatusModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <h2 className="text-xl font-bold mb-4">Update Status Laporan</h2>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">
+                  Status Saat Ini
+                </label>
+                <div className="p-2 bg-gray-100 rounded">{currentStatus}</div>
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">
+                  Status Baru
+                </label>
+                <select
+                  value={statusForm.status}
+                  onChange={(e) =>
+                    setStatusForm({ ...statusForm, status: e.target.value })
+                  }
+                  className="w-full p-2 border rounded"
+                >
+                  <option value="On-Going">On-Going</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Cancel">Cancel</option>
+                </select>
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">
+                  Riwayat Status
+                </label>
+                <div className="max-h-40 overflow-y-auto">
+                  {statusHistory.map((status, index) => (
+                    <div key={index} className="p-2 border-b">
+                      <p>
+                        {status.status} -{" "}
+                        {new Date(status.updated_at).toLocaleString()}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Oleh: {status.updater?.name}
+                      </p>
+                    </div>
+                  ))}
                 </div>
-              )}
-            </>
-          )}
-        </main>
-        <ActionModal
-          show={showActionModal}
-          onClose={() => setShowActionModal(false)}
-          actionForm={actionForm}
-          onFormChange={handleActionFormChange}
-          onSubmit={handleCreateAction}
-          reports={reports}
-          isLoading={isLoading}
-          currentOfficer={currentOfficer}
-        />
-        <ReportDetailModal
-          report={selectedReport}
-          onClose={() => setSelectedReport(null)}
-          onAssign={handleAssignReport}
-          onUpdateStatus={handleUpdateStatus}
-          getStatusColor={getStatusColor}
-          getPriorityColor={getPriorityColor}
-          getStatusText={getStatusText}
-        />
-      </div>
-      {showStatusModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Update Status Laporan</h2>
+              </div>
 
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">
-                Status Saat Ini
-              </label>
-              <div className="p-2 bg-gray-100 rounded">{currentStatus}</div>
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">
-                Status Baru
-              </label>
-              <select
-                value={statusForm.status}
-                onChange={(e) =>
-                  setStatusForm({ ...statusForm, status: e.target.value })
-                }
-                className="w-full p-2 border rounded"
-              >
-                <option value="On-Going">On-Going</option>
-                <option value="Completed">Completed</option>
-                <option value="Cancel">Cancel</option>
-              </select>
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">
-                Riwayat Status
-              </label>
-              <div className="max-h-40 overflow-y-auto">
-                {statusHistory.map((status, index) => (
-                  <div key={index} className="p-2 border-b">
-                    <p>
-                      {status.status} -{" "}
-                      {new Date(status.updated_at).toLocaleString()}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      Oleh: {status.updater?.name}
-                    </p>
-                  </div>
-                ))}
+              <div className="flex justify-end space-x-2">
+                <button
+                  onClick={() => setShowStatusModal(false)}
+                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={handleUpdateStatus}
+                  disabled={isLoading}
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
+                >
+                  {isLoading ? "Memproses..." : "Simpan"}
+                </button>
               </div>
             </div>
-
-            <div className="flex justify-end space-x-2">
-              <button
-                onClick={() => setShowStatusModal(false)}
-                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-              >
-                Batal
-              </button>
-              <button
-                onClick={handleUpdateStatus}
-                disabled={isLoading}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
-              >
-                {isLoading ? "Memproses..." : "Simpan"}
-              </button>
-            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 };
 

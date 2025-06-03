@@ -7,6 +7,7 @@ import ReportForm from "../components/UserPage/ReportForm";
 import authService from "../services/authService";
 import reportService from "../services/reportService";
 import { Droplets, FileText, Plus, AlertCircle, Activity } from "lucide-react";
+import Footer from "../components/LandingPage/Footer";
 
 export default function UserPage() {
   const { user, logout } = useAuth();
@@ -203,6 +204,7 @@ export default function UserPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </>
   );
 }

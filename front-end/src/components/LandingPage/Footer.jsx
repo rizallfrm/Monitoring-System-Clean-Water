@@ -1,13 +1,7 @@
 "use client";
-import { 
-  Droplets, 
-  Phone, 
-  Mail, 
-  MapPin,
-  
-  Globe
-} from 'lucide-react';
+import { Droplets, Phone, Mail, MapPin, Globe } from "lucide-react";
 
+import Logo from "../../assets/logo.png";
 
 export const Footer = () => {
   return (
@@ -16,17 +10,11 @@ export const Footer = () => {
         <div className="grid md:grid-cols-4 gap-8 mb-12">
           {/* Brand */}
           <div className="md:col-span-2">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="bg-blue-600 p-3 rounded-2xl">
-                <Droplets className="w-8 h-8 text-white" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold">PDAM Smart Monitor</h3>
-                <p className="text-gray-400">Cilacap</p>
-              </div>
-            </div>
+            <div className="flex items-center gap-3 mb-6"></div>
             <p className="text-gray-300 mb-6 max-w-md">
-              Platform monitoring air bersih yang memudahkan masyarakat mengakses informasi distribusi air secara transparan dan real-time.
+              Platform monitoring air bersih yang memudahkan masyarakat
+              mengakses informasi distribusi air secara transparan dan
+              real-time.
             </p>
             <div className="flex gap-4">
               <div className="bg-blue-600 p-3 rounded-full hover:bg-blue-700 transition-colors cursor-pointer">
@@ -45,17 +33,52 @@ export const Footer = () => {
           <div>
             <h4 className="font-bold text-lg mb-6">Link Penting</h4>
             <ul className="space-y-3">
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Tentang Kami</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">FAQ</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Kebijakan Privasi</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Syarat & Ketentuan</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Panduan Pengguna</a></li>
+              <li>
+                <a
+                  href="#"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
+                  Tentang Kami
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
+                  FAQ
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
+                  Kebijakan Privasi
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
+                  Syarat & Ketentuan
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
+                  Panduan Pengguna
+                </a>
+              </li>
             </ul>
           </div>
 
           {/* Contact Info */}
           <div>
-            <h4 className="font-bold text-lg mb-6">Kontak PDAM</h4>
+            <h4 className="font-bold text-lg mb-6">Kontak</h4>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <Phone className="w-5 h-5 text-blue-400 mt-0.5" />
@@ -68,14 +91,18 @@ export const Footer = () => {
                 <Mail className="w-5 h-5 text-green-400 mt-0.5" />
                 <div>
                   <p className="font-medium">Email</p>
-                  <p className="text-gray-300">info@pdamcilacap.go.id</p>
+                  <p className="text-gray-300">hydroflow@pdam.go.id</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-red-400 mt-0.5" />
                 <div>
                   <p className="font-medium">Alamat</p>
-                  <p className="text-gray-300">Jl. Sudirman No. 123<br />Cilacap, Jawa Tengah</p>
+                  <p className="text-gray-300">
+                    Jl. Sudirman No. 123
+                    <br />
+                     Jawa Tengah
+                  </p>
                 </div>
               </div>
             </div>
@@ -83,21 +110,14 @@ export const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-gray-800 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-400 text-sm">
-              © 2025 PDAM Cilacap. Semua hak dilindungi undang-undang.
-            </p>
-            <div className="flex items-center gap-2 text-sm text-gray-400">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              Sistem Online - Last Update: 2 menit lalu
-            </div>
+        <div className="border-t  border-gray-800 pt-8">
+          <div className="border-t border-gray-800 pt-8 text-center">
+            <p className="text-gray-400 text-sm">© 2025 HydroFlow.</p>
           </div>
         </div>
       </div>
     </footer>
   );
 };
-
 
 export default Footer;
