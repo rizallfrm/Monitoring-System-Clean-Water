@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../Context/authContext";
 import ProfileSection from "../components/UserPage/ProfileSection";
-import Logo from "../assets/logo.png";
+import Logo from "../../public/logo.png"; // Import logo dari folder assets
 import Footer from "../components/LandingPage/Footer";
 
 const menuItems = [

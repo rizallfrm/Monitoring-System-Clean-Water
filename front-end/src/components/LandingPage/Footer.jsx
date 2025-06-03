@@ -1,7 +1,6 @@
 "use client";
 import { Droplets, Phone, Mail, MapPin, Globe } from "lucide-react";
 
-import Logo from "../../assets/logo.png";
 
 export const Footer = () => {
   return (

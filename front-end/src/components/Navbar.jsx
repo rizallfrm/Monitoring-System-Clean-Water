@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../Context/authContext";
 import { User, LogOut, ChevronDown } from "lucide-react";
 import ProfileSection from "../components/UserPage/ProfileSection";
-import Logo from "../assets/logo.png"; // Import logo dari folder assets
+import Logo from "../../public/logo.png"; // Import logo dari folder assets
 
 export default function Navbar() {
     const { user, logout } = useAuth();
