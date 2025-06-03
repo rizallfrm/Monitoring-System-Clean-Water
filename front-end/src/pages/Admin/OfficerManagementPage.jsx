@@ -15,14 +15,26 @@ import {
   Filter,
   Download,
   RefreshCw,
+  User,
+  ChevronDown,
+  X,
+  MapPin,
+  Calendar,
+  Clock,
+  Badge,
+  Phone,
+  Mail,
+  UserCheck,
+  FileText,
+  TrendingUp,
+  Award,
+  Shield,
 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import userService from "../../services/userService";
 import reportService from "../../services/reportService";
 import AddOfficerModal from "./AddOfficerModal";
 import Navbar from "../../components/Navbar";
-
-// Mock service untuk demo - ganti dengan import asli Anda
 
 const OfficerManagementPage = () => {
   const [officers, setOfficers] = useState([]);
@@ -36,6 +48,7 @@ const OfficerManagementPage = () => {
   const [menuOpen, setMenuOpen] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [reportsCount, setReportsCount] = useState({});
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -56,7 +69,7 @@ const OfficerManagementPage = () => {
     fetchOfficers();
   }, []);
 
-  // Tutup menu saat klik di luar
+  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = () => setMenuOpen(null);
     document.addEventListener("click", handleClickOutside);
@@ -73,16 +86,19 @@ const OfficerManagementPage = () => {
 
   const handleMenuClick = (officerId, event) => {
     event.stopPropagation();
-    // Tutup menu jika sudah terbuka, buka yang baru jika berbeda
     setMenuOpen((prev) => (prev === officerId ? null : officerId));
   };
 
-  const handleViewOfficer = (officerId) => {
-    navigate(`/users/${officerId}`);
+  const handleViewOfficer = (officerId, event) => {
+    event?.stopPropagation();
+    const officer = officers.find(o => o.user_id === officerId);
+    setSelectedOfficer(officer);
+    setShowProfileModal(true);
     setMenuOpen(null);
   };
 
-  const handleEditOfficer = (officerId) => {
+  const handleEditOfficer = (officerId, event) => {
+    event?.stopPropagation();
     navigate(`/officers/edit/${officerId}`);
     setMenuOpen(null);
   };
@@ -91,26 +107,23 @@ const OfficerManagementPage = () => {
     setOfficers((prev) => [...prev, newOfficer]);
   };
 
-  // Update handleAddOfficer untuk membuka modal
   const handleAddOfficer = () => {
     setIsAddModalOpen(true);
   };
-  const handleDeleteClick = (officer) => {
+
+  const handleDeleteClick = (officer, event) => {
+    event?.stopPropagation();
     setOfficerToDelete(officer);
     setDeleteDialogOpen(true);
     setMenuOpen(null);
+    setShowProfileModal(false);
   };
 
   const handleDeleteConfirm = async () => {
     try {
       await userService.deleteUser(officerToDelete.user_id);
-      // Update state officers
-      setOfficers(officers.filter((o) => o.id !== officerToDelete.user_id));
-
-      // Tampilkan alert sukses
+      setOfficers(officers.filter((o) => o.user_id !== officerToDelete.user_id));
       alert(`Officer "${officerToDelete.name}" berhasil dihapus!`);
-
-      // Tutup modal dan reset state
       setDeleteDialogOpen(false);
       setOfficerToDelete(null);
     } catch (err) {
@@ -121,6 +134,34 @@ const OfficerManagementPage = () => {
 
   const handleRefresh = () => {
     window.location.reload();
+  };
+
+  // Function to format date
+  const formatDate = (dateString) => {
+    if (!dateString) return "-";
+    return new Date(dateString).toLocaleDateString('id-ID', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
+  };
+
+  // Function to calculate days since last login
+  const getDaysSinceLastLogin = (lastLogin) => {
+    if (!lastLogin) return null;
+    const today = new Date();
+    const loginDate = new Date(lastLogin);
+    const diffTime = Math.abs(today - loginDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  // Function to get performance rating
+  const getPerformanceRating = (reportsCount) => {
+    if (reportsCount >= 50) return { rating: "Excellent", color: "text-green-600", bgColor: "bg-green-100" };
+    if (reportsCount >= 30) return { rating: "Good", color: "text-blue-600", bgColor: "bg-blue-100" };
+    if (reportsCount >= 15) return { rating: "Average", color: "text-yellow-600", bgColor: "bg-yellow-100" };
+    return { rating: "Needs Improvement", color: "text-red-600", bgColor: "bg-red-100" };
   };
 
   const filteredOfficers = officers.filter((officer) => {
@@ -135,6 +176,7 @@ const OfficerManagementPage = () => {
 
     return matchesSearch && matchesFilter;
   });
+
   const activeOfficersCount = officers.filter((o) => o.active).length;
   const totalReports = officers.reduce(
     (sum, o) => sum + (o.assigned_reports_count || 0),
@@ -167,12 +209,12 @@ const OfficerManagementPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
-      {/* Header */}
       <AddOfficerModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onOfficerAdded={handleOfficerAdded}
-      />            <Navbar/>
+      />
+      <Navbar />
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Search and Filter */}
@@ -212,10 +254,6 @@ const OfficerManagementPage = () => {
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
                     Contact
                   </th>
-
-                  <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900">
-                    Tindakan
-                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -223,7 +261,7 @@ const OfficerManagementPage = () => {
                   <tr
                     key={officer.user_id}
                     className="hover:bg-blue-50/50 transition-colors duration-200 cursor-pointer"
-                    onClick={() => handleViewOfficer(officer.user_id)}
+                    onClick={(e) => handleViewOfficer(officer.user_id, e)}
                   >
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-3">
@@ -248,41 +286,8 @@ const OfficerManagementPage = () => {
                         <p className="text-sm text-gray-600">{officer.phone}</p>
                       </div>
                     </td>
-
                     <td className="px-6 py-4 text-right">
-                      <div className="relative">
-                        <button
-                          onClick={(e) => handleMenuClick(officer.user_id, e)}
-                          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
-                        >
-                          <MoreVertical className="h-4 w-4" />
-                        </button>
-
-                        {menuOpen === officer.user_id && (
-                          <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEditOfficer(officer.user_id);
-                              }}
-                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center space-x-2"
-                            >
-                              <Edit3 className="h-4 w-4" />
-                              <span>Edit</span>
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteClick(officer);
-                              }}
-                              className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              <span>Delete</span>
-                            </button>
-                          </div>
-                        )}
-                      </div>
+                      
                     </td>
                   </tr>
                 ))}
@@ -311,13 +316,12 @@ const OfficerManagementPage = () => {
                 <Trash2 className="h-8 w-8 text-red-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-               
+                Konfirmasi Penghapusan
               </h3>
               <p className="text-gray-600 mb-6">
-                Apakah Anda yakin ingin menghapus dari akun petugas{" "}
+                Apakah Anda yakin ingin menghapus petugas{" "}
                 <strong>{officerToDelete?.name}</strong>?
               </p>
-
               <div className="flex space-x-3">
                 <button
                   onClick={() => {
@@ -335,6 +339,134 @@ const OfficerManagementPage = () => {
                   <Trash2 className="h-4 w-4" />
                   <span>Delete</span>
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Enhanced Officer Profile Modal */}
+      {showProfileModal && selectedOfficer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    Profil Petugas
+                  </h2>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Informasi lengkap dan statistik petugas
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowProfileModal(false)}
+                  className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full p-2 transition-all duration-200"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Officer Profile Header */}
+                <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-6">
+                  <div className="flex items-center space-x-4">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full blur opacity-20"></div>
+                      <div className="relative bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full p-4">
+                        <User className="h-8 w-8 text-white" />
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-gray-900">
+                        {selectedOfficer.name}
+                      </h3>
+                      <div className="flex items-center space-x-2 mt-1">
+                        <span className="text-sm font-medium text-blue-600 capitalize">
+                          {selectedOfficer.role}
+                        </span>
+                      </div>
+                      
+                    </div>
+                  </div>
+                </div>
+
+              
+
+                {/* Contact Information */}
+                <div className="bg-gray-50 rounded-xl p-6">
+                  <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
+                    <Phone className="h-5 w-5 text-gray-600" />
+                    <span>Informasi Kontak</span>
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex items-center space-x-3">
+                      <Mail className="h-5 w-5 text-gray-500" />
+                      <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">Email</p>
+                        <p className="text-sm font-medium text-gray-900">
+                          {selectedOfficer.email}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Phone className="h-5 w-5 text-gray-500" />
+                      <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">Telepon</p>
+                        <p className="text-sm font-medium text-gray-900">
+                          {selectedOfficer.phone || "Tidak ada"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Account Information */}
+                <div className="bg-gray-50 rounded-xl p-6">
+                  <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
+                    <Shield className="h-5 w-5 text-gray-600" />
+                    <span>Informasi Akun</span>
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex items-center space-x-3">
+                      <Calendar className="h-5 w-5 text-gray-500" />
+                      <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">Tanggal Bergabung</p>
+                        <p className="text-sm font-medium text-gray-900">
+                          {formatDate(selectedOfficer.created_at)}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-3">
+                      <UserCheck className="h-5 w-5 text-gray-500" />
+                      <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">ID Petugas</p>
+                        <p className="text-sm font-medium text-gray-900">
+                          #{selectedOfficer.user_id}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                
+
+                {/* Actions */}
+                <div className="border-t border-gray-200 pt-6 flex space-x-3">
+                  
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteClick(selectedOfficer, e);
+                    }}
+                    className="flex-1 rounded-lg border border-red-500 bg-white px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center justify-center space-x-2"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    <span>Hapus Akun</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>

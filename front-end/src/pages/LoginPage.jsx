@@ -169,32 +169,6 @@ const LoginPage = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <input
-                    id="remember-me"
-                    name="remember-me"
-                    type="checkbox"
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 bg-white bg-opacity-20 border-blue-300 border-opacity-40 rounded"
-                  />
-                  <label
-                    htmlFor="remember-me"
-                    className="ml-2 block text-sm text-blue-200"
-                  >
-                    Ingat saya
-                  </label>
-                </div>
-
-                <div className="text-sm">
-                  <Link
-                    to="/forgot-password"
-                    className="font-medium text-cyan-300 hover:text-cyan-200 transition-colors duration-200"
-                  >
-                    Lupa password?
-                  </Link>
-                </div>
-              </div>
-
               <div>
                 <button
                   type="submit"
@@ -252,8 +226,8 @@ const LoginPage = () => {
 
           {/* Footer info */}
           <div className="text-center text-xs text-blue-300 opacity-75 mt-4">
-            <p>© 2024 PDAM Monitoring System</p>
-            <p>Sistem Pemantauan Distribusi Air Bersih</p>
+            <p>© 2025 Hydroflow</p>
+            <p>Sistem Pemantauan PDAM</p>
           </div>
         </div>
       </div>
