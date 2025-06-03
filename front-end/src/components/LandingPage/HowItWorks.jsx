@@ -90,28 +90,7 @@ export const HowItWorks = () => {
         </div>
 
         {/* Process Flow Visualization */}
-        <div className="mt-16 bg-gray-800 rounded-3xl p-8 text-white">
-          <h3 className="text-2xl font-bold text-center mb-8">Alur Sistem Real-Time</h3>
-          <div className="flex items-center justify-center space-x-4 overflow-x-auto">
-            <div className="flex items-center gap-4 min-w-max">
-              <div className="bg-blue-600 p-4 rounded-full">
-                <Users className="w-6 h-6" />
-              </div>
-              <ChevronRight className="w-5 h-5 text-gray-400" />
-              <div className="bg-green-600 p-4 rounded-full">
-                <Globe className="w-6 h-6" />
-              </div>
-              <ChevronRight className="w-5 h-5 text-gray-400" />
-              <div className="bg-purple-600 p-4 rounded-full">
-                <Bell className="w-6 h-6" />
-              </div>
-              <ChevronRight className="w-5 h-5 text-gray-400" />
-              <div className="bg-pink-600 p-4 rounded-full">
-                <CheckCircle className="w-6 h-6" />
-              </div>
-            </div>
-          </div>
-        </div>
+        
       </div>
     </div>
   );
