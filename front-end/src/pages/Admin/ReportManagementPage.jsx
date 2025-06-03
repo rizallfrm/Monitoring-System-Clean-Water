@@ -138,7 +138,7 @@ const ReportManagementPage = () => {
           report.report_id === selectedReportId
             ? {
                 ...report,
-                status: "On-Going",
+                status: "Pending",
                 assigned_to: officers.find((o) => o.user_id === selectedOfficer)
                   ?.name,
               }
