@@ -91,45 +91,7 @@ export const StatisticsSection = () => {
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
-            <TrendingUp className="w-4 h-4" />
-            Statistik Layanan
-          </div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Dipercaya Ribuan Pengguna
-          </h2>
-          <p className="text-xl text-gray-200 max-w-3xl mx-auto">
-            Angka yang menunjukkan kepercayaan dan kepuasan masyarakat terhadap layanan kami
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {stats.map((stat, index) => (
-            <div key={index} className="group">
-              <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 text-center hover:bg-white/10 transition-all duration-500 group-hover:scale-105 border border-white/10">
-                <div className={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r ${stat.color} rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-500`}>
-                  {stat.icon}
-                </div>
-                <div className="text-4xl md:text-5xl font-bold mb-2">
-                  {counters[stat.key].toLocaleString()}
-                  <span className="text-2xl ml-1">{stat.suffix}</span>
-                </div>
-                <p className="text-gray-300 font-medium">{stat.label}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Live Updates Indicator */}
-        <div className="mt-16 text-center">
-          <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3">
-            <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="text-sm font-medium">Data diperbarui setiap 5 menit</span>
-          </div>
-        </div>
-      </div>
+      
     </div>
   );
 };
