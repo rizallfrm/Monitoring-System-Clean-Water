@@ -358,14 +358,14 @@ const reportController = {
       // Jika status masih Pending, update ke On-Going
       if (report.status === "Pending") {
         await report.update({
-          status: "On-Going",
+          status: "Pending",
         });
 
         // Buat entry status update
         await StatusUpdate.create({
           report_id: report.report_id,
           updated_by: req.user.id,
-          status: "On-Going",
+          status: "Pending",
         });
       }
 
