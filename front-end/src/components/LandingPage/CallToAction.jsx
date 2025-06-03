@@ -8,6 +8,7 @@ import {
   Zap,
   ChevronRight
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export const CallToAction = () => {
   return (
@@ -32,16 +33,7 @@ export const CallToAction = () => {
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
-          <button className="group bg-white text-blue-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-blue-50 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-2">
-            <Users className="w-5 h-5 group-hover:scale-110 transition-transform" />
-            Daftar Sekarang
-          </button>
-          <button className="group border-2 border-white text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white hover:text-blue-600 transform hover:scale-105 transition-all duration-300 flex items-center gap-2">
-            Masuk ke Akun
-            <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </button>
-        </div>
+       
 
         {/* Benefits */}
         {/* Benefits */}
