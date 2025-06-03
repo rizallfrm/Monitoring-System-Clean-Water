@@ -10,9 +10,11 @@ import {
   Download,
   UserPlus,
   AlertCircle,
+  Shield,
 } from "lucide-react";
 import userService from "../../services/userService";
 import Navbar from "../../components/Navbar";
+import Footer from "../../components/LandingPage/Footer";
 
 const UserManagementPage = () => {
   const [users, setUsers] = useState([]);
@@ -283,183 +285,209 @@ const UserManagementPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <Navbar />
-      <div className="mx-auto max-w-7xl">
-        {/* Header */}
-        <div className="mb-8 flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              User Management
-            </h1>
-            <p className="mt-1 text-gray-600">
-              Kelola pengguna sistem monitoring air
-            </p>
-          </div>
-        </div>
+    <>
+      <div className="min-h-screen bg-gray-50 p-6">
+        <Navbar />
+        <div className="mx-auto max-w-7xl pt-6">
+          {/* Header */}
+          <div className="mb-8 ">
+            <div className="relative  overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 p-6 shadow-xl">
+              {/* Background decorative elements */}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-600/10"></div>
+              <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/10 blur-3xl"></div>
+              <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-white/10 blur-3xl"></div>
 
-        {/* Filters and Search */}
-        <div className="mb-6 flex flex-col space-y-4 rounded-lg bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-          <div className="flex flex-1 items-center space-x-4">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search users..."
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="w-full rounded-lg border border-gray-300 pl-10 pr-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-            </div>
-            <div className="flex items-center space-x-2">
-              <Filter className="h-4 w-4 text-gray-400" />
-              <select
-                value={filterRole}
-                onChange={(e) => setFilterRole(e.target.value)}
-                className="rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              >
-                <option value="all">All Roles</option>
-                <option value="Admin">Admin</option>
-                <option value="Petugas">Petugas</option>
-                <option value="Warga">Warga</option>
-              </select>
-            </div>
-          </div>
-          <div className="text-sm text-gray-500">
-            {filteredUsers.length} of {users.length} users
-          </div>
-        </div>
+              <div className="relative z-10">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                  <div className="mb-6 lg:mb-0">
+                    <div className="flex items-center space-x-4 mb-4">
+                      <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                        <Shield className="h-8 w-8 text-white" />
+                      </div>
+                      <div>
+                        <h1 className="text-3xl font-bold text-white">
+                          User Management
+                        </h1>
+                        <p className="text-blue-100 mt-2 ">
+                          Kelola dan pantau semua user yang terdaftar dalam
+                          sistem. Berikan akses tepat, pantau aktivitas, dan
+                          optimalkan pengalaman
+                        </p>
+                      </div>
+                    </div>
+                  </div>
 
-        {/* Users Grid */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredUsers.map((user) => (
-            <UserCard key={user.user_id} user={user} />
-          ))}
-        </div>
-
-        {filteredUsers.length === 0 && (
-          <div className="py-12 text-center">
-            <div className="mx-auto h-24 w-24 rounded-full bg-gray-100 flex items-center justify-center">
-              <Search className="h-8 w-8 text-gray-400" />
-            </div>
-            <h3 className="mt-4 text-lg font-medium text-gray-900">
-              No users found
-            </h3>
-            <p className="mt-2 text-gray-500">
-              {searchTerm
-                ? "Try adjusting your search criteria"
-                : "Get started by adding your first user"}
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* Delete Confirmation Dialog */}
-      {deleteDialogOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
-            <div className="flex items-center space-x-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
-                <AlertCircle className="h-6 w-6 text-red-600" />
-              </div>
-              <div>
-                <h3 className="text-lg font-medium text-gray-900">
-                  Confirm Delete
-                </h3>
-                <p className="text-sm text-gray-500">
-                  This action cannot be undone
-                </p>
+                  {/* Action buttons */}
+                  <div className="flex flex-col sm:flex-row gap-3"></div>
+                </div>
               </div>
             </div>
-            <div className="mt-4">
-              <p className="text-gray-700">
-                Are you sure you want to delete user{" "}
-                <strong>{userToDelete?.name}</strong>?
+          </div>
+
+          {/* Filters and Search */}
+          <div className="mb-6 flex flex-col space-y-4 rounded-lg bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+            <div className="flex flex-1 items-center space-x-4">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search users..."
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  className="w-full rounded-lg border border-gray-300 pl-10 pr-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+              <div className="flex items-center space-x-2">
+                <Filter className="h-4 w-4 text-gray-400" />
+                <select
+                  value={filterRole}
+                  onChange={(e) => setFilterRole(e.target.value)}
+                  className="rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                >
+                  <option value="all">All Roles</option>
+                  <option value="Admin">Admin</option>
+                  <option value="Petugas">Petugas</option>
+                  <option value="Warga">Warga</option>
+                </select>
+              </div>
+            </div>
+            <div className="text-sm text-gray-500">
+              {filteredUsers.length} of {users.length} users
+            </div>
+          </div>
+
+          {/* Users Grid */}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {filteredUsers.map((user) => (
+              <UserCard key={user.user_id} user={user} />
+            ))}
+          </div>
+
+          {filteredUsers.length === 0 && (
+            <div className="py-12 text-center">
+              <div className="mx-auto h-24 w-24 rounded-full bg-gray-100 flex items-center justify-center">
+                <Search className="h-8 w-8 text-gray-400" />
+              </div>
+              <h3 className="mt-4 text-lg font-medium text-gray-900">
+                No users found
+              </h3>
+              <p className="mt-2 text-gray-500">
+                {searchTerm
+                  ? "Try adjusting your search criteria"
+                  : "Get started by adding your first user"}
               </p>
             </div>
-            <div className="mt-6 flex space-x-3">
-              <button
-                onClick={() => setDeleteDialogOpen(false)}
-                className="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeleteConfirm}
-                className="flex-1 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
-              >
-                Delete
-              </button>
+          )}
+        </div>
+
+        {/* Delete Confirmation Dialog */}
+        {deleteDialogOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+              <div className="flex items-center space-x-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
+                  <AlertCircle className="h-6 w-6 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900">
+                    Confirm Delete
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    This action cannot be undone
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4">
+                <p className="text-gray-700">
+                  Are you sure you want to delete user{" "}
+                  <strong>{userToDelete?.name}</strong>?
+                </p>
+              </div>
+              <div className="mt-6 flex space-x-3">
+                <button
+                  onClick={() => setDeleteDialogOpen(false)}
+                  className="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteConfirm}
+                  className="flex-1 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Click outside to close dropdown */}
-      {activeDropdown && (
-        <div
-          className="fixed inset-0 z-0"
-          onClick={() => setActiveDropdown(null)}
-        ></div>
-      )}
-      {editDialogOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">
-              Edit User
-            </h2>
-            <div className="space-y-4">
-              <input
-                name="name"
-                value={editFormData.name}
-                onChange={handleEditInputChange}
-                placeholder="Name"
-                className="w-full rounded border px-4 py-2"
-              />
-              <input
-                name="email"
-                value={editFormData.email}
-                onChange={handleEditInputChange}
-                placeholder="Email"
-                className="w-full rounded border px-4 py-2"
-              />
-              <input
-                name="phone"
-                value={editFormData.phone}
-                onChange={handleEditInputChange}
-                placeholder="Phone"
-                className="w-full rounded border px-4 py-2"
-              />
-              <select
-                name="role"
-                value={editFormData.role}
-                onChange={handleEditInputChange}
-                className="w-full rounded border px-4 py-2"
-              >
-                <option value="Admin">Admin</option>
-                <option value="Petugas">Petugas</option>
-                <option value="Warga">Warga</option>
-              </select>
-            </div>
+        {/* Click outside to close dropdown */}
+        {activeDropdown && (
+          <div
+            className="fixed inset-0 z-0"
+            onClick={() => setActiveDropdown(null)}
+          ></div>
+        )}
+        {editDialogOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                Edit User
+              </h2>
+              <div className="space-y-4">
+                <input
+                  name="name"
+                  value={editFormData.name}
+                  onChange={handleEditInputChange}
+                  placeholder="Name"
+                  className="w-full rounded border px-4 py-2"
+                />
+                <input
+                  name="email"
+                  value={editFormData.email}
+                  onChange={handleEditInputChange}
+                  placeholder="Email"
+                  className="w-full rounded border px-4 py-2"
+                />
+                <input
+                  name="phone"
+                  value={editFormData.phone}
+                  onChange={handleEditInputChange}
+                  placeholder="Phone"
+                  className="w-full rounded border px-4 py-2"
+                />
+                <select
+                  name="role"
+                  value={editFormData.role}
+                  onChange={handleEditInputChange}
+                  className="w-full rounded border px-4 py-2"
+                >
+                  <option value="Admin">Admin</option>
+                  <option value="Petugas">Petugas</option>
+                  <option value="Warga">Warga</option>
+                </select>
+              </div>
 
-            <div className="mt-6 flex justify-end space-x-3">
-              <button
-                onClick={() => setEditDialogOpen(false)}
-                className="rounded bg-gray-100 px-4 py-2 text-gray-700"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleEditSubmit}
-                className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-              >
-                Save Changes
-              </button>
+              <div className="mt-6 flex justify-end space-x-3">
+                <button
+                  onClick={() => setEditDialogOpen(false)}
+                  className="rounded bg-gray-100 px-4 py-2 text-gray-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleEditSubmit}
+                  className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                >
+                  Save Changes
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>{" "}
+      <Footer />
+    </>
   );
 };
 
