@@ -1,11 +1,13 @@
 import axios from "axios";
+const VITE_API_BASE_URL = "https://hydroflow-backend-production.up.railway.app";
 
 const servicePorts = {
-  user: "http://localhost:3001/api",
-  report: "http://localhost:3002/api",
-  status: "http://localhost:3003/api",
-  action: "http://localhost:3004/api",
+  user: `${VITE_API_BASE_URL}/api/`,
+  report: `${VITE_API_BASE_URL}/api/`,
+  status: `${VITE_API_BASE_URL}/api/`,
+  action: `${VITE_API_BASE_URL}/api/`,
 };
+
 
 const createApiInstance = (serviceName) => {
   const instance = axios.create({
@@ -16,7 +18,7 @@ const createApiInstance = (serviceName) => {
       "Cache-Control": "no-cache",
       Pragma: "no-cache",
     },
-    timeout: 10000, // Tambahkan timeout 10 detik
+    timeout: 10000,
   });
 
   // Interceptor untuk menambahkan token
