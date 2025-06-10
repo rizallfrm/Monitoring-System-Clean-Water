@@ -117,10 +117,14 @@ const LoginPage = () => {
             {/* Logo/Icon area */}
             <div className="text-center mb-2">
               <img
-                src={Logo}
-                alt="Hydroflow"
-                className="h-40 w-auto transform group-hover:scale-105 transition-transform duration-200 mt-2 px-28"
-              />
+                                src={Logo}
+                                alt="Hydroflow"
+                                className="h-24 w-auto mx-auto
+                         sm:h-32
+                         md:h-32
+                         lg:h-32
+                         group-hover:scale-105 transition-transform duration-200 mt-2"
+                              />
               <h2 className="text-center  text-xl font-bold text-white mb-8">
                 Masuk ke akun Anda
               </h2>
