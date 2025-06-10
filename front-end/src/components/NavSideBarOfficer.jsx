@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  Home, FileText, CheckCircle, LogOut, Activity, User, ChevronDown 
+  Home, FileText, CheckCircle, LogOut, Activity, User, ChevronDown, Menu, X 
 } from 'lucide-react';
 import { useAuth } from '../Context/authContext';
 import authService from '../services/authService';
 import ProfileSection from '../components/UserPage/ProfileSection';
-import Logo from "../../public/logo.png"; // Import logo dari folder assets
+import Logo from "../../public/logo.png";
 
 const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
   const { user, logout } = useAuth();
@@ -19,7 +19,9 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
   const [profile, setProfile] = useState(null);
   const [profileLoading, setProfileLoading] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const mobileMenuRef = useRef(null);
 
   // Handle scroll effect
   useEffect(() => {
@@ -36,12 +38,26 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
       }
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target) && !event.target.closest('.mobile-menu-button')) {
+        setIsMobileMenuOpen(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
+  }, []);
+
+  // Close mobile menu when resizing to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 1024) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Fetch user profile for sidebar
@@ -92,6 +108,7 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
     try {
       await logout();
       setIsDropdownOpen(false);
+      setIsMobileMenuOpen(false);
     } catch (error) {
       console.error("Logout error:", error);
     }
@@ -117,8 +134,18 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
       }`}>
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* Logo Section */}
+            {/* Logo and Mobile Menu Button */}
             <div className="flex items-center">
+              <button 
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="lg:hidden mr-4 mobile-menu-button"
+              >
+                {isMobileMenuOpen ? (
+                  <X className="h-6 w-6 text-gray-600" />
+                ) : (
+                  <Menu className="h-6 w-6 text-gray-600" />
+                )}
+              </button>
               <div className="flex items-center group cursor-pointer">
                 <img
                   src={Logo}
@@ -228,8 +255,13 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
         </div>
       </nav>
 
-      {/* Sidebar */}
-      <div className="fixed inset-y-0 left-0 w-72 bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 shadow-2xl border-r border-slate-200/60 flex flex-col overflow-hidden pt-16 backdrop-blur-sm">
+      {/* Mobile Sidebar Overlay */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 bg-red/50 lg:hidden z-40" onClick={() => setIsMobileMenuOpen(false)}></div>
+      )}
+
+      {/* Sidebar - Desktop */}
+      <div className="hidden lg:flex fixed inset-y-0 left-0 w-72 bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 shadow-2xl border-r border-slate-200/60 flex flex-col overflow-hidden pt-16 backdrop-blur-sm">
         {/* Background decorative elements */}
         <div className="absolute top-0 right-0 w-40 h-80 bg-gradient-to-bl from-blue-100/40 via-cyan-50/30 to-transparent"></div>
         <div className="absolute bottom-0 left-0 w-48 h-64 bg-gradient-to-tr from-indigo-100/40 via-purple-50/30 to-transparent"></div>
@@ -240,7 +272,6 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
           <div className="flex items-center group">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-cyan-600 to-indigo-600 rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
-
             </div>
             <div className="ml-4 flex-1">
               <h1 className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
@@ -282,7 +313,117 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
           ].map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => {
+                setActiveTab(tab.id);
+                setIsMobileMenuOpen(false);
+              }}
+              className={`group flex items-center w-full px-5 py-4 text-sm font-semibold rounded-2xl transition-all duration-300 relative overflow-hidden backdrop-blur-sm ${
+                activeTab === tab.id
+                  ? `bg-gradient-to-r text-white shadow-xl transform scale-105 border border-white/20 ${tab.gradient}`
+                  : "text-slate-700 hover:bg-white/60 hover:text-slate-900 hover:scale-105 hover:shadow-lg bg-white/40 border border-white/30"
+              }`}
+            >
+              {activeTab === tab.id && (
+                <div className="absolute inset-0 bg-white/20 rounded-2xl"></div>
+              )}
+              <div
+                className={`p-3 rounded-xl mr-4 transition-all duration-300 relative z-10 ${
+                  activeTab === tab.id
+                    ? "bg-white/25 shadow-lg"
+                    : "bg-white/60 group-hover:bg-white/80 shadow-sm"
+                }`}
+              >
+                <tab.icon
+                  className={`h-5 w-5 ${
+                    activeTab === tab.id
+                      ? "text-white"
+                      : "text-slate-600 group-hover:text-slate-800"
+                  }`}
+                />
+              </div>
+              <span className="relative z-10 flex-1 text-left">{tab.label}</span>
+              {activeTab === tab.id && (
+                <div className="ml-auto relative z-10">
+                  <div className="w-2 h-2 bg-white rounded-full animate-pulse shadow-sm"></div>
+                </div>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div className="p-6 border-t border-slate-200/60 relative z-10 bg-white/40 backdrop-blur-sm">
+          <div className="text-center">
+            <p className="text-xs text-slate-500">
+              © 2025 Hydroflow System
+            </p>
+            <p className="text-xs text-slate-400 mt-1">
+              Dashboard Petugas v1.0
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Sidebar */}
+      <div 
+        ref={mobileMenuRef}
+        className={`lg:hidden fixed top-0 left-0 h-full w-72 bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 shadow-2xl border-r border-slate-200/60 flex flex-col overflow-hidden pt-16 backdrop-blur-sm z-40 transform transition-all duration-300 ease-in-out ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        {/* Background decorative elements */}
+        <div className="absolute top-0 right-0 w-40 h-80 bg-gradient-to-bl from-blue-100/40 via-cyan-50/30 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-64 bg-gradient-to-tr from-indigo-100/40 via-purple-50/30 to-transparent"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-gradient-to-r from-blue-200/20 to-cyan-200/20 rounded-full blur-3xl"></div>
+
+        {/* User Profile Section */}
+        <div className="p-6 border-b border-slate-200/60 relative z-10 bg-white/40 backdrop-blur-sm">
+          <div className="flex items-center group">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-cyan-600 to-indigo-600 rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
+            </div>
+            <div className="ml-4 flex-1">
+              <h1 className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+                Dashboard Petugas
+              </h1>
+              <p className="text-sm text-slate-500 mt-1">
+                Kelola laporan & tindakan
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-3 relative z-10">
+          {[
+            {
+              id: "dashboard",
+              label: "Dashboard",
+              icon: Home,
+              gradient: "from-blue-500 to-indigo-600",
+              hoverGradient: "from-blue-600 to-indigo-700",
+            },
+            {
+              id: "reports",
+              label: "Laporan",
+              icon: FileText,
+              gradient: "from-emerald-500 to-teal-600",
+              hoverGradient: "from-emerald-600 to-teal-700",
+            },
+            {
+              id: "actions",
+              label: "Tindakan",
+              icon: CheckCircle,
+              gradient: "from-purple-500 to-pink-600",
+              hoverGradient: "from-purple-600 to-pink-700",
+            },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setActiveTab(tab.id);
+                setIsMobileMenuOpen(false);
+              }}
               className={`group flex items-center w-full px-5 py-4 text-sm font-semibold rounded-2xl transition-all duration-300 relative overflow-hidden backdrop-blur-sm ${
                 activeTab === tab.id
                   ? `bg-gradient-to-r text-white shadow-xl transform scale-105 border border-white/20 ${tab.gradient}`
@@ -369,7 +510,7 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
       )}
 
       {/* Content padding to account for sidebar */}
-      <div className="ml-72">
+      <div className="lg:ml-72">
         <div className="h-16"></div> {/* Spacer for navbar */}
       </div>
     </>
