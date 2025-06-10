@@ -20,6 +20,7 @@ import { useAuth } from "../Context/authContext";
 import ProfileSection from "../components/UserPage/ProfileSection";
 import Logo from "../../public/logo.png"; // Import logo dari folder assets
 import Footer from "../components/LandingPage/Footer";
+import Navbar from "../components/Navbar";
 
 const menuItems = [
   {
