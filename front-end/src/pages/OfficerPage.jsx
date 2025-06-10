@@ -79,8 +79,6 @@ const OfficerPage = (response) => {
       const response = await actionService.getActionsByReportId(reportId);
 
       if (response.status === "success") {
-      
-
         const actionsData = Array.isArray(response.data) ? response.data : [];
 
         setActions(actionsData);
@@ -162,44 +160,44 @@ const OfficerPage = (response) => {
   };
 
   const handleCreateAction = async () => {
-  if (!actionForm.reportId || !actionForm.actionDescription) {
-    alert("ID laporan dan deskripsi tindakan harus diisi!");
-    return;
-  }
-
-  setIsLoading(true);
-  try {
-    const actionData = {
-      reportId: actionForm.reportId,
-      actionDescription: actionForm.actionDescription,
-      performed_by: currentOfficer.user_id || currentOfficer.id,
-      status: "Pending" // Tambahkan status Pending secara default
-    };
-
-    const response = await actionService.createAction(actionData);
-
-    if (response.status === "success") {
-      await loadData();
-      // Jika ingin memperbarui status laporan juga ke Pending
-      await handleUpdateStatus(actionForm.reportId, "Pending");
-      
-      setShowActionModal(false);
-      setActionForm({
-        reportId: "",
-        actionDescription: "",
-        dueDate: "",
-      });
-      alert("Tindakan berhasil ditambahkan!");
-    } else {
-      throw new Error(response.message || "Gagal membuat tindakan");
+    if (!actionForm.reportId || !actionForm.actionDescription) {
+      alert("ID laporan dan deskripsi tindakan harus diisi!");
+      return;
     }
-  } catch (error) {
-    console.error("Error creating action:", error);
-    alert(`Terjadi kesalahan: ${error.message}`);
-  } finally {
-    setIsLoading(false);
-  }
-};
+
+    setIsLoading(true);
+    try {
+      const actionData = {
+        reportId: actionForm.reportId,
+        actionDescription: actionForm.actionDescription,
+        performed_by: currentOfficer.user_id || currentOfficer.id,
+        status: "Pending", // Tambahkan status Pending secara default
+      };
+
+      const response = await actionService.createAction(actionData);
+
+      if (response.status === "success") {
+        await loadData();
+        // Jika ingin memperbarui status laporan juga ke Pending
+        await handleUpdateStatus(actionForm.reportId, "Pending");
+
+        setShowActionModal(false);
+        setActionForm({
+          reportId: "",
+          actionDescription: "",
+          dueDate: "",
+        });
+        alert("Tindakan berhasil ditambahkan!");
+      } else {
+        throw new Error(response.message || "Gagal membuat tindakan");
+      }
+    } catch (error) {
+      console.error("Error creating action:", error);
+      alert(`Terjadi kesalahan: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleUpdateStatus = async (reportId, newStatus) => {
     setIsLoading(true);
@@ -390,7 +388,7 @@ const OfficerPage = (response) => {
         {/* Integrated NavSideBarOfficer */}
         <NavSideBarOfficer activeTab={activeTab} setActiveTab={setActiveTab} />
 
-        <div className="flex-1 ml-72">
+        <div className="lg:ml-72 transition-all duration-300">
           <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* Error Message */}
             {error && (
@@ -635,7 +633,6 @@ const OfficerPage = (response) => {
                                 Gunakan dropdown di atas untuk memilih laporan
                                 dan melihat tindakannya
                               </p>
-                             
                             </div>
                           ) : (
                             <div className="space-y-4">
