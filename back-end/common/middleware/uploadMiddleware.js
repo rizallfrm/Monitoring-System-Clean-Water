@@ -45,5 +45,5 @@ const uploadToImageKit = async (req, res, next) => {
 
 module.exports = {
   upload,
-  uploadToImageKit,
+    uploadToImageKit,
 };
