@@ -29,6 +29,7 @@ import {
   TrendingUp,
   Award,
   Shield,
+  ChevronLeft,
 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import userService from "../../services/userService";
@@ -241,7 +242,15 @@ const OfficerManagementPage = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-600/10"></div>
             <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/10 blur-3xl"></div>
             <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-white/10 blur-3xl"></div>
-
+<div className="mb-4">
+                <button
+                  onClick={() => window.history.back()}
+                  className="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/30 text-white rounded-lg backdrop-blur-sm transition-colors"
+                >
+                  <ChevronLeft className="w-5 h-5 mr-2" />
+                  Kembali ke Halaman Sebelumnya
+                </button>
+              </div>
             <div className="relative z-10">
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
                 <div className="mb-6 lg:mb-0">
