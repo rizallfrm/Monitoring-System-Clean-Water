@@ -62,7 +62,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
               Dashboard Petugas
             </h1>
             <p className="text-sm text-gray-500 mt-0.5">
-              Kelola laporan & tindakan
+              Kelola laporan & tindaka
             </p>
           </div>
         </div>
