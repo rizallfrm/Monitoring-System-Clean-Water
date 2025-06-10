@@ -65,7 +65,6 @@ const UserManagementPage = () => {
 
   const handleViewUser = (userId) => {
     // Navigate to user details
-    console.log("View user:", userId);
     setActiveDropdown(null);
   };
 
@@ -175,7 +174,6 @@ const UserManagementPage = () => {
   const handleDeleteConfirm = async () => {
     try {
       await userService.deleteUser(userToDelete?.user_id);
-      console.log("Deleting user:", userToDelete);
 
       setUsers(users.filter((user) => user.user_id !== userToDelete.user_id));
       setDeleteDialogOpen(false);

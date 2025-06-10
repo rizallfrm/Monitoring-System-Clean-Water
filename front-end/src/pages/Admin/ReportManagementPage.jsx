@@ -78,13 +78,10 @@ const ReportManagementPage = () => {
       setOfficersLoading(true);
       const data = await userService.getOfficers();
 
-      console.log("Raw officers data:", data);
-
       const validOfficers = Array.isArray(data)
         ? data.filter((officer) => officer?.user_id && officer?.name)
         : [];
 
-      console.log("Valid officers:", validOfficers);
       setOfficers(validOfficers);
     } catch (err) {
       console.error("Gagal mengambil data petugas:", err);
@@ -137,7 +134,6 @@ const ReportManagementPage = () => {
   };
 
   const handleAssignClick = (reportId) => {
-    console.log("Opening assign dialog for report:", reportId);
     setSelectedReportId(reportId);
     setAssignDialogOpen(true);
     setSelectedOfficer(null);
@@ -517,17 +513,22 @@ const ReportManagementPage = () => {
                           <div className="ml-6 flex-shrink-0">
                             <button
                               onClick={() => handleAssignClick(report.id)}
-                              disabled={!!report.assigned_to}
                               className={`inline-flex items-center px-6 py-3 rounded-xl space-x-2 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 ${
-                                report.assigned_to
+                                report.assigned_to &&
+                                report.assigned_to !== "Belum ditugaskan"
                                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                                   : "bg-blue-600 hover:bg-blue-700 text-white"
                               }`}
+                              disabled={
+                                report.assigned_to &&
+                                report.assigned_to !== "Belum ditugaskan"
+                              }
                             >
                               <UserCheck className="w-4 h-4" />
                               <span className="font-medium">
-                                {report.assigned_to
-                                  ? "Sudah Ditugaskan"
+                                {report.assigned_to &&
+                                report.assigned_to !== "Belum ditugaskan"
+                                  ? `Sudah Ditugaskan`
                                   : "Tugaskan Petugas"}
                               </span>
                             </button>
@@ -657,19 +658,19 @@ const ReportManagementPage = () => {
 
         {notification.show && (
           <div
-            className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${
+            className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 p-4 rounded-lg shadow-lg animate-fade-in ${
               notification.type === "success"
                 ? "bg-green-100 text-green-800 border border-green-200"
                 : "bg-red-100 text-red-800 border border-red-200"
             }`}
           >
-            <div className="flex items-center">
+            <div className="flex items-center justify-center">
               {notification.type === "success" ? (
                 <CheckCircle className="w-5 h-5 mr-2" />
               ) : (
                 <AlertTriangle className="w-5 h-5 mr-2" />
               )}
-              <span>{notification.message}</span>
+              <span className="text-center">{notification.message}</span>
             </div>
           </div>
         )}

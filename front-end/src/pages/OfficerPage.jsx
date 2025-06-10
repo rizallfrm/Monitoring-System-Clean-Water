@@ -68,7 +68,6 @@ const OfficerPage = (response) => {
   }, [activeTab, currentOfficerId]);
 
   const handleReportClick = (report) => {
-    console.log("Selected report:", report);
     setSelectedReport(report);
   };
 
@@ -96,7 +95,6 @@ const OfficerPage = (response) => {
   };
 
   const handleViewActionsFromReport = (reportId) => {
-    console.log("View actions for report:", reportId);
     setSelectedReportId(reportId);
     loadActionsForReport(reportId);
     setActiveTab("actions");
@@ -137,7 +135,6 @@ const OfficerPage = (response) => {
     setActionsError(null);
     try {
       const response = await actionService.getActionsByReportId(reportId);
-      console.log("Response dari API:", response);
       if (response.status === "success") {
         setActions(Array.isArray(response.data) ? response.data : []);
         setSelectedReportId(reportId);
@@ -240,7 +237,6 @@ const OfficerPage = (response) => {
       const officerId =
         localStorage.getItem("officerId") || "current-officer-id";
 
-      console.log("Assigning report", reportId, "to officer", officerId);
       const response = await reportService.assignOfficer(reportId, {
         officerId,
       });

@@ -52,7 +52,6 @@ export const AuthProvider = ({ children }) => {
         credentials.email.trim(),
         credentials.password.trim()
       );
-      console.log("RESPONSE DATA LENGKAP >>>", response.data);
 
       const data = response?.data;
 

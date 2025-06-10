@@ -197,7 +197,6 @@ const ReportDetail = ({ report, statusHistory, onClose, loading }) => {
     setActionsError(null);
     try {
       const response = await actionService.getActionsByReportId(reportId);
-      console.log("Response dari API:", response);
       if (response.status === "success") {
         setActions(Array.isArray(response.data) ? response.data : []);
       } else {

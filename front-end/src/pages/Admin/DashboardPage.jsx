@@ -48,7 +48,6 @@ const DashboardPage = () => {
           }),
         ]);
 
-        console.log("Data yang diterima:", { statusStats, reports, users });
 
         const officerCount = users.filter(
           (user) => user.role === "Petugas"

@@ -21,7 +21,6 @@ export default function UserPage() {
       try {
         setLoading(true);
         const reportsData = await reportService.getAllReports();
-        console.log("Fetched reports:", reportsData);
 
         setReports(reportsData);
       } catch (err) {

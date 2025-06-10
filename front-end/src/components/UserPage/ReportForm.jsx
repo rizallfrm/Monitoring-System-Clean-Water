@@ -52,7 +52,6 @@ const ReportForm = ({ onReportCreated }) => {
       // Kirim ke service
       const createdReport = await reportService.createReport(formData, files);
 
-      console.log("Report created:", createdReport); // Debug
 
       if (createdReport.status === "error") {
         throw new Error(createdReport.message);

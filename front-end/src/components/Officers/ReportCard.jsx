@@ -65,8 +65,6 @@ const ReportCard = ({ report, onView, onAssign, onAddAction }) => {
         onAssign(reportId);
       }
 
-      // Tambahkan notifikasi sukses jika diperlukan
-      console.log("Laporan berhasil diassign");
     } catch (error) {
       console.error("Gagal mengassign laporan:", error);
       // Tambahkan notifikasi error jika diperlukan

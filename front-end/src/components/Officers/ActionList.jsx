@@ -12,7 +12,6 @@ const ActionList = ({ reportId }) => {
   setError(null);
   try {
     const response = await actionService.getActionsByReportId(reportId);
-    console.log("Full response:", response); // Debugging
     
     if (response.status === "success" && Array.isArray(response.data)) {
       // Format data sesuai response Postman

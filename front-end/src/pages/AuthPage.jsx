@@ -62,11 +62,9 @@ const AuthPage = () => {
           role: "Warga",
         };
 
-        console.log("Attempting register with:", userData); // Debug
         await authService.register(userData); // 👈 Register dulu
 
         // 3. Auto-login setelah register
-        console.log("Attempting auto-login...");
         const loginResult = await authService.login({
           email: userData.email,
           password: userData.password,
