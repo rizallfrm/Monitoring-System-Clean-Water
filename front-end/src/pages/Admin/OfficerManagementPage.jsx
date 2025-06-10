@@ -235,7 +235,7 @@ const OfficerManagementPage = () => {
           onOfficerAdded={handleOfficerAdded}
         />
         <Navbar />
-        <div className="mb-8 px-80 pt-8">
+        <div className="mb-8 mx-auto md:max-w-7xl px-4 pt-10 sm:px-6 lg:px-8 sm:max-w-96 ">
           <div className="relative  overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 p-6 shadow-xl">
             {/* Background decorative elements */}
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-600/10"></div>
@@ -251,7 +251,7 @@ const OfficerManagementPage = () => {
                     </div>
                     <div>
                       <h1 className="text-3xl font-bold text-white">
-                        User Management
+                        Officer Management
                       </h1>
                       <p className="text-blue-100 mt-2 ">
                         Kelola dan pantau semua petugas yang terdaftar dalam
