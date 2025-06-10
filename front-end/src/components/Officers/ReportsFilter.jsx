@@ -3,12 +3,12 @@ import { Search, Filter, SlidersHorizontal } from 'lucide-react';
 
 const ReportsFilter = ({ searchTerm, setSearchTerm, filterStatus, setFilterStatus }) => {
   return (
-    <div className="bg-white rounded-xl sm:rounded-2xl shadow-md sm:shadow-lg border border-gray-100 p-4 sm:p-6 mb-4 sm:mb-6 relative overflow-hidden">
+    <div className=" bg-white rounded-xl sm:rounded-2xl shadow-md sm:shadow-lg border border-gray-100 p-4 sm:p-6 mb-4 sm:mb-6 relative overflow-hidden">
       {/* Background decorative elements */}
-      <div className="absolute top-0 right-0 w-64 h-32 bg-gradient-to-l from-blue-50/30 to-transparent rounded-full -translate-y-16 translate-x-32 hidden sm:block"></div>
-      <div className="absolute bottom-0 left-0 w-48 h-24 bg-gradient-to-r from-purple-50/30 to-transparent rounded-full translate-y-12 -translate-x-24 hidden sm:block"></div>
+      <div className=" absolute top-0 right-0 w-64 h-32 bg-gradient-to-l from-blue-50/30 to-transparent rounded-full -translate-y-16 translate-x-32 hidden sm:block"></div>
+      <div className=" absolute bottom-0 left-0 w-48 h-24 bg-gradient-to-r from-purple-50/30 to-transparent rounded-full translate-y-12 -translate-x-24 hidden sm:block"></div>
       
-      <div className="relative z-10">
+      <div className="relative z-10 ">
         <div className="flex items-center mb-3 sm:mb-4">
           <div className="p-1.5 sm:p-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg sm:rounded-lg mr-2 sm:mr-3">
             <SlidersHorizontal className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
