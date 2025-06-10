@@ -54,7 +54,6 @@ if (require.main === module) {
     
     try {
       await sequelize.authenticate();
-      console.log('Koneksi database berhasil');
     } catch (error) {
       console.error('Tidak dapat terhubung ke database:', error);
     }
