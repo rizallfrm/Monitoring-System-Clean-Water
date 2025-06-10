@@ -1,17 +1,27 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Home, FileText, CheckCircle, LogOut, Activity, User, ChevronDown, Menu, X 
-} from 'lucide-react';
-import { useAuth } from '../Context/authContext';
-import authService from '../services/authService';
-import ProfileSection from '../components/UserPage/ProfileSection';
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Home,
+  FileText,
+  CheckCircle,
+  LogOut,
+  Activity,
+  User,
+  ChevronDown,
+  Menu,
+  X,
+  AlignLeft,
+  Sidebar,
+} from "lucide-react";
+import { useAuth } from "../Context/authContext";
+import authService from "../services/authService";
+import ProfileSection from "../components/UserPage/ProfileSection";
 import Logo from "../../public/logo.png";
 
 const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
   const { user, logout } = useAuth();
   const [userProfile, setUserProfile] = useState({
-    name: 'Loading...',
-    role: 'Loading...'
+    name: "Loading...",
+    role: "Loading...",
   });
   const [loading, setLoading] = useState(true);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -28,8 +38,8 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   // Close dropdown when clicking outside
@@ -38,14 +48,18 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
       }
-      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target) && !event.target.closest('.mobile-menu-button')) {
+      if (
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target) &&
+        !event.target.closest(".mobile-menu-button")
+      ) {
         setIsMobileMenuOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -56,8 +70,8 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
         setIsMobileMenuOpen(false);
       }
     };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // Fetch user profile for sidebar
@@ -67,14 +81,14 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
         setLoading(true);
         const profile = await authService.getProfile();
         setUserProfile({
-          name: profile.name || 'Unknown User',
-          role: profile.role || 'Unknown Role'
+          name: profile.name || "Unknown User",
+          role: profile.role || "Unknown Role",
         });
       } catch (error) {
-        console.error('Failed to fetch user profile:', error);
+        console.error("Failed to fetch user profile:", error);
         setUserProfile({
-          name: 'Petugas',
-          role: 'Petugas Lapangan'
+          name: "Petugas",
+          role: "Petugas Lapangan",
         });
       } finally {
         setLoading(false);
@@ -115,11 +129,11 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
   };
 
   const getInitials = (name) => {
-    if (!name || name === 'Loading...') return 'JP';
+    if (!name || name === "Loading...") return "JP";
     return name
-      .split(' ')
-      .map(word => word.charAt(0))
-      .join('')
+      .split(" ")
+      .map((word) => word.charAt(0))
+      .join("")
       .toUpperCase()
       .slice(0, 2);
   };
@@ -127,25 +141,17 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
   return (
     <>
       {/* Navbar */}
-      <nav className={`fixed top-0 left-0 right-0 w-full z-50 transition-all duration-300 ${
-        isScrolled
-          ? 'bg-white/95 backdrop-blur-lg shadow-lg border-b border-gray-200/50'
-          : 'bg-white/90 backdrop-blur-sm shadow-sm border-b border-gray-100'
-      }`}>
+      <nav
+        className={`fixed top-0 left-0 right-0 w-full z-50 transition-all duration-300 ${
+          isScrolled
+            ? "bg-white/95 backdrop-blur-lg shadow-lg border-b border-gray-200/50"
+            : "bg-white/90 backdrop-blur-sm shadow-sm border-b border-gray-100"
+        }`}
+      >
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo and Mobile Menu Button */}
             <div className="flex items-center">
-              <button 
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden mr-4 mobile-menu-button"
-              >
-                {isMobileMenuOpen ? (
-                  <X className="h-6 w-6 text-gray-600" />
-                ) : (
-                  <Menu className="h-6 w-6 text-gray-600" />
-                )}
-              </button>
               <div className="flex items-center group cursor-pointer">
                 <img
                   src={Logo}
@@ -153,8 +159,16 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
                   className="h-40 w-auto transform group-hover:scale-105 transition-transform duration-200 mt-2"
                 />
               </div>
+              {/* Floating Menu Button - Kecil dan di pojok kiri bawah */}
             </div>
-
+            {!isMobileMenuOpen && (
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="fixed top-20  left-4 z-50 p-2 text-black rounded-full shadow hover:bg-white/20 transition-colors lg:hidden"
+              >
+                <Sidebar className="h-7 w-7" /> {/* Ukuran lebih kecil */}
+              </button>
+            )}
             {/* Right Section - User Profile */}
             <div className="flex items-center">
               {user && (
@@ -171,17 +185,21 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
                     </div>
                     <div className="hidden md:block text-left">
                       <p className="text-sm font-semibold text-gray-900 leading-tight">
-                        {user.name || user.email?.split('@')[0]}
+                        {user.name || user.email?.split("@")[0]}
                       </p>
                       <p className="text-xs text-gray-500 leading-tight">
-                        {user.role === 'Admin' ? 'Admin' :
-                          user.role === 'Petugas' ? 'Petugas' :
-                            user.role === 'Warga' ? 'Warga' : 'Petugas'}
+                        {user.role === "Admin"
+                          ? "Admin"
+                          : user.role === "Petugas"
+                          ? "Petugas"
+                          : user.role === "Warga"
+                          ? "Warga"
+                          : "Petugas"}
                       </p>
                     </div>
                     <ChevronDown
                       className={`h-4 w-4 text-gray-500 transition-all duration-300 ${
-                        isDropdownOpen ? 'rotate-180 text-blue-500' : ''
+                        isDropdownOpen ? "rotate-180 text-blue-500" : ""
                       }`}
                     />
                   </button>
@@ -200,16 +218,20 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-bold text-gray-900 truncate">
-                              {user.name || 'User'}
+                              {user.name || "User"}
                             </p>
                             <p className="text-xs text-gray-500 truncate">
                               {user.email}
                             </p>
                             {user.role && (
                               <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 mt-1">
-                                {user.role === 'Admin' ? 'Admin' :
-                                  user.role === 'Petugas' ? 'Petugas' :
-                                    user.role === 'Warga' ? 'Warga' : 'Petugas'}
+                                {user.role === "Admin"
+                                  ? "Admin"
+                                  : user.role === "Petugas"
+                                  ? "Petugas"
+                                  : user.role === "Warga"
+                                  ? "Warga"
+                                  : "Petugas"}
                               </span>
                             )}
                           </div>
@@ -227,7 +249,9 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
                           </div>
                           <div className="text-left">
                             <p className="font-medium">Profil Saya</p>
-                            <p className="text-xs text-gray-500">Kelola informasi akun</p>
+                            <p className="text-xs text-gray-500">
+                              Kelola informasi akun
+                            </p>
                           </div>
                         </button>
 
@@ -242,7 +266,9 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
                           </div>
                           <div className="text-left">
                             <p className="font-medium">Keluar</p>
-                            <p className="text-xs text-red-500">Logout dari sistem</p>
+                            <p className="text-xs text-red-500">
+                              Logout dari sistem
+                            </p>
                           </div>
                         </button>
                       </div>
@@ -257,7 +283,10 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
 
       {/* Mobile Sidebar Overlay */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 bg-red/50 lg:hidden z-40" onClick={() => setIsMobileMenuOpen(false)}></div>
+        <div
+          className="fixed inset-0 bg-red/50 lg:hidden z-40"
+          onClick={() => setIsMobileMenuOpen(false)}
+        ></div>
       )}
 
       {/* Sidebar - Desktop */}
@@ -280,8 +309,7 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
               <p className="text-sm text-slate-500 mt-1">
                 Kelola laporan & tindakan
               </p>
-              <div className="mt-2 flex items-center space-x-2">
-              </div>
+              <div className="mt-2 flex items-center space-x-2"></div>
             </div>
           </div>
         </div>
@@ -341,7 +369,9 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
                   }`}
                 />
               </div>
-              <span className="relative z-10 flex-1 text-left">{tab.label}</span>
+              <span className="relative z-10 flex-1 text-left">
+                {tab.label}
+              </span>
               {activeTab === tab.id && (
                 <div className="ml-auto relative z-10">
                   <div className="w-2 h-2 bg-white rounded-full animate-pulse shadow-sm"></div>
@@ -354,9 +384,7 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
         {/* Footer */}
         <div className="p-6 border-t border-slate-200/60 relative z-10 bg-white/40 backdrop-blur-sm">
           <div className="text-center">
-            <p className="text-xs text-slate-500">
-              © 2025 Hydroflow System
-            </p>
+            <p className="text-xs text-slate-500">© 2025 Hydroflow System</p>
             <p className="text-xs text-slate-400 mt-1">
               Dashboard Petugas v1.0
             </p>
@@ -365,12 +393,19 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
       </div>
 
       {/* Mobile Sidebar */}
-      <div 
+      <div
         ref={mobileMenuRef}
         className={`lg:hidden fixed top-0 left-0 h-full w-72 bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 shadow-2xl border-r border-slate-200/60 flex flex-col overflow-hidden pt-16 backdrop-blur-sm z-40 transform transition-all duration-300 ease-in-out ${
-          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
+        {/* Close Button di dalam Sidebar Mobile */}
+        <button
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="absolute top-4 right-4 p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
+        >
+          <X className="h-5 w-5" />
+        </button>
         {/* Background decorative elements */}
         <div className="absolute top-0 right-0 w-40 h-80 bg-gradient-to-bl from-blue-100/40 via-cyan-50/30 to-transparent"></div>
         <div className="absolute bottom-0 left-0 w-48 h-64 bg-gradient-to-tr from-indigo-100/40 via-purple-50/30 to-transparent"></div>
@@ -448,7 +483,9 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
                   }`}
                 />
               </div>
-              <span className="relative z-10 flex-1 text-left">{tab.label}</span>
+              <span className="relative z-10 flex-1 text-left">
+                {tab.label}
+              </span>
               {activeTab === tab.id && (
                 <div className="ml-auto relative z-10">
                   <div className="w-2 h-2 bg-white rounded-full animate-pulse shadow-sm"></div>
@@ -461,9 +498,7 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
         {/* Footer */}
         <div className="p-6 border-t border-slate-200/60 relative z-10 bg-white/40 backdrop-blur-sm">
           <div className="text-center">
-            <p className="text-xs text-slate-500">
-              © 2025 Hydroflow System
-            </p>
+            <p className="text-xs text-slate-500">© 2025 Hydroflow System</p>
             <p className="text-xs text-slate-400 mt-1">
               Dashboard Petugas v1.0
             </p>
@@ -481,14 +516,26 @@ const NavSideBarOfficer = ({ activeTab, setActiveTab }) => {
                   <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
                     Profil Pengguna
                   </h2>
-                  <p className="text-sm text-gray-500 mt-1">Kelola informasi akun Anda</p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Kelola informasi akun Anda
+                  </p>
                 </div>
                 <button
                   onClick={() => setShowProfileModal(false)}
                   className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full p-2 transition-all duration-200"
                 >
-                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
