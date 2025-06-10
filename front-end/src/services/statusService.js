@@ -37,19 +37,17 @@ const statusService = {
 
   getStatusStatistics: async () => {
     try {
-      console.log("Mengambil statistik status...");
       const response = await api("status").get("/status/status-statistics");
 
-      console.log("Response statistik:", response.data);
 
       // Pastikan struktur data sesuai dengan backend
       const backendData = response.data.data || response.data;
 
       return {
         pending: parseInt(backendData.pending) || 0,
-        onGoing: parseInt(backendData.onGoing) || 0, // Sesuaikan dengan backend
+        onGoing: parseInt(backendData.onGoing) || 0, 
         completed: parseInt(backendData.completed) || 0,
-        cancelled: parseInt(backendData.cancelled) || 0, // Sesuaikan dengan backend
+        cancelled: parseInt(backendData.cancelled) || 0, 
       };
     } catch (error) {
       console.error("Gagal mengambil statistik status:", {

@@ -3,14 +3,10 @@ import { api } from "./apiService";
 const authService = {
   login: async (email, password) => {
     try {
-      console.log("Sending login request with:", { email, password });
       const response = await api("user").post("/users/login", {
         email,
         password,
       });
-
-      console.log("Full response:", response);
-      console.log("Response data:", response.data);
 
       if (!response || !response.data) {
         throw new Error("Invalid server response");
@@ -20,7 +16,6 @@ const authService = {
         throw new Error("Missing data in response");
       }
       const data = response.data.data;
-      console.log("Login token:", data.token);
 
       return {
         data: response.data.data,

@@ -35,7 +35,6 @@ const createApiInstance = (serviceName) => {
       ) {
         config.headers["Content-Type"] = "application/json";
       }
-      console.log(`Mengirim request ke: ${config.baseURL}${config.url}`); // Logging
       return config;
     },
     (error) => {

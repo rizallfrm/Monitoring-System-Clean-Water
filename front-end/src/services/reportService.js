@@ -58,7 +58,6 @@ const reportService = {
       });
 
       const response = await apiInstance.get(`/reports/reports/${id}`);
-      console.log("Full API response:", response);
 
       // Pastikan struktur data sesuai
       if (response.data && response.data.status === "success") {

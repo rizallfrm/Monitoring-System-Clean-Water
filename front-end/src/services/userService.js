@@ -12,7 +12,6 @@ const userService = {
 
   getProfile: async () => {
     try {
-      console.log("Get profile");
       const response = await api("user").get("/users/profile");
       return response.data;
     } catch (error) {

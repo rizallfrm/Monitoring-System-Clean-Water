@@ -17,8 +17,6 @@ const actionService = {
       );
 
       // Debugging response structure
-      console.log("Raw API response:", response);
-
       if (response.data && response.data.status === "success") {
         return response.data;
       }
