@@ -417,7 +417,7 @@ const OfficerPage = (response) => {
             ) : (
               <>
                 {activeTab === "dashboard" && (
-                  <div className="space-y-8">
+                  <div className="space-y-8 pt-10">
                     {/* Enhanced Recent Reports */}
                     <div className="relative">
                       <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-purple-600/5 rounded-2xl"></div>
@@ -495,7 +495,7 @@ const OfficerPage = (response) => {
                 )}
 
                 {activeTab === "reports" && (
-                  <div className="space-y-6">
+                  <div className="space-y-6 pt-10">
                     {/* Enhanced Filter Section */}
                     <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 p-6">
                       <ReportsFilter
@@ -546,7 +546,7 @@ const OfficerPage = (response) => {
                 )}
 
                 {activeTab === "actions" && (
-                  <div className="space-y-6">
+                  <div className="space-y-6 pt-10">
                     <div className="relative">
                       <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/5 to-blue-600/5 rounded-2xl"></div>
                       <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 relative">
