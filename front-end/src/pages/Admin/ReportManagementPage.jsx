@@ -13,6 +13,7 @@ import {
   ChevronDown,
   MapPin,
   Shield,
+  ChevronLeft,
 } from "lucide-react";
 import reportService from "../../services/reportService";
 import userService from "../../services/userService";
@@ -67,7 +68,11 @@ const ReportManagementPage = () => {
   const [selectedOfficer, setSelectedOfficer] = useState(null);
   const [assignLoading, setAssignLoading] = useState(false);
   const [officersLoading, setOfficersLoading] = useState(false);
-
+  const [notification, setNotification] = useState({
+    show: false,
+    message: "",
+    type: "",
+  });
   const fetchOfficers = async () => {
     try {
       setOfficersLoading(true);
@@ -96,10 +101,19 @@ const ReportManagementPage = () => {
         const data = await reportService.getAllReports();
 
         const normalizedReports = Array.isArray(data)
-          ? data.map((report, index) => ({
-              ...report,
-              id: report.report_id || index + 1,
-            }))
+          ? data.map((report, index) => {
+              // Cari nama officer jika assigned_to berisi user_id
+              const officerName =
+                report.assigned_to &&
+                officers.find((o) => o.user_id === report.assigned_to)?.name;
+
+              return {
+                ...report,
+                id: report.report_id || index + 1,
+                assigned_to:
+                  officerName || report.assigned_to || "Belum ditugaskan",
+              };
+            })
           : [];
 
         setReports(normalizedReports);
@@ -113,6 +127,9 @@ const ReportManagementPage = () => {
 
     fetchReports();
     fetchOfficers(); // Now we can call it here
+  }, []);
+  useEffect(() => {
+    fetchOfficers();
   }, []);
 
   const handleSearchChange = (e) => {
@@ -132,6 +149,7 @@ const ReportManagementPage = () => {
     try {
       setAssignLoading(true);
       await reportService.assignOfficer(selectedReportId, selectedOfficer);
+
       // Update UI
       setReports(
         reports.map((report) =>
@@ -146,15 +164,28 @@ const ReportManagementPage = () => {
         )
       );
 
+      // Tampilkan notifikasi sukses
+      setNotification({
+        show: true,
+        message: "Petugas berhasil ditugaskan!",
+        type: "success",
+      });
+
+      // Sembunyikan notifikasi setelah 3 detik
+      setTimeout(() => {
+        setNotification({ show: false, message: "", type: "" });
+      }, 3000);
+
       setAssignDialogOpen(false);
       setSelectedReportId(null);
       setSelectedOfficer(null);
-
-      // Notifikasi sukses
-      console.log("Petugas berhasil ditugaskan!");
     } catch (err) {
       console.error("Gagal menugaskan petugas:", err);
-      console.log(err.message || "Gagal menugaskan petugas");
+      setNotification({
+        show: true,
+        message: err.message || "Gagal menugaskan petugas",
+        type: "error",
+      });
     } finally {
       setAssignLoading(false);
     }
@@ -295,7 +326,15 @@ const ReportManagementPage = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-600/10"></div>
               <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/10 blur-3xl"></div>
               <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-white/10 blur-3xl"></div>
-
+              <div className="mb-4">
+                <button
+                  onClick={() => window.history.back()}
+                  className="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/30 text-white rounded-lg backdrop-blur-sm transition-colors"
+                >
+                  <ChevronLeft className="w-5 h-5 mr-2" />
+                  Kembali ke Halaman Sebelumnya
+                </button>
+              </div>
               <div className="relative z-10">
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
                   <div className="mb-6 lg:mb-0">
@@ -310,8 +349,9 @@ const ReportManagementPage = () => {
                         <p className="text-blue-100 mt-2">
                           Pantau dan kelola seluruh laporan masuk secara
                           real-time. <br />
-                          Lacak status, tanggapi keluhan dengan menugaskan petugas, dan optimalkan
-                          resolusi masalah dengan workflow terstruktur.
+                          Lacak status, tanggapi keluhan dengan menugaskan
+                          petugas, dan optimalkan resolusi masalah dengan
+                          workflow terstruktur.
                         </p>
                       </div>
                     </div>
@@ -465,7 +505,11 @@ const ReportManagementPage = () => {
                           <div className="flex items-center space-x-2">
                             <UserCheck className="w-4 h-4 text-purple-500" />
                             <span>
-                              {report.assigned_to || "Belum ditugaskan"}
+                              {report.assigned_to
+                                ? officers.find(
+                                    (o) => o.user_id === report.assigned_to
+                                  )?.name || report.assigned_to
+                                : "Belum ditugaskan"}
                             </span>
                           </div>
                         </div>
@@ -473,11 +517,18 @@ const ReportManagementPage = () => {
                           <div className="ml-6 flex-shrink-0">
                             <button
                               onClick={() => handleAssignClick(report.id)}
-                              className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl space-x-2 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
+                              disabled={!!report.assigned_to}
+                              className={`inline-flex items-center px-6 py-3 rounded-xl space-x-2 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 ${
+                                report.assigned_to
+                                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                  : "bg-blue-600 hover:bg-blue-700 text-white"
+                              }`}
                             >
                               <UserCheck className="w-4 h-4" />
                               <span className="font-medium">
-                                Tugaskan Petugas
+                                {report.assigned_to
+                                  ? "Sudah Ditugaskan"
+                                  : "Tugaskan Petugas"}
                               </span>
                             </button>
                           </div>
@@ -602,6 +653,25 @@ const ReportManagementPage = () => {
             className="fixed inset-0 z-10"
             onClick={() => setShowFilterDropdown(false)}
           />
+        )}
+
+        {notification.show && (
+          <div
+            className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${
+              notification.type === "success"
+                ? "bg-green-100 text-green-800 border border-green-200"
+                : "bg-red-100 text-red-800 border border-red-200"
+            }`}
+          >
+            <div className="flex items-center">
+              {notification.type === "success" ? (
+                <CheckCircle className="w-5 h-5 mr-2" />
+              ) : (
+                <AlertTriangle className="w-5 h-5 mr-2" />
+              )}
+              <span>{notification.message}</span>
+            </div>
+          </div>
         )}
       </div>
 
