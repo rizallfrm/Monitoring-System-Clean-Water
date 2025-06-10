@@ -11,7 +11,6 @@ const userController = {
       console.log("Role dari token:", req.user?.role);
 
       const { name, email, password, phone, role } = req.body;
-      console.log("EMAIL YANG MASUK:", email);
 
       // Periksa apakah email sudah terdaftar
       const existingUser = await User.findOne({ where: { email } });
@@ -61,7 +60,6 @@ const userController = {
         data: userWithoutPassword,
       });
     } catch (error) {
-      console.log("BODY YANG DITERIMA:", req.body);
 
       console.error(error);
       return res.status(500).json({
@@ -75,7 +73,6 @@ const userController = {
   // Login user
   login: async (req, res) => {
     try {
-      console.log("Request body:", req.body);
       const { email, password } = req.body;
 
       // Cari user berdasarkan email
